@@ -1,5 +1,5 @@
 #include "ui_ble_scan.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "../hardware/ble_driver.h"
 #include "ui_menu_ble.h"
 

@@ -1,5 +1,6 @@
 import hashlib
 import sys
+import platform
 from typing import TYPE_CHECKING, Any
 import requests
 
@@ -13,7 +14,10 @@ from os import makedirs, remove, rename
 from os.path import basename, dirname, exists, isfile, join
 
 # Get the pio executable path from the same Python environment
-PIO_PATH = join(dirname(dirname(sys.executable)), "bin", "pio")
+if platform.system() == "Windows":
+    PIO_PATH = join(dirname(sys.executable), "pio.exe")
+else:
+    PIO_PATH = join(dirname(dirname(sys.executable)), "bin", "pio")
 
 Import("env")  # type: ignore
 
@@ -45,8 +49,17 @@ else:
                 % (PIO_PATH, mcu, mcu, original_file, patched_file)
             )
 
+        # Ensure files are writable before operations
+        import stat
+        import os
+        
         if isfile("%s.old" % (original_file)):
+            os.chmod("%s.old" % (original_file), stat.S_IWRITE)
             remove("%s.old" % (original_file))
+            
+        if isfile(original_file):
+             os.chmod(original_file, stat.S_IWRITE)
+             
         rename(original_file, "%s.old" % (original_file))
         rename(patched_file, original_file)
 

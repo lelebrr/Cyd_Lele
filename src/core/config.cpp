@@ -1,7 +1,7 @@
 ﻿#include "config.h"
 #include "sd_functions.h"
 
-JsonDocument leleConfig::toJson() const {
+JsonDocument LeleConfig::toJson() const {
     JsonDocument jsonDoc;
     JsonObject setting = jsonDoc.to<JsonObject>();
 
@@ -117,7 +117,7 @@ JsonDocument leleConfig::toJson() const {
     return jsonDoc;
 }
 
-void leleConfig::fromFile(bool checkFS) {
+void LeleConfig::fromFile(bool checkFS) {
     FS *fs;
     if (checkFS) {
         if (!getFsStorage(fs)) {
@@ -514,7 +514,7 @@ void leleConfig::fromFile(bool checkFS) {
     log_i("Using config from file");
 }
 
-void leleConfig::saveFile() {
+void LeleConfig::saveFile() {
     FS *fs = &LittleFS;
     JsonDocument jsonDoc = toJson();
 
@@ -536,14 +536,14 @@ void leleConfig::saveFile() {
     if (setupSdCard()) copyToFs(LittleFS, SD, filepath, false);
 }
 
-void leleConfig::factoryReset() {
+void LeleConfig::factoryReset() {
     FS *fs = &LittleFS;
     fs->rename(String(filepath), "/bak." + String(filepath).substring(1));
     if (setupSdCard()) SD.rename(String(filepath), "/bak." + String(filepath).substring(1));
     ESP.restart();
 }
 
-void leleConfig::validateConfig() {
+void LeleConfig::validateConfig() {
     validateRotationValue();
     validateDimmerValue();
     validateBrightValue();
@@ -573,128 +573,126 @@ void leleConfig::validateConfig() {
     validateEvilPasswordMode();
 }
 
-void leleConfig::setUiColor(uint16_t primary, uint16_t *secondary, uint16_t *background) {
+void LeleConfig::setUiColor(uint16_t primary, uint16_t *secondary, uint16_t *background) {
     LeleTheme::_setUiColor(primary, secondary, background);
     saveFile();
 }
 
-void leleConfig::setRotation(int value) {
+void LeleConfig::setRotation(int value) {
     rotation = value;
     validateRotationValue();
     saveFile();
 }
 
-void leleConfig::validateRotationValue() {
+void LeleConfig::validateRotationValue() {
     if (rotation < 0 || rotation > 3) rotation = 1;
 }
 
-void leleConfig::setDimmer(int value) {
+void LeleConfig::setDimmer(int value) {
     dimmerSet = value;
     validateDimmerValue();
     saveFile();
 }
 
-void leleConfig::validateDimmerValue() {
+void LeleConfig::validateDimmerValue() {
     if (dimmerSet < 0) dimmerSet = 10;
     if (dimmerSet > 60) dimmerSet = 0;
 }
 
-void leleConfig::setBright(uint8_t value) {
+void LeleConfig::setBright(uint8_t value) {
     bright = value;
     validateBrightValue();
     saveFile();
 }
 
-void leleConfig::validateBrightValue() {
+void LeleConfig::validateBrightValue() {
     if (bright > 100) bright = 100;
 }
 
-void leleConfig::setTmz(float value) {
+void LeleConfig::setTmz(float value) {
     tmz = value;
     validateTmzValue();
     saveFile();
 }
 
-void leleConfig::validateTmzValue() {
+void LeleConfig::validateTmzValue() {
     if (tmz < -12 || tmz > 14) tmz = 0;
 }
 
-void leleConfig::setSoundEnabled(int value) {
+void LeleConfig::setSoundEnabled(int value) {
     soundEnabled = value;
     validateSoundEnabledValue();
     saveFile();
 }
 
-void leleConfig::setSoundVolume(int value) {
+void LeleConfig::setSoundVolume(int value) {
     soundVolume = value;
     validateSoundVolumeValue();
     saveFile();
 }
 
-void leleConfig::validateSoundEnabledValue() {
+void LeleConfig::validateSoundEnabledValue() {
     if (soundEnabled > 1) soundEnabled = 1;
 }
 
-void leleConfig::validateSoundVolumeValue() {
+void LeleConfig::validateSoundVolumeValue() {
     if (soundVolume > 100) soundVolume = 100;
 }
 
-void leleConfig::setWifiAtStartup(int value) {
+void LeleConfig::setWifiAtStartup(int value) {
     wifiAtStartup = value;
     validateWifiAtStartupValue();
     saveFile();
 }
 
-void leleConfig::validateWifiAtStartupValue() {
+void LeleConfig::validateWifiAtStartupValue() {
     if (wifiAtStartup > 1) wifiAtStartup = 1;
 }
 
 #ifdef HAS_RGB_LED
-void leleConfig::setLedBright(int value) {
+void LeleConfig::setLedBright(int value) {
     ledBright = value;
     validateLedBrightValue();
     saveFile();
 }
 
-void leleConfig::validateLedBrightValue() { ledBright = max(0, min(100, ledBright)); }
+void LeleConfig::validateLedBrightValue() { ledBright = max(0, min(100, ledBright)); }
 
-void leleConfig::setLedColor(uint32_t value) {
+void LeleConfig::setLedColor(uint32_t value) {
     ledColor = value;
     validateLedColorValue();
     saveFile();
 }
 
-void leleConfig::validateLedColorValue() {
-    ledColor = max<uint32_t>(0, min<uint32_t>(0xFFFFFFFF, ledColor));
-}
+void LeleConfig::validateLedColorValue() { ledColor = max<uint32_t>(0, min<uint32_t>(0xFFFFFFFF, ledColor)); }
 
-void leleConfig::setLedBlinkEnabled(int value) {
+void LeleConfig::setLedBlinkEnabled(int value) {
     ledBlinkEnabled = value;
     validateLedBlinkEnabledValue();
     saveFile();
 }
 
-void leleConfig::validateLedBlinkEnabledValue() {
+void LeleConfig::validateLedBlinkEnabledValue() {
     if (ledBlinkEnabled > 1) ledBlinkEnabled = 1;
 }
 
-void leleConfig::setLedEffect(int value) {
+void LeleConfig::setLedEffect(int value) {
     ledEffect = value;
     validateLedEffectValue();
     saveFile();
 }
 
-void leleConfig::validateLedEffectValue() {
+void LeleConfig::validateLedEffectValue() {
     if (ledEffect < 0 || ledEffect > 5) ledEffect = 0;
 }
 
-void leleConfig::setLedEffectSpeed(int value) {
+void LeleConfig::setLedEffectSpeed(int value) {
     ledEffectSpeed = value;
     validateLedEffectSpeedValue();
     saveFile();
 }
 
-void leleConfig::validateLedEffectSpeedValue() {
+void LeleConfig::validateLedEffectSpeedValue() {
 #ifdef HAS_ENCODER_LED
     if (ledEffectSpeed > 11) ledEffectSpeed = 11;
 #else
@@ -703,58 +701,58 @@ void leleConfig::validateLedEffectSpeedValue() {
     if (ledEffectSpeed < 0) ledEffectSpeed = 1;
 }
 
-void leleConfig::setLedEffectDirection(int value) {
+void LeleConfig::setLedEffectDirection(int value) {
     ledEffectDirection = value;
     validateLedEffectDirectionValue();
     saveFile();
 }
 
-void leleConfig::validateLedEffectDirectionValue() {
+void LeleConfig::validateLedEffectDirectionValue() {
     if (ledEffectDirection > 1 || ledEffectDirection == 0) ledEffectDirection = 1;
     if (ledEffectDirection < -1) ledEffectDirection = -1;
 }
 #endif
 
-void leleConfig::setWebUICreds(const String &usr, const String &pwd) {
+void LeleConfig::setWebUICreds(const String &usr, const String &pwd) {
     webUI.user = usr;
     webUI.pwd = pwd;
     saveFile();
 }
 
-void leleConfig::setWifiApCreds(const String &ssid, const String &pwd) {
+void LeleConfig::setWifiApCreds(const String &ssid, const String &pwd) {
     wifiAp.ssid = ssid;
     wifiAp.pwd = pwd;
     saveFile();
 }
 
-void leleConfig::addWifiCredential(const String &ssid, const String &pwd) {
+void LeleConfig::addWifiCredential(const String &ssid, const String &pwd) {
     wifi[ssid] = pwd;
     saveFile();
 }
 
-String leleConfig::getWifiPassword(const String &ssid) const {
+String LeleConfig::getWifiPassword(const String &ssid) const {
     auto it = wifi.find(ssid);
     if (it != wifi.end()) return it->second;
     return "";
 }
 
-void leleConfig::addEvilWifiName(String value) {
+void LeleConfig::addEvilWifiName(String value) {
     evilWifiNames.insert(value);
     saveFile();
 }
 
-void leleConfig::removeEvilWifiName(String value) {
+void LeleConfig::removeEvilWifiName(String value) {
     evilWifiNames.erase(value);
     saveFile();
 }
 
-void leleConfig::setEvilEndpointCreds(String value) {
+void LeleConfig::setEvilEndpointCreds(String value) {
     evilPortalEndpoints.getCredsEndpoint = value;
     validateEvilEndpointCreds();
     saveFile();
 }
 
-void leleConfig::validateEvilEndpointCreds() {
+void LeleConfig::validateEvilEndpointCreds() {
     if (evilPortalEndpoints.getCredsEndpoint == evilPortalEndpoints.setSsidEndpoint) {
         // on collision reset to defaults
         evilPortalEndpoints.getCredsEndpoint = "/creds";
@@ -764,13 +762,13 @@ void leleConfig::validateEvilEndpointCreds() {
     }
 }
 
-void leleConfig::setEvilEndpointSsid(String value) {
+void LeleConfig::setEvilEndpointSsid(String value) {
     evilPortalEndpoints.setSsidEndpoint = value;
     validateEvilEndpointCreds();
     saveFile();
 }
 
-void leleConfig::validateEvilEndpointSsid() {
+void LeleConfig::validateEvilEndpointSsid() {
     if (evilPortalEndpoints.getCredsEndpoint == evilPortalEndpoints.setSsidEndpoint) {
         // on collision reset to defaults
         evilPortalEndpoints.setSsidEndpoint = "/ssid";
@@ -780,201 +778,201 @@ void leleConfig::validateEvilEndpointSsid() {
     }
 }
 
-void leleConfig::setEvilAllowEndpointDisplay(bool value) {
+void LeleConfig::setEvilAllowEndpointDisplay(bool value) {
     evilPortalEndpoints.showEndpoints = value;
     saveFile();
 }
 
-void leleConfig::setEvilAllowGetCreds(bool value) {
+void LeleConfig::setEvilAllowGetCreds(bool value) {
     evilPortalEndpoints.allowGetCreds = value;
     saveFile();
 }
 
-void leleConfig::setEvilAllowSetSsid(bool value) {
+void LeleConfig::setEvilAllowSetSsid(bool value) {
     evilPortalEndpoints.allowSetSsid = value;
     saveFile();
 }
 
-void leleConfig::setEvilPasswordMode(EvilPortalPasswordMode value) {
+void LeleConfig::setEvilPasswordMode(EvilPortalPasswordMode value) {
     evilPortalPasswordMode = value;
     saveFile();
 }
 
-void leleConfig::validateEvilPasswordMode() {
+void LeleConfig::validateEvilPasswordMode() {
     if (evilPortalPasswordMode < 0 || evilPortalPasswordMode > 2) evilPortalPasswordMode = FULL_PASSWORD;
 }
 
-void leleConfig::setBleName(String value) {
+void LeleConfig::setBleName(String value) {
     bleName = value;
     saveFile();
 }
 
-void leleConfig::setIrTxPin(int value) {
+void LeleConfig::setIrTxPin(int value) {
     irTx = value;
     saveFile();
 }
 
-void leleConfig::setIrTxRepeats(uint8_t value) {
+void LeleConfig::setIrTxRepeats(uint8_t value) {
     irTxRepeats = value;
     saveFile();
 }
 
-void leleConfig::setIrRxPin(int value) {
+void LeleConfig::setIrRxPin(int value) {
     irRx = value;
     saveFile();
 }
 
-void leleConfig::setRfTxPin(int value) {
+void LeleConfig::setRfTxPin(int value) {
     rfTx = value;
     saveFile();
 }
 
-void leleConfig::setRfRxPin(int value) {
+void LeleConfig::setRfRxPin(int value) {
     rfRx = value;
     saveFile();
 }
 
-void leleConfig::setRfModule(RFModules value) {
+void LeleConfig::setRfModule(RFModules value) {
     rfModule = value;
     validateRfModuleValue();
     saveFile();
 }
 
-void leleConfig::validateRfModuleValue() {
+void LeleConfig::validateRfModuleValue() {
     if (rfModule != M5_RF_MODULE && rfModule != CC1101_SPI_MODULE) { rfModule = M5_RF_MODULE; }
 }
 
-void leleConfig::setRfFreq(float value, int fxdFreq) {
+void LeleConfig::setRfFreq(float value, int fxdFreq) {
     rfFreq = value;
     if (fxdFreq > 1) rfFxdFreq = fxdFreq;
     saveFile();
 }
 
-void leleConfig::setRfFxdFreq(float value) {
+void LeleConfig::setRfFxdFreq(float value) {
     rfFxdFreq = value;
     saveFile();
 }
 
-void leleConfig::setRfScanRange(int value, int fxdFreq) {
+void LeleConfig::setRfScanRange(int value, int fxdFreq) {
     rfScanRange = value;
     rfFxdFreq = fxdFreq;
     validateRfScanRangeValue();
     saveFile();
 }
 
-void leleConfig::validateRfScanRangeValue() {
+void LeleConfig::validateRfScanRangeValue() {
     if (rfScanRange < 0 || rfScanRange > 3) rfScanRange = 3;
 }
 
-void leleConfig::setRfidModule(RFIDModules value) {
+void LeleConfig::setRfidModule(RFIDModules value) {
     rfidModule = value;
     validateRfidModuleValue();
     saveFile();
 }
 
-void leleConfig::validateRfidModuleValue() {
+void LeleConfig::validateRfidModuleValue() {
     if (rfidModule != M5_RFID2_MODULE && rfidModule != PN532_I2C_MODULE && rfidModule != PN532_SPI_MODULE &&
         rfidModule != RC522_SPI_MODULE && rfidModule != PN532_I2C_SPI_MODULE) {
         rfidModule = M5_RFID2_MODULE;
     }
 }
 
-void leleConfig::setiButtonPin(int value) {
+void LeleConfig::setiButtonPin(int value) {
     if (value < GPIO_NUM_MAX) {
         iButton = value;
         saveFile();
     } else log_e("iButton: Gpio pin not set, incompatible with this device\n");
 }
 
-void leleConfig::addMifareKey(String value) {
+void LeleConfig::addMifareKey(String value) {
     if (value.length() != 12) return;
     mifareKeys.insert(value);
     validateMifareKeysItems();
     saveFile();
 }
 
-void leleConfig::validateMifareKeysItems() {
+void LeleConfig::validateMifareKeysItems() {
     for (auto key = mifareKeys.begin(); key != mifareKeys.end();) {
         if (key->length() != 12) key = mifareKeys.erase(key);
         else ++key;
     }
 }
 
-void leleConfig::setGpsBaudrate(int value) {
+void LeleConfig::setGpsBaudrate(int value) {
     gpsBaudrate = value;
     validateGpsBaudrateValue();
     saveFile();
 }
 
-void leleConfig::validateGpsBaudrateValue() {
+void LeleConfig::validateGpsBaudrateValue() {
     if (gpsBaudrate != 9600 && gpsBaudrate != 19200 && gpsBaudrate != 57600 && gpsBaudrate != 38400 &&
         gpsBaudrate != 115200)
         gpsBaudrate = 9600;
 }
 
-void leleConfig::setStartupApp(String value) {
+void LeleConfig::setStartupApp(String value) {
     startupApp = value;
     saveFile();
 }
 
-void leleConfig::setWigleBasicToken(String value) {
+void LeleConfig::setWigleBasicToken(String value) {
     wigleBasicToken = value;
     saveFile();
 }
 
-void leleConfig::setDevMode(int value) {
+void LeleConfig::setDevMode(int value) {
     devMode = value;
     validateDevModeValue();
     saveFile();
 }
 
-void leleConfig::validateDevModeValue() {
+void LeleConfig::validateDevModeValue() {
     if (devMode > 1) devMode = 1;
 }
 
-void leleConfig::setColorInverted(int value) {
+void LeleConfig::setColorInverted(int value) {
     colorInverted = value;
     validateColorInverted();
     saveFile();
 }
 
-void leleConfig::validateColorInverted() {
+void LeleConfig::validateColorInverted() {
     if (colorInverted > 1) colorInverted = 1;
 }
 
-void leleConfig::setBadUSBBLEKeyboardLayout(int value) {
+void LeleConfig::setBadUSBBLEKeyboardLayout(int value) {
     badUSBBLEKeyboardLayout = value;
     validateBadUSBBLEKeyboardLayout();
     saveFile();
 }
 
-void leleConfig::validateBadUSBBLEKeyboardLayout() {
+void LeleConfig::validateBadUSBBLEKeyboardLayout() {
     if (badUSBBLEKeyboardLayout < 0 || badUSBBLEKeyboardLayout > 13) badUSBBLEKeyboardLayout = 0;
 }
 
-void leleConfig::setBadUSBBLEKeyDelay(int value) {
+void LeleConfig::setBadUSBBLEKeyDelay(int value) {
     badUSBBLEKeyDelay = value;
     validateBadUSBBLEKeyDelay();
     saveFile();
 }
 
-void leleConfig::validateBadUSBBLEKeyDelay() {
+void LeleConfig::validateBadUSBBLEKeyDelay() {
     if (badUSBBLEKeyDelay < 20) badUSBBLEKeyDelay = 20;
     if (badUSBBLEKeyDelay > 500) badUSBBLEKeyDelay = 500;
 }
 
-void leleConfig::addDisabledMenu(String value) {
+void LeleConfig::addDisabledMenu(String value) {
     // TODO: check if duplicate
     disabledMenus.push_back(value);
     saveFile();
 }
 
-void leleConfig::addQrCodeEntry(const String &menuName, const String &content) {
+void LeleConfig::addQrCodeEntry(const String &menuName, const String &content) {
     qrCodes.push_back({menuName, content});
     saveFile();
 }
 
-void leleConfig::removeQrCodeEntry(const String &menuName) {
+void LeleConfig::removeQrCodeEntry(const String &menuName) {
     size_t writeIndex = 0;
 
     for (size_t readIndex = 0; readIndex < qrCodes.size(); ++readIndex) {
@@ -991,14 +989,14 @@ void leleConfig::removeQrCodeEntry(const String &menuName) {
     saveFile();
 }
 
-void leleConfig::addWebUISession(const String &token) {
+void LeleConfig::addWebUISession(const String &token) {
     webUISessions.push_back(token);
     // Limit to maximum 5 sessions - remove oldest (first element) if exceeded
     if (webUISessions.size() > 5) { webUISessions.erase(webUISessions.begin()); }
     saveFile();
 }
 
-void leleConfig::removeWebUISession(const String &token) {
+void LeleConfig::removeWebUISession(const String &token) {
     for (auto it = webUISessions.begin(); it != webUISessions.end(); ++it) {
         if (*it == token) {
             webUISessions.erase(it);
@@ -1008,7 +1006,7 @@ void leleConfig::removeWebUISession(const String &token) {
     saveFile();
 }
 
-bool leleConfig::isValidWebUISession(const String &token) {
+bool LeleConfig::isValidWebUISession(const String &token) {
     auto it = std::find(webUISessions.begin(), webUISessions.end(), token);
 
     if (it == webUISessions.end()) {

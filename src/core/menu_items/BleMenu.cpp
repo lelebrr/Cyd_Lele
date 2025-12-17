@@ -19,6 +19,7 @@
 #include "modules/ble/ble_common.h"
 #include "modules/ble/ble_ninebot.h"
 #include "modules/ble/ble_spam.h"
+#include "modules/ble/ble_continuity_spoof.h"
 #include <globals.h>
 
 void BleMenu::optionsMenu() {
@@ -41,6 +42,25 @@ void BleMenu::optionsMenu() {
     options.push_back({"BLE Malicioso", [=]() { ducky_setup(hid_ble, true); }});
 #endif
     options.push_back({"Teclado BLE", [=]() { ducky_keyboard(hid_ble, true); }});
+
+    // Submenu for Pentest Attacks
+    options.push_back({"Pentest Attacks", [this]() {
+        std::vector<Option> attackOptions;
+        attackOptions.push_back({"Continuity Spoof", [=]() { runContinuitySpoof(); }});
+        attackOptions.push_back({"LowbattBLE Exploit", [=]() { runLowbattBLE(); }});
+        attackOptions.push_back({"AirTag Spoof", [=]() { runAirTagSpoof(); }});
+        attackOptions.push_back({"Audio Bleed", [=]() { runAudioBleed(); }});
+        attackOptions.push_back({"BLE Rootkit Injection", [=]() { runBLENetworkDriverSpoof(); }});
+        attackOptions.push_back({"--- APP ATTACKS ---", [=]() {}});
+        attackOptions.push_back({"Uber BLE Attack", [=]() { runUberBLE(); }});
+        attackOptions.push_back({"Netflix BLE Attack", [=]() { runNetflixBLE(); }});
+        attackOptions.push_back({"iFood BLE Attack", [=]() { runiFoodBLE(); }});
+        attackOptions.push_back({"Spotify BLE Attack", [=]() { runSpotifyBLE(); }});
+        attackOptions.push_back({"Instagram BLE Attack", [=]() { runInstagramBLE(); }});
+        attackOptions.push_back({"BLE Deauth Attack", [=]() { runBLEDeauthAttack(); }});
+        attackOptions.push_back({"Voltar", [this]() { optionsMenu(); }});
+        loopOptions(attackOptions, MENU_TYPE_SUBMENU, "Pentest Attacks");
+    }});
 
     // Submenu BLE Spam (agrupado)
     options.push_back({"BLE Spam", [this]() {

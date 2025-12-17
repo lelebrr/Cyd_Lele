@@ -98,9 +98,9 @@ void save_and_display_qrcode() {
     }
 
     if (std::any_of(
-            leleConfig.qrCodes.begin(),
-            leleConfig.qrCodes.end(),
-            [&](const leleConfig::QrCodeEntry &entry) { return entry.menuName == name; }
+            leleConfig.qrCodes.begin(), leleConfig.qrCodes.end(), [&](const LeleConfig::QrCodeEntry &entry) {
+                return entry.menuName == name;
+            }
         )) {
         displayError("Name already exists!");
         delay(1000);

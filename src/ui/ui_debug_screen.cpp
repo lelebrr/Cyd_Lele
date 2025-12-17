@@ -1,5 +1,5 @@
 #include "ui_debug_screen.h"
-#include "../core/config.h"
+#include "core/config.h"
 #include "../hardware/system_hardware.h"
 #include <Arduino.h>
 

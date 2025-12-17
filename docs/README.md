@@ -2,7 +2,7 @@
 
 Bem-vindo à documentação oficial do **Lele Origin 1.0** - um firmware versátil para ESP32 focado em operações de segurança ofensiva e Red Team.
 
-> 📅 **Última atualização:** 2024-12-13
+> 📅 **Última atualização:** 2025-12-17
 
 ## 📖 Índice de Documentação
 
@@ -29,6 +29,7 @@ Bem-vindo à documentação oficial do **Lele Origin 1.0** - um firmware versát
 ## 🔧 Lista de Componentes do Projeto
 
 ### Módulos Principais
+
 | Componente | Modelo | Interface |
 |------------|--------|-----------|
 | 🖥️ Placa Principal | CYD-2USB (ESP32 2.8" Touch) | - |
@@ -43,6 +44,7 @@ Bem-vindo à documentação oficial do **Lele Origin 1.0** - um firmware versát
 | 🔋 Alimentação | 18650 Shield V9 (4 bat) | 5V |
 
 ### Componentes Passivos Necessários
+
 | Componente | Valor | Para |
 |------------|-------|------|
 | Resistor | 4.7kΩ 1/4W | DS18B20 pull-up |

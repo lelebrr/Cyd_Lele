@@ -24,7 +24,7 @@ enum RFModules {
 
 enum EvilPortalPasswordMode { FULL_PASSWORD = 0, FIRST_LAST_CHAR = 1, HIDE_PASSWORD = 2, SAVE_LENGTH = 3 };
 
-class leleConfig : public LeleTheme {
+class LeleConfig : public LeleTheme {
 public:
     struct WiFiCredential {
         String ssid;
@@ -150,8 +150,8 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////
     // Constructor
     /////////////////////////////////////////////////////////////////////////////////////
-    leleConfig() {};
-    // ~leleConfig();
+    LeleConfig() {};
+    // ~LeleConfig();
 
     /////////////////////////////////////////////////////////////////////////////////////
     // Operations

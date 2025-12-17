@@ -1356,10 +1356,10 @@ void setMacAddressMenu() {
 **  Function: setSPIPins
 **  Main Menu to manually set SPI Pins
 **********************************************************************/
-void setSPIPinsMenu(leleConfigPins::SPIPins &value) {
+void setSPIPinsMenu(LeleConfigPins::SPIPins &value) {
     uint8_t opt = 0;
     bool changed = false;
-    leleConfigPins::SPIPins points = value;
+    LeleConfigPins::SPIPins points = value;
 
 RELOAD:
     options = {
@@ -1411,10 +1411,10 @@ RELOAD:
 **  Function: setUARTPins
 **  Main Menu to manually set SPI Pins
 **********************************************************************/
-void setUARTPinsMenu(leleConfigPins::UARTPins &value) {
+void setUARTPinsMenu(LeleConfigPins::UARTPins &value) {
     uint8_t opt = 0;
     bool changed = false;
-    leleConfigPins::UARTPins points = value;
+    LeleConfigPins::UARTPins points = value;
 
 RELOAD:
     options = {
@@ -1454,10 +1454,10 @@ RELOAD:
 **  Function: setI2CPins
 **  Main Menu to manually set SPI Pins
 **********************************************************************/
-void setI2CPinsMenu(leleConfigPins::I2CPins &value) {
+void setI2CPinsMenu(LeleConfigPins::I2CPins &value) {
     uint8_t opt = 0;
     bool changed = false;
-    leleConfigPins::I2CPins points = value;
+    LeleConfigPins::I2CPins points = value;
 
 RELOAD:
     options = {

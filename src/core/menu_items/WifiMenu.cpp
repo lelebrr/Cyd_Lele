@@ -1,4 +1,5 @@
 ﻿#include "WifiMenu.h"
+#include <lvgl.h>
 #include "core/display.h"
 #include "core/settings.h"
 #include "core/utils.h"
@@ -22,7 +23,10 @@
 #include "modules/wifi/wifi_enterprise.h"
 #include "modules/wifi/wifi_handshake_attacks.h"
 #include "modules/wifi/wifite_auto.h"
-#include "modules/wifi/wps_attacks.h"
+#include "modules/wps/wps_attacks.h"
+#include "modules/wifi/wifi_mitm_attacks.h"
+
+extern "C" void wpsMenuFunction();
 
 #ifndef LITE_VERSION
 #include "modules/pwnagotchi/pwnagotchi.h"
@@ -80,6 +84,16 @@ void WifiMenu::optionsMenu() {
                                wifiDisconnect();
                            }
                            EvilPortal();
+                       }});
+    options.push_back({"MITM Attacks", [this]() {
+                           std::vector<Option> mitmOptions;
+                           mitmOptions.push_back({"DNS Spoof", [=]() { wifi_mitm_dnsspoof(); }});
+                           mitmOptions.push_back({"HTTPS Downgrade", [=]() { wifi_https_downgrade(); }});
+                           mitmOptions.push_back({"Captive Survey", [=]() { wifi_captive_portal_survey(); }});
+                           mitmOptions.push_back({"Beacon Spam", [=]() { wifi_beacon_spam(); }});
+                           mitmOptions.push_back({"Spotify OAuth", [=]() { wifi_spotify_oauth_portal(); }});
+                           mitmOptions.push_back({"Voltar", [this]() { optionsMenu(); }});
+                           loopOptions(mitmOptions, MENU_TYPE_SUBMENU, "MITM Attacks");
                        }});
     // options.push_back({"ReverseShell", [=]()       { ReverseShell(); }});
     options.push_back({"Escutar TCP", listenTcpPort});
@@ -208,71 +222,8 @@ void WifiMenu::drawIcon(float scale) {
 void WifiMenu::advancedAttacksMenu() {
     std::vector<Option> advOptions;
 
-    // Submenu WPS
-    advOptions.push_back(
-        {"Ataques WPS", [this]() {
-             std::vector<Option> wpsOptions;
-             wpsOptions.push_back(
-                 {"Scan WPS", [this]() {
-                      wps_init();
-                      displayInfo("Escaneando redes WPS...", false);
-                      int count = wps_scan_networks();
-
-                      if (count == 0) {
-                          displayWarning("Nenhuma rede WPS encontrada", true);
-                          return;
-                      }
-
-                      // Cria menu de seleção de rede
-                      std::vector<Option> networkOptions;
-                      auto &networks = wps_get_networks();
-
-                      for (size_t i = 0; i < networks.size(); i++) {
-                          WPSNetwork &net = networks[i];
-                          char label[48];
-                          snprintf(label, sizeof(label), "%s (%ddBm)", net.ssid, net.rssi);
-
-                          networkOptions.push_back(
-                              {String(label), [&net, this]() {
-                                   // Mostra opções de ataque para rede selecionada
-                                   std::vector<Option> atkOptions;
-
-                                   atkOptions.push_back({"Pixie Dust", [&net]() {
-                                                             wps_start_pixie_dust(net.bssid, net.channel);
-                                                         }});
-
-                                   atkOptions.push_back({"Bruteforce PIN", [&net]() {
-                                                             wps_start_bruteforce(net.bssid, net.channel, 0);
-                                                         }});
-
-                                   atkOptions.push_back({"PIN Flood DoS", [&net]() {
-                                                             wps_start_pin_flood(net.bssid, net.channel);
-                                                         }});
-
-                                   atkOptions.push_back({"Voltar", []() {}});
-
-                                   char title[36];
-                                   snprintf(title, sizeof(title), "Alvo: %.16s", net.ssid);
-                                   loopOptions(atkOptions, MENU_TYPE_SUBMENU, title);
-                               }}
-                          );
-                      }
-
-                      networkOptions.push_back({"Voltar", [this]() { advancedAttacksMenu(); }});
-                      loopOptions(networkOptions, MENU_TYPE_SUBMENU, "Selecione Alvo");
-                  }}
-             );
-
-             wpsOptions.push_back({"PIN Flood Broadcast", [=]() {
-                                       displayWarning("PIN Flood para todos...", false);
-                                       uint8_t bcast[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-                                       wps_start_pin_flood(bcast, 6);
-                                   }});
-
-             wpsOptions.push_back({"Voltar", [this]() { advancedAttacksMenu(); }});
-             loopOptions(wpsOptions, MENU_TYPE_SUBMENU, "Ataques WPS");
-         }}
-    );
+    // Novo menu WPS com Pixie Dust + Reaver
+    advOptions.push_back({"WPS Attacks", [=]() { wpsMenuFunction(); }});
 
     // Submenu IoT Deauth
     advOptions.push_back({"Deauth IoT", [this]() {

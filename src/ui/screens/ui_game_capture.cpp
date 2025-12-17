@@ -1,11 +1,10 @@
 #include "ui_game_capture.h"
-#include "../../wifi/esp_now_mesh.h"
+// #include "../../wifi/esp_now_mesh.h" // TODO: Not implemented yet
 #include "../ui_helpers.h"
 #include "../ui_main.h"
 #include <algorithm>
 #include <globals.h>
 #include <vector>
-
 
 struct PlayerScore {
     char name[17];
@@ -54,18 +53,15 @@ void game_report_handshake_capture(const char *ssid) {
 
     // Broadcast new score
     GameSyncPacket pkt;
-    strncpy(pkt.name, bruceConfig.bleName.c_str(), 16);
+    strncpy(pkt.name, leleConfig.bleName.c_str(), 16);
     pkt.score = myScore;
 
-    // We need a specific mesh type for this, borrowing MESH_TYPE_GAME_SYNC
-    // Ideally we'd modify esp_now_mesh.h to be cleaner but we can cast for now
-    // Or add a specialized method in MeshSystem
-    // For prototype:
+    // TODO: MeshSystem not implemented yet
     // MeshSystem.broadcast(&pkt, sizeof(pkt));
 }
 
 void ui_capture_handshake_game_init(void) {
-    MeshSystem.begin();
+    // TODO: MeshSystem.begin() - not implemented yet
 
     // Mock initial players
     // players.push_back({"HackerOne", 500, millis()});

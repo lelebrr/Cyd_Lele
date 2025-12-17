@@ -1,10 +1,11 @@
 #pragma once
+#include "LeleBLEService.hpp"
 #include <NimBLEServer.h>
-#include "BruceBLEService.hpp"
 
-class BatteryService : public BruceBLEService {
+class BatteryService : public LeleBLEService {
     NimBLECharacteristic *battery_char = nullptr;
     TaskHandle_t battery_task_handle = nullptr;
+
 public:
     BatteryService(/* args */);
     ~BatteryService() override;

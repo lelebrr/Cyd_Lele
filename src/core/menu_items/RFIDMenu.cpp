@@ -9,6 +9,7 @@
 #include "modules/rfid/rfid125.h"
 #include "modules/rfid/rfid_fuzzer.h"
 #include "modules/rfid/tag_o_matic.h"
+#include "modules/rfid/nfc_attacks.h"
 #ifndef LITE_VERSION
 #include "modules/rfid/emv_reader.hpp"
 #endif
@@ -25,6 +26,18 @@ void RFIDMenu::optionsMenu() {
         {"Carregar arquivo", [=]() { TagOMatic(TagOMatic::LOAD_MODE); }      },
         {"Apagar dados",     [=]() { TagOMatic(TagOMatic::ERASE_MODE); }     },
         {"Gravar NDEF",      [=]() { TagOMatic(TagOMatic::WRITE_NDEF_MODE); }},
+        {"--- NFC Attacks ---", [=]() {}                                     },
+        {"Clone Card",       [=]() { nfc_clone_card(); }                     },
+        {"Phishing Tag",     [=]() { nfc_phishing_tag(); }                   },
+        {"OTA Rewrite",      [=]() { nfc_ota_rewrite(); }                    },
+        {"Fake Apple Pay",   [=]() { nfc_fake_apple_pay(); }                 },
+        {"Audio Injection",  [=]() { nfc_audio_injection(); }                },
+        {"--- Pulse Injection ---", [=]() {}                                 },
+        {"Claw Machine Credit", [=]() { nfc_pulse_injection_claw_machine(); }},
+        {"Time Clock Shock", [=]() { nfc_pulse_injection_time_clock(); }     },
+        {"Bus Card Overflow", [=]() { nfc_pulse_injection_bus_card(); }      },
+        {"Reverse Credit",   [=]() { nfc_pulse_injection_reverse_credit(); } },
+        {"Ghost Reader",     [=]() { nfc_pulse_injection_ghost_reader(); }   },
 #endif
 #ifndef LITE_VERSION
         {"Amiibolink",       [=]() { Amiibo(); }                             },

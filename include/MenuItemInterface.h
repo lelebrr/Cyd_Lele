@@ -15,28 +15,28 @@ public:
     String getName() const { return _name; }
 
     void draw(float scale = 1) {
-        if (rotation != bruceConfig.rotation) resetCoordinates();
+        if (rotation != leleConfig.rotation) resetCoordinates();
         if (!getTheme()) {
-            if (bruceConfig.themePath != "") {
+            if (leleConfig.themePath != "") {
                 // Image is not available for active theme, clear larger area
-                tft.fillRect(0, 27, tftWidth, tftHeight - 27, bruceConfig.bgColor);
+                tft.fillRect(0, 27, tftWidth, tftHeight - 27, leleConfig.bgColor);
             }
             drawIcon(scale);
             drawArrows(scale);
             drawTitle(scale);
         } else {
-            if (bruceConfig.theme.label)
+            if (leleConfig.theme.label)
                 drawTitle(scale); // If using .GIF, labels are draw after complete, which takes some time
             drawIconImg();
-            if (bruceConfig.theme.label) drawTitle(scale); // Makes sure to draw over the image
+            if (leleConfig.theme.label) drawTitle(scale); // Makes sure to draw over the image
         }
         drawStatusBar();
     }
 
     void drawArrows(float scale = 1) {
-        tft.fillRect(arrowAreaX, iconAreaY, arrowAreaW, iconAreaH, bruceConfig.bgColor);
+        tft.fillRect(arrowAreaX, iconAreaY, arrowAreaW, iconAreaH, leleConfig.bgColor);
         tft.fillRect(
-            tftWidth - arrowAreaX - arrowAreaW, iconAreaY, arrowAreaW, iconAreaH, bruceConfig.bgColor
+            tftWidth - arrowAreaX - arrowAreaW, iconAreaY, arrowAreaW, iconAreaH, leleConfig.bgColor
         );
 
         int arrowSize = scale * 10;
@@ -52,8 +52,8 @@ public:
             arrowX + arrowSize,
             arrowY + arrowSize,
             lineWidth,
-            bruceConfig.priColor,
-            bruceConfig.bgColor
+            leleConfig.priColor,
+            leleConfig.bgColor
         );
         tft.drawWideLine(
             arrowX,
@@ -61,8 +61,8 @@ public:
             arrowX + arrowSize,
             arrowY - arrowSize,
             lineWidth,
-            bruceConfig.priColor,
-            bruceConfig.bgColor
+            leleConfig.priColor,
+            leleConfig.bgColor
         );
 
         // Right Arrow
@@ -72,8 +72,8 @@ public:
             tftWidth - arrowX - arrowSize,
             arrowY + arrowSize,
             lineWidth,
-            bruceConfig.priColor,
-            bruceConfig.bgColor
+            leleConfig.priColor,
+            leleConfig.bgColor
         );
         tft.drawWideLine(
             tftWidth - arrowX,
@@ -81,8 +81,8 @@ public:
             tftWidth - arrowX - arrowSize,
             arrowY - arrowSize,
             lineWidth,
-            bruceConfig.priColor,
-            bruceConfig.bgColor
+            leleConfig.priColor,
+            leleConfig.bgColor
         );
     }
 
@@ -91,7 +91,7 @@ public:
 
         tft.setTextSize(FM);
         tft.drawPixel(0, 0, 0);
-        tft.fillRect(arrowAreaX, titleY, tftWidth - 2 * arrowAreaX, LH * FM, bruceConfig.bgColor);
+        tft.fillRect(arrowAreaX, titleY, tftWidth - 2 * arrowAreaX, LH * FM, leleConfig.bgColor);
         int nchars = (tftWidth - 16) / (LW * FM);
         tft.drawCentreString(getName().substring(0, nchars), iconCenterX, titleY, 1);
     }
@@ -117,10 +117,8 @@ protected:
 
     MenuItemInterface(const String &name) : _name(name) {}
 
-    void clearIconArea(void) {
-        tft.fillRect(iconAreaX, iconAreaY, iconAreaW, iconAreaH, bruceConfig.bgColor);
-    }
-    void clearImgArea(void) { tft.fillRect(7, 27, tftWidth - 14, tftHeight - 34, bruceConfig.bgColor); }
+    void clearIconArea(void) { tft.fillRect(iconAreaX, iconAreaY, iconAreaW, iconAreaH, leleConfig.bgColor); }
+    void clearImgArea(void) { tft.fillRect(7, 27, tftWidth - 14, tftHeight - 34, leleConfig.bgColor); }
     void resetCoordinates(void) {
         // Recalculate Center and ared due to portrait/landscape changings
         if (tftWidth > tftHeight) {
@@ -144,7 +142,7 @@ protected:
         arrowAreaX = BORDER_PAD_X;
         arrowAreaW = iconAreaX - arrowAreaX;
 
-        rotation = bruceConfig.rotation;
+        rotation = leleConfig.rotation;
     }
 };
 

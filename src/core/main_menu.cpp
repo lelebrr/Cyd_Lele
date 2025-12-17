@@ -5,7 +5,8 @@
 
 MainMenu::MainMenu() {
     _menuItems = {
-        &wifiMenu,     &bleMenu,
+        &wifiMenu,     &bleMenu,    &consoleMenu, &iotMenu,
+        &faultInjectionMenu,
 #if !defined(LITE_VERSION)
         &ethernetMenu,
 #endif

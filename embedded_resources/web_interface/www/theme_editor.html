@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -291,13 +291,13 @@
   <div class="particles" id="particles"></div>
 
   <div class="container">
-    <div class="dragon-header">DRAGÃƒO</div>
+    <div class="dragon-header">DRAGÃÆO</div>
     <h1>Lele THEME EDITOR 2025</h1>
 
     <div class="preview">
       <div class="preview-header">
-        <div class="preview-title">PRÃ‰-VISUALIZAÃ‡ÃƒO AO VIVO</div>
-        <div class="preview-mascot" id="mascot">DRAGÃƒO</div>
+        <div class="preview-title">PRÃâ°-VISUALIZAÃâ¡ÃÆO AO VIVO</div>
+        <div class="preview-mascot" id="mascot">DRAGÃÆO</div>
       </div>
 
       <div class="preview-buttons">
@@ -326,14 +326,14 @@
         <button class="preset-btn" onclick="loadPreset('sunset_orange')">Sunset Orange</button>
       </div>
 
-      <h2>Editor Manual AvanÃ§ado</h2>
+      <h2>Editor Manual AvanÃÂ§ado</h2>
       <div class="color-grid">
         <div class="color-item">
           <label>Cor Principal (Glow)</label>
           <input type="color" id="primary" value="#00ff88" onchange="updateTheme()">
         </div>
         <div class="color-item">
-          <label>SecundÃ¡ria</label>
+          <label>SecundÃÂ¡ria</label>
           <input type="color" id="secondary" value="#0088ff" onchange="updateTheme()">
         </div>
         <div class="color-item">
@@ -357,7 +357,7 @@
           <input type="color" id="text" value="#ffffff" onchange="updateTheme()">
         </div>
         <div class="color-item">
-          <label>Texto SecundÃ¡rio</label>
+          <label>Texto SecundÃÂ¡rio</label>
           <input type="color" id="textDim" value="#88ffcc" onchange="updateTheme()">
         </div>
       </div>
@@ -448,19 +448,19 @@
         const status = document.getElementById('status');
         if (response.ok) {
           status.className = 'status success';
-          status.textContent = 'âœ“ TEMA SALVO COM SUCESSO NO Lele!';
+          status.textContent = 'âÅâ TEMA SALVO COM SUCESSO NO Lele!';
         } else {
           status.className = 'status error';
-          status.textContent = 'âœ— ERRO AO SALVAR TEMA';
+          status.textContent = 'âÅâ ERRO AO SALVAR TEMA';
         }
         setTimeout(() => { status.className = 'status'; status.textContent = ''; }, 4000);
       } catch (err) {
         document.getElementById('status').className = 'status error';
-        document.getElementById('status').textContent = 'âœ— SEM CONEXÃƒO COM O DRAGÃƒO';
+        document.getElementById('status').textContent = 'âÅâ SEM CONEXÃÆO COM O DRAGÃÆO';
       }
     }
 
-    // PartÃ­culas neon de fundo
+    // PartÃÂ­culas neon de fundo
     const canvas = document.createElement('canvas');
     canvas.style.position = 'fixed';
     canvas.style.inset = '0';

@@ -7,7 +7,10 @@
 #include "menu_items/ClockMenu.h"
 #include "menu_items/ConfigMenu.h"
 #include "menu_items/ConnectMenu.h"
+#include "menu_items/ConsoleMenu.h"
 #include "menu_items/EthernetMenu.h"
+#include "menu_items/FaultInjectionMenu.h"
+#include "menu_items/IoTMenu.h"
 #include "menu_items/FMMenu.h"
 #include "menu_items/FaultInjectionMenu.h"
 #include "menu_items/FileMenu.h"
@@ -30,6 +33,8 @@ public:
     ClockMenu clockMenu;
     ConnectMenu connectMenu;
     ConfigMenu configMenu;
+    ConsoleMenu consoleMenu;
+    IoTMenu iotMenu;
     FMMenu fmMenu;
     GpsMenu gpsMenu;
     IRMenu irMenu;

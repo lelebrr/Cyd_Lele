@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -377,11 +377,11 @@
 <body>
     <div class="bg-grid"></div>
 
-    <a href="/" class="back-btn">â† VOLTAR</a>
+    <a href="/" class="back-btn">ââ Â VOLTAR</a>
 
     <div id="container">
         <div class="header">
-            <h1>ðŸ‰ ACESSO REMOTO</h1>
+            <h1>°Å¸Ââ° ACESSO REMOTO</h1>
             <div class="status">
                 <span class="connection-dot" id="conn-dot"></span>
                 <span id="status-text">CONECTANDO...</span>
@@ -402,7 +402,7 @@
         </div>
 
         <div class="footer">
-            <span>ðŸ“¡</span> Toque na tela para controlar o Lele |
+            <span>°Å¸âÂ¡</span> Toque na tela para controlar o Lele |
             <span id="fps">-- FPS</span> |
             <span id="latency">-- ms</span>
         </div>
@@ -442,7 +442,7 @@
             loading.style.display = 'none';
             img.style.display = 'block';
             isConnected = true;
-            statusText.textContent = 'CONECTADO â€” TEMPO REAL';
+            statusText.textContent = 'CONECTADO ââ¬â TEMPO REAL';
             connDot.classList.remove('disconnected');
             resize();
             frameCount++;
@@ -455,16 +455,16 @@
                 lastFpsTime = now;
             }
 
-            // Auto-refresh: carregar prÃ³ximo frame apÃ³s 200ms
+            // Auto-refresh: carregar prÃÂ³ximo frame apÃÂ³s 200ms
             setTimeout(refreshFrame, 200);
         };
 
-        // FunÃ§Ã£o para atualizar o frame
+        // FunÃÂ§ÃÂ£o para atualizar o frame
         function refreshFrame() {
             img.src = '/stream?' + Date.now();
         }
 
-        // Backoff para reconexÃ£o
+        // Backoff para reconexÃÂ£o
         let retryDelay = 500;
         const MAX_RETRY_DELAY = 5000;
 
@@ -483,7 +483,7 @@
                 img.src = '/stream?' + Date.now();
             }, retryDelay);
 
-            // Aumentar delay (backoff) atÃ© o mÃ¡ximo
+            // Aumentar delay (backoff) atÃÂ© o mÃÂ¡ximo
             retryDelay = Math.min(retryDelay * 1.5, MAX_RETRY_DELAY);
         };
 
@@ -558,7 +558,7 @@
         // Initial resize
         resize();
 
-        // Iniciar refresh automÃ¡tico
+        // Iniciar refresh automÃÂ¡tico
         refreshFrame();
 
         // Periodic connection check

@@ -18,7 +18,9 @@
 #include "core/i2c_finder.h"
 #include "core/settings.h"
 #include "core/utils.h"
+#include <WiFi.h>
 #include <globals.h>
+
 
 // Estrutura para módulos de hardware
 struct HardwareModule {

@@ -13,7 +13,6 @@
 #include "modules/wifi/wifi_advanced_attacks.h"
 #include <vector>
 
-
 void wifi_chaos_menu() {
     tft.fillScreen(TFT_BLACK);
     drawMainBorder();
@@ -44,7 +43,7 @@ void wifi_chaos_menu() {
         // Phase 1: Deauth Storm
         tft.println("[1] sending DEAUTH...");
         uint8_t bcast[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        wifi_adv_disassoc_flood(bcast, 1, 0); // 1 pacote burst
+        wifi_adv_disassoc_flood(bcast, 1); // 1 packet burst
         wifi_adv_auth_flood(bcast, 1, 0);
         delay(100);
 

@@ -64,8 +64,8 @@ extern XPowersPPM PPM;
 
 extern bool interpreter_start;
 
-extern BruceConfig bruceConfig;
-extern BruceConfigPins bruceConfigPins;
+extern LeleConfig leleConfig;
+extern LeleConfigPins leleConfigPins;
 extern SerialCli serialCli;
 extern SerialDevice *serialDevice;
 extern USBSerial USBserial;

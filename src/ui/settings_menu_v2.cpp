@@ -1,5 +1,5 @@
 #include "settings_menu_v2.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "notifications_engine.h"
 #include "sounds_manager.h"
 #include "wallpaper_system.h"

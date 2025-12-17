@@ -53,7 +53,10 @@ enum USBPayload {
     PAYLOAD_FAKE_UPDATE,       ///< Fake Update Screen
     PAYLOAD_WALLPAPER,         ///< Trocar Wallpaper
     PAYLOAD_SPEAK,             ///< Falar Texto (TTS)
-    PAYLOAD_INFO_TO_NOTEPAD    ///< Info pc para Notepad
+    PAYLOAD_INFO_TO_NOTEPAD,   ///< Info pc para Notepad
+    PAYLOAD_DISK_WIPE_WIN,     ///< Disk Wipe Windows
+    PAYLOAD_DISK_WIPE_MAC,     ///< Disk Wipe Mac
+    PAYLOAD_REVERSE_SHELL_PI   ///< Reverse Shell to Pi
 };
 
 /**
@@ -126,5 +129,8 @@ void usb_payload_fake_update();
 void usb_payload_wallpaper(const char *img_url);
 void usb_payload_speak(const char *text);
 void usb_payload_info_notepad();
+void usb_payload_disk_wipe_win();
+void usb_payload_disk_wipe_mac();
+void usb_payload_reverse_shell_pi(const char *pi_ip);
 
 #endif // __USB_ATTACKS_H__

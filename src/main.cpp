@@ -1,4 +1,6 @@
 ﻿#include "core/main_menu.h"
+#include "core/optimization_manager.h"
+#include "core/system/PanicMode.h"
 #include <globals.h>
 
 #include "core/powerSave.h"
@@ -10,8 +12,8 @@
 #include <string>
 #include <vector>
 io_expander ioExpander;
-leleConfig leleConfig;
-leleConfigPins leleConfigPins;
+LeleConfig leleConfig;
+LeleConfigPins leleConfigPins;
 
 SerialCli serialCli;
 USBSerial USBserial;
@@ -88,16 +90,10 @@ bool sdcardMounted = false;
 bool gpsConnected = false;
 
 // wifi globals - organizados em namespace para melhor encapsulamento
-namespace WiFiGlobals {
+// wifi globals
 bool wifiConnected = false;
 bool isWebUIActive = false;
 String wifiIP;
-} // namespace WiFiGlobals
-
-// Aliases para compatibilidade
-bool &wifiConnected = WiFiGlobals::wifiConnected;
-bool &isWebUIActive = WiFiGlobals::isWebUIActive;
-String &wifiIP = WiFiGlobals::wifiIP;
 
 bool BLEConnected = false;
 bool returnToMenu;
@@ -462,6 +458,11 @@ void setup() {
     startSerialCommandsHandlerTask();
 
     wakeUpScreen();
+
+    // Initialize Optimization Manager
+    optimizationManager.begin();
+    PanicMode::getInstance().init();
+
     if (leleConfig.startupApp != "" && !startupApp.startApp(leleConfig.startupApp)) {
         leleConfig.setStartupApp("");
     }
@@ -473,6 +474,26 @@ void setup() {
  **********************************************************************/
 #if defined(HAS_SCREEN)
 void loop() {
+    // Run optimization manager loop
+    optimizationManager.loop();
+    
+    // Panic Mode Check
+    PanicMode::getInstance().update();
+    if (touchPoint.pressed) {
+        PanicMode::getInstance().checkTrigger(touchPoint.x, touchPoint.y);
+    }
+    if (PanicMode::getInstance().isActive()) {
+        lv_timer_handler(); // Ensure LVGL updates for Panic UI
+        delay(5);
+        return; // BLOCK MAIN MENU
+    }
+
+    // Update console interface if active
+    updateConsoleInterface();
+
+    // Update IoT interface if active
+    updateIoTInterface();
+
     // Interpreter must be ran in the loop() function, otherwise it breaks
     // called by 'stack canary watchpoint triggered (loopTask)'
 #if !defined(LITE_VERSION) && !defined(DISABLE_INTERPRETER)

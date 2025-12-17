@@ -4,6 +4,7 @@
 #include "core/mykeyboard.h"
 #include "wifi_mac.h"
 #include <debug_log.h>
+#include <esp_wifi.h>
 #include <globals.h>
 
 void applyConfiguredMAC() {

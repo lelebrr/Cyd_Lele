@@ -131,7 +131,6 @@ struct FrameInfo {
     bool isEapol = false;
     uint8_t apAddr[6] = {0};
     uint64_t apKey = 0;
-    uint64_t apKey = 0;
     char ssid[33] = {0};
 };
 

@@ -41,7 +41,7 @@ void _setup_gpio() {
     } else log_i("Touch IC Started");
 #endif
 
-    bruceConfig.colorInverted = 0;
+    leleConfig.colorInverted = 0;
 }
 
 /***************************************************************************************
@@ -133,16 +133,16 @@ void InputHandler(void) {
             auto t = touch.getPointScaled();
 #endif
             // Serial.printf("\nRAW: Touch Pressed on x=%d, y=%d",t.x, t.y);
-            if (bruceConfig.rotation == 3) {
+            if (leleConfig.rotation == 3) {
                 t.y = (tftHeight + 20) - t.y;
                 t.x = tftWidth - t.x;
             }
-            if (bruceConfig.rotation == 0) {
+            if (leleConfig.rotation == 0) {
                 int tmp = t.x;
                 t.x = tftWidth - t.y;
                 t.y = tmp;
             }
-            if (bruceConfig.rotation == 2) {
+            if (leleConfig.rotation == 2) {
                 int tmp = t.x;
                 t.x = t.y;
                 t.y = (tftHeight + 20) - tmp;

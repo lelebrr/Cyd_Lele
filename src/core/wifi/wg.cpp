@@ -77,10 +77,8 @@ void parse_config_file(File configFile) {
             }
         }
     }
-}
-
-LOG_WIFI("Closing file!");
-configFile.close();
+    LOG_WIFI("Closing file!");
+    configFile.close();
 }
 
 /*********************************************************************

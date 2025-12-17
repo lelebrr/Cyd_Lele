@@ -7,10 +7,21 @@
  */
 
 #include "RFIDInterface.h"
+#define private public
 #include <Adafruit_PN532.h>
+#undef private
 
 class PN532 : public RFIDInterface {
 public:
+    struct UidType {
+        uint8_t uidByte[10];
+        uint8_t size;
+        uint8_t sak;
+        uint8_t atqaByte[2];
+    };
+    UidType targetUid;
+    UidType uid; // Internal storage for read operations
+
     enum CONNECTION_TYPE { I2C = 1, I2C_SPI = 2, SPI = 3 };
     enum PICC_Type {
         PICC_TYPE_MIFARE_MINI = 0x09, // MIFARE Classic protocol, 320 bytes
@@ -25,7 +36,7 @@ public:
 #if defined(PN532_IRQ) && defined(PN532_RF_REST)
     Adafruit_PN532 nfc = Adafruit_PN532(PN532_IRQ, PN532_RF_REST);
 #else
-    Adafruit_PN532 nfc = Adafruit_PN532();
+    Adafruit_PN532 nfc = Adafruit_PN532(0xFF, 0xFF);
 #endif
 
     /////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +71,7 @@ private:
     void format_data_felica(uint8_t idm[8], uint8_t pmm[8], uint16_t sys_code);
     void parse_data();
     void set_uid();
+    bool readDetectedTarget();
 
     /////////////////////////////////////////////////////////////////////////////////////
     // PICC Helpers

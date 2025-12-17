@@ -1,5 +1,5 @@
 #include "ui_captures.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "ui_helpers.h"
 #include "ui_main.h"
 #include "ui_themes.h"

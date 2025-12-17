@@ -41,10 +41,10 @@ function saveAPConfig() {
     const password = document.getElementById('ap-password').value;
     const channel = document.getElementById('ap-channel').value;
     const ip = document.getElementById('ap-ip').value;
-    if (!ssid) { addLog('SSID Ã© obrigatÃ³rio', 'error'); return; }
+    if (!ssid) { addLog('SSID é obrigatório', 'error'); return; }
     if (password && password.length < 8) { addLog('Senha deve ter 8+ caracteres', 'error'); return; }
     sendCommand('set_ap_config', { ssid, password, channel: parseInt(channel), ip });
-    addLog('ConfiguraÃ§Ã£o do AP salva. IP serÃ¡ ' + ip + ' apÃ³s reinÃ­cio.', 'success');
+    addLog('Configuração do AP salva. IP será ' + ip + ' após reinício.', 'success');
 }
 function saveDashboardAuth() {
     const username = document.getElementById('dash-username').value;
@@ -61,14 +61,14 @@ function saveOpenAIConfig() {
     localStorage.setItem('openai-model', model);
     localStorage.setItem('openai-tokens', tokens);
     sendCommand('set_openai', { key, model, max_tokens: parseInt(tokens) });
-    addLog('ConfiguraÃ§Ã£o OpenAI salva', 'success');
+    addLog('Configuração OpenAI salva', 'success');
 }
 function saveOHCConfig() {
     const email = document.getElementById('ohc-email').value;
     const key = document.getElementById('ohc-key').value;
     localStorage.setItem('ohc-email', email);
     localStorage.setItem('ohc-key', key);
-    addLog('ConfiguraÃ§Ã£o OnlineHashCrack salva', 'success');
+    addLog('Configuração OnlineHashCrack salva', 'success');
 }
 // Load OHC Config on startup
 document.addEventListener('DOMContentLoaded', () => {
@@ -148,7 +148,7 @@ async function uploadOTA(file) {
     formData.append('update', file);
     try {
         const r = await fetch('/update', { method: 'POST', body: formData });
-        if (r.ok) { alert('AtualizaÃ§Ã£o OK! Reiniciando...'); setTimeout(() => location.reload(), 5000); }
+        if (r.ok) { alert('Atualização OK! Reiniciando...'); setTimeout(() => location.reload(), 5000); }
     } catch (e) { addLog('Erro OTA', 'error'); }
 }
 function sendTerminalCommand() {
@@ -174,7 +174,7 @@ function startCracking() { addLog('Cracking iniciado...', 'info'); }
 function startEvilTwin() {
     const ssid = document.getElementById('et-ssid').value;
     const template = document.getElementById('et-template').value;
-    if (!ssid) { addLog('SSID obrigatÃ³rio', 'error'); return; }
+    if (!ssid) { addLog('SSID obrigatório', 'error'); return; }
     sendCommand('evil_twin', { ssid, template });
 }
 function scheduleAttack() { addLog('Agendar ataque - em desenvolvimento', 'info'); }
@@ -198,7 +198,7 @@ function startAutoFind() {
     const brand = document.getElementById('ir-autofind-brand').value;
     autoFindState = { brand, codeIndex: 0, maxCodes: 50, button: 'vol_up', phase: 1 };
     document.getElementById('ir-autofind-status').style.display = 'block';
-    document.getElementById('ir-autofind-text').textContent = `Testando ${brand.toUpperCase()} cÃ³digo 1 de 50... Pressione VOL+ na TV`;
+    document.getElementById('ir-autofind-text').textContent = `Testando ${brand.toUpperCase()} código 1 de 50... Pressione VOL+ na TV`;
     sendCommand('ir_autofind', { brand, codeIndex: 0, button: 'vol_up' });
     addLog(`ðŸ” Buscando controle ${brand}...`, 'info');
 }
@@ -210,7 +210,7 @@ function autoFindYes() {
         sendCommand('ir_autofind', { brand: autoFindState.brand, codeIndex: autoFindState.codeIndex, button: 'ch_up' });
     } else {
         document.getElementById('ir-autofind-status').style.display = 'none';
-        addLog(`âœ… Controle ${autoFindState.brand.toUpperCase()} encontrado! CÃ³digo: ${autoFindState.codeIndex}`, 'success');
+        addLog(`âœ… Controle ${autoFindState.brand.toUpperCase()} encontrado! Código: ${autoFindState.codeIndex}`, 'success');
         document.getElementById('ir-brand').value = autoFindState.brand;
         sendCommand('ir_save_found', { brand: autoFindState.brand, codeIndex: autoFindState.codeIndex });
     }
@@ -219,10 +219,10 @@ function autoFindNo() {
     autoFindState.codeIndex++;
     if (autoFindState.codeIndex >= autoFindState.maxCodes) {
         document.getElementById('ir-autofind-status').style.display = 'none';
-        addLog(`âŒ Nenhum cÃ³digo funcionou para ${autoFindState.brand}`, 'error');
+        addLog(`âŒ Nenhum código funcionou para ${autoFindState.brand}`, 'error');
         return;
     }
-    document.getElementById('ir-autofind-text').textContent = `Testando ${autoFindState.brand.toUpperCase()} cÃ³digo ${autoFindState.codeIndex + 1} de 50...`;
+    document.getElementById('ir-autofind-text').textContent = `Testando ${autoFindState.brand.toUpperCase()} código ${autoFindState.codeIndex + 1} de 50...`;
     sendCommand('ir_autofind', { brand: autoFindState.brand, codeIndex: autoFindState.codeIndex, button: autoFindState.button });
 }
 // Record Remote
@@ -261,7 +261,7 @@ function finishRecording() {
     recordState.recording = false;
     document.getElementById('ir-record-status').style.display = 'none';
     sendCommand('ir_record_save', { name: recordState.name, buttons: recordState.buttons });
-    addLog(`âœ… Controle "${recordState.name}" salvo com ${Object.keys(recordState.buttons).length} botÃµes!`, 'success');
+    addLog(`âœ… Controle "${recordState.name}" salvo com ${Object.keys(recordState.buttons).length} botões!`, 'success');
     loadSavedRemotes();
 }
 async function loadSavedRemotes() {
@@ -387,7 +387,7 @@ async function startCameraScan() {
     document.getElementById('cam-scan-bar').style.width = '0%';
     document.getElementById('cam-scan-text').textContent = 'Iniciando scan...';
     foundCameras = [];
-    addLog(`ðŸ“· Escaneando cÃ¢meras em ${range}.0/24...`, 'info');
+    addLog(`ðŸ“· Escaneando câmeras em ${range}.0/24...`, 'info');
     sendCommand('camera_scan', { range, ports });
     // Simulate progress
     let progress = 0;
@@ -396,7 +396,7 @@ async function startCameraScan() {
         if (progress >= 100) {
             clearInterval(interval);
             document.getElementById('cam-scan-text').textContent = 'Scan completo!';
-            addLog('âœ… Scan de cÃ¢meras concluÃ­do', 'success');
+            addLog('âœ… Scan de câmeras concluído', 'success');
         }
         document.getElementById('cam-scan-bar').style.width = progress + '%';
         document.getElementById('cam-scan-text').textContent = `Escaneando ${range}.${Math.floor(progress * 2.54)}...`;
@@ -410,7 +410,7 @@ function updateCameraTable() {
     const tbody = document.getElementById('cameras-tbody');
     document.getElementById('cam-count').textContent = foundCameras.length;
     if (foundCameras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-muted" style="padding:20px;text-align:center;">Nenhuma cÃ¢mera encontrada. Inicie um scan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-muted" style="padding:20px;text-align:center;">Nenhuma câmera encontrada. Inicie um scan.</td></tr>';
         return;
     }
     tbody.innerHTML = foundCameras.map((cam, i) => `
@@ -422,7 +422,7 @@ function updateCameraTable() {
                         <span style="padding:4px 8px;border-radius:4px;font-size:0.75rem;background:${cam.status === 'vulnerable' ? 'var(--danger)' :
             cam.status === 'logged' ? 'var(--success)' :
                 'var(--warning)'
-        };color:#fff;">${cam.status === 'vulnerable' ? 'ðŸ”“ VulnerÃ¡vel' :
+        };color:#fff;">${cam.status === 'vulnerable' ? 'ðŸ”“ Vulnerável' :
             cam.status === 'logged' ? 'âœ… Logado' :
                 'ðŸ”’ Protegido'
         }</span>
@@ -441,15 +441,15 @@ function camAttack(type) {
 function attackCamera(index) {
     const cam = foundCameras[index];
     if (!cam) return;
-    addLog(`âš”ï¸ Atacando cÃ¢mera ${cam.ip}:${cam.port}...`, 'info');
+    addLog(`âš”ï¸ Atacando câmera ${cam.ip}:${cam.port}...`, 'info');
     sendCommand('camera_attack_single', { ip: cam.ip, port: cam.port });
 }
 function attackAllCameras() {
     if (foundCameras.length === 0) {
-        addLog('âŒ Nenhuma cÃ¢mera encontrada. Execute o scan primeiro.', 'error');
+        addLog('âŒ Nenhuma câmera encontrada. Execute o scan primeiro.', 'error');
         return;
     }
-    addLog(`â˜ ï¸ ATACANDO ${foundCameras.length} CÃ‚MERAS COM TODOS OS MÃ‰TODOS...`, 'warning');
+    addLog(`â˜ ï¸ ATACANDO ${foundCameras.length} CÃ‚MERAS COM TODOS OS MÉTODOS...`, 'warning');
     sendCommand('camera_attack_all', {
         targets: foundCameras,
         attacks: ['default_creds', 'admin_nopass', 'onvif_discover', 'rtsp_capture', 'xiongmai_backdoor', 'mirai_check']
@@ -518,10 +518,10 @@ async function startPrinterScan() {
         if (progress >= 100) {
             clearInterval(interval);
             if (foundPrinters.length === 0) {
-                addLog('Scan de impressoras concluÃ­do. Nenhuma encontrada.', 'warning');
+                addLog('Scan de impressoras concluído. Nenhuma encontrada.', 'warning');
                 updatePrinterTable(); // Ensure table shows "empty" state appropriately
             } else {
-                addLog(`âœ… Scan concluÃ­do! ${foundPrinters.length} impressoras encontradas.`, 'success');
+                addLog(`âœ… Scan concluído! ${foundPrinters.length} impressoras encontradas.`, 'success');
             }
         }
         document.getElementById('printer-scan-bar').style.width = progress + '%';
@@ -545,7 +545,7 @@ function updatePrinterTable() {
     tbody.innerHTML = foundPrinters.map((prt, i) => `
                 <tr style="border-bottom:1px solid var(--border-color);">
                     <td style="padding:8px;">${prt.ip}</td>
-                    <td style="padding:8px;">${prt.brand || 'GenÃ©rica'}</td>
+                    <td style="padding:8px;">${prt.brand || 'Genérica'}</td>
                     <td style="padding:8px;">
                         <span style="padding:2px 6px;border-radius:4px;font-size:0.75rem;background:${prt.status === 'vulnerable' ? 'var(--danger)' :
             prt.status === 'logged' ? 'var(--success)' :
@@ -759,7 +759,7 @@ function saveHandshakeSchedule() {
         addLog(`ðŸ“… Agendado para daqui a ${minutes} minutos.`, 'success');
     } else {
         localStorage.removeItem('hs-schedule-next');
-        addLog('ðŸ“… Agendado para a prÃ³xima conexÃ£o.', 'success');
+        addLog('ðŸ“… Agendado para a próxima conexão.', 'success');
     }
 }
 
@@ -772,7 +772,7 @@ function checkScheduler() {
     if (nextCheck) {
         if (new Date().getTime() >= parseInt(nextCheck)) {
             // Time to remind or upload
-            addLog('â° Lembrete de Handshake: Hora de enviar handshakes nÃ£o quebrados!', 'warning');
+            addLog('â° Lembrete de Handshake: Hora de enviar handshakes não quebrados!', 'warning');
             // If we had a list of uncracked, we would try to upload them here
             if (confirm('â° Lembrete: Enviar handshakes pendentes para OnlineHashCrack agora?')) {
                 // Logic to bulk upload or redirect
@@ -785,7 +785,7 @@ function checkScheduler() {
         // 'next_connect' logic - we are here, so we are connected
         const time = localStorage.getItem('hs-schedule-time');
         if (time === 'next_connect') {
-            addLog('â° Auto-Check: ConexÃ£o Web detectada.', 'info');
+            addLog('â° Auto-Check: Conexão Web detectada.', 'info');
         }
     }
 }
@@ -796,7 +796,7 @@ function uploadSoundToSD(file) {
     addLog(`ðŸ“¤ Enviando ${file.name} para o SD...`, 'info');
     // Mock upload
     setTimeout(() => {
-        addLog('âœ… Upload ConcluÃ­do! Som disponÃ­vel para ataques.', 'success');
+        addLog('âœ… Upload Concluído! Som disponível para ataques.', 'success');
         loadSoundList(); // Refresh list
     }, 1000);
 }
@@ -806,7 +806,7 @@ function loadSoundList() {
     if (!list) return;
     // Mock list
     const sounds = ['ble_spam.wav', 'siren.mp3', 'glitch_noise.wav', 'custom_voice.wav'];
-    list.innerHTML = sounds.map(s => `<div style="padding:5px;border-bottom:1px solid #444;display:flex;justify-content:space-between;"><span>ðŸŽµ ${s}</span> <button class="btn btn-sm btn-danger" onclick="addLog('Som excluÃ­do (mock)', 'warning')">ðŸ—‘ï¸</button></div>`).join('');
+    list.innerHTML = sounds.map(s => `<div style="padding:5px;border-bottom:1px solid #444;display:flex;justify-content:space-between;"><span>ðŸŽµ ${s}</span> <button class="btn btn-sm btn-danger" onclick="addLog('Som excluído (mock)', 'warning')">ðŸ—‘ï¸</button></div>`).join('');
 }
 
 // Init
@@ -881,7 +881,7 @@ async function uploadSelectedHandshakeToOHC() {
         document.getElementById('ohc-usage').textContent = '3 / 100'; // Simply increment for feedback
         document.getElementById('ohc-progress').style.width = '3%';
     } else {
-        addLog('FunÃ§Ã£o de upload nÃ£o encontrada (js error)', 'error');
+        addLog('Função de upload não encontrada (js error)', 'error');
     }
 }
 
@@ -907,7 +907,7 @@ function attackAllBluetooth() {
         return;
     }
 
-    if (!confirm('â˜ ï¸ ATENÃ‡ÃƒO: ISSO VAI DERRUBAR TUDO AO REDOR. CONTINUAR?')) return;
+    if (!confirm('â˜ ï¸ ATENÇÃƒO: ISSO VAI DERRUBAR TUDO AO REDOR. CONTINUAR?')) return;
 
     addLog('â˜ ï¸ INICIANDO CAOS BLUETOOTH TOTAL â˜ ï¸', 'danger');
     sendCommand('play_sound', { sound: 'nuclear_alarm' });
@@ -958,7 +958,7 @@ async function startAllWPS() {
     sendCommand('wps_flood');
     await new Promise(r => setTimeout(r, 10000));
 
-    addLog('âœ… Todos ataques WPS concluÃ­dos!', 'success');
+    addLog('âœ… Todos ataques WPS concluídos!', 'success');
     if (btn) btn.disabled = false;
 }
 

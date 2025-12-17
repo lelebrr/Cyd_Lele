@@ -7,11 +7,15 @@
  */
 
 #include "boot_animation.h"
-#include "../core/pin_definitions.h"
+#ifndef LCD_WIDTH
+#define LCD_WIDTH TFT_WIDTH
+#endif
+#ifndef LCD_HEIGHT
+#define LCD_HEIGHT TFT_HEIGHT
+#endif
 #include "boot_logger.h"
 #include "sounds_manager.h"
 #include <debug_log.h>
-
 
 // Instância global
 BootAnimation bootAnimation;
@@ -93,7 +97,7 @@ void BootAnimation::start() {
     for (int i = 0; i < MAX_CIRCUIT_RAYS; i++) {
         rays[i].active = true;
         rays[i].currentSegment = 0;
-        rays[i].color = (i % 2 == 0) ? lv_color_to_u32(COLOR_NEON_CYAN) : lv_color_to_u32(COLOR_NEON_MAGENTA);
+        rays[i].color = (i % 2 == 0) ? lv_color_to32(COLOR_NEON_CYAN) : lv_color_to32(COLOR_NEON_MAGENTA);
 
         // Pontos de origem nos cantos/bordas
         float angle = (i * 360.0f / MAX_CIRCUIT_RAYS) * 3.14159f / 180.0f;

@@ -4,7 +4,7 @@
  */
 
 #include "ui_avatar.h"
-#include "../core/globals.h"             // Include globals for mascot_type
+#include "globals.h"                       // Include globals for mascot_type
 #include "../hardware/audio_driver.h"    // For sound
 #include "../hardware/system_hardware.h" // For haptics
 #include "../wifi/wifi_attacks.h"

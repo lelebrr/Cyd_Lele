@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -47,8 +47,8 @@
 
     <div class="preview">
       <div class="preview-header">
-        <h2>PrÃ©-visualizaÃ§Ã£o</h2>
-        <div class="preview-mascot" id="mascot">ðŸ²</div>
+        <h2>PrÃÂ©-visualizaÃÂ§ÃÂ£o</h2>
+        <div class="preview-mascot" id="mascot">°Å¸ÂÂ²</div>
       </div>
       <div class="preview-buttons">
         <button class="preview-btn btn-primary">Ataque</button>
@@ -58,7 +58,7 @@
     </div>
 
     <div class="editor">
-      <h2>Presets RÃ¡pidos</h2>
+      <h2>Presets RÃÂ¡pidos</h2>
       <div class="theme-presets">
         <button class="preset-btn active" onclick="loadPreset('dark_dragon')">Dark Dragon</button>
         <button class="preset-btn" onclick="loadPreset('cyber_purple')">Cyber Purple</button>
@@ -69,7 +69,7 @@
         <button class="preset-btn" onclick="loadPreset('stealth')">Stealth</button>
       </div>
 
-      <h2>Editor AvanÃ§ado</h2>
+      <h2>Editor AvanÃÂ§ado</h2>
       <div class="color-grid">
         <div class="color-item">
           <label>Primary</label>
@@ -193,17 +193,17 @@
         const status = document.getElementById('status');
         if (response.ok) {
           status.className = 'status success';
-          status.textContent = 'âœ“ Tema salvo com sucesso!';
+          status.textContent = 'âÅâ Tema salvo com sucesso!';
         } else {
           status.className = 'status error';
-          status.textContent = 'âœ— Erro ao salvar tema';
+          status.textContent = 'âÅâ Erro ao salvar tema';
         }
 
         setTimeout(() => { status.className = 'status'; status.textContent = ''; }, 3000);
       } catch (err) {
         const status = document.getElementById('status');
         status.className = 'status error';
-        status.textContent = 'âœ— Erro de conexÃ£o';
+        status.textContent = 'âÅâ Erro de conexÃÂ£o';
         setTimeout(() => { status.className = 'status'; status.textContent = ''; }, 3000);
       }
     }

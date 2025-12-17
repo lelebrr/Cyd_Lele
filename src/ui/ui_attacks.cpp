@@ -4,16 +4,17 @@
  */
 
 #include "ui_attacks.h"
-#include "../core/globals.h"
 #include "../hardware/ble_driver.h"
 #include "../hardware/wifi_driver.h"
 #include "../wifi/captive_portal.h"
 #include "../wifi/wifi_attacks.h"
 #include "../wifi/wps_attacks.h"
+#include "globals.h"
 #include "ui_helpers.h"
 #include "ui_main.h"
 #include "ui_wifi_chaos.h"
 #include <debug_log.h>
+
 
 // Objetos LVGL
 static lv_obj_t *scr_attacks = nullptr;

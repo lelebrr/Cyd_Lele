@@ -1,8 +1,8 @@
-﻿/**
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+ï»¿/**
+ * ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
  * lele - Mascot System with Sprites
  * Lele mascot with multiple mood sprites
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+ * ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
  */
 
 const MascotSystem = {
@@ -12,25 +12,25 @@ const MascotSystem = {
     mascots: {
         lele: {
             name: 'Lele',
-            emoji: 'ðŸ‘¦',
+            emoji: '°Å¸âÂ¦',
             sprite: 'lele_idle.png',
             moods: {
-                idle: { emoji: 'ðŸ‘¦', sprite: 'lele_idle.png' },
-                happy: { emoji: 'ðŸ˜„', sprite: 'lele_happy_1.png' },
-                hunting: { emoji: 'ðŸ§', sprite: 'lele_idle_2.png' },
-                angry: { emoji: 'ðŸ˜ ', sprite: 'lele_sad.png' },
-                sleeping: { emoji: 'ðŸ˜´', sprite: 'lele_sleep_1.png' },
-                attacking: { emoji: 'ðŸ˜Ž', sprite: 'lele_attack.png' },
-                success: { emoji: 'âœŒï¸', sprite: 'lele_happy_2.png' },
-                alert: { emoji: 'ðŸ˜³', sprite: 'lele_motivated.png' },
-                cool: { emoji: 'ðŸ˜Ž', sprite: 'lele_cool.png' }
+                idle: { emoji: '°Å¸âÂ¦', sprite: 'lele_idle.png' },
+                happy: { emoji: '°Å¸Ëâ', sprite: 'lele_happy_1.png' },
+                hunting: { emoji: '°Å¸Â§Â', sprite: 'lele_idle_2.png' },
+                angry: { emoji: '°Å¸ËÂ ', sprite: 'lele_sad.png' },
+                sleeping: { emoji: '°Å¸ËÂ´', sprite: 'lele_sleep_1.png' },
+                attacking: { emoji: '°Å¸ËÅ½', sprite: 'lele_attack.png' },
+                success: { emoji: 'âÅÅÃ¯Â¸Â', sprite: 'lele_happy_2.png' },
+                alert: { emoji: '°Å¸ËÂ³', sprite: 'lele_motivated.png' },
+                cool: { emoji: '°Å¸ËÅ½', sprite: 'lele_cool.png' }
             },
             phrases: {
-                idle: ['E aÃ­, beleza?', 'Tudo tranquilo?', 'Bora mexer nesses pacotes?', 'TÃ´ pronto, e vocÃª?'],
-                hunting: ['Olhando quem tÃ¡ perto...', 'Escaneando...', 'Hum, rede interessante...', 'Xiii, achei algo.'],
-                success: ['AÃ­ sim! Pegamos!', 'Sucesso total!', 'TÃ¡ na mÃ£o!', 'Handshake capturado! ðŸ”“'],
+                idle: ['E aÃÂ­, beleza?', 'Tudo tranquilo?', 'Bora mexer nesses pacotes?', 'TÃÂ´ pronto, e vocÃÂª?'],
+                hunting: ['Olhando quem tÃÂ¡ perto...', 'Escaneando...', 'Hum, rede interessante...', 'Xiii, achei algo.'],
+                success: ['AÃÂ­ sim! Pegamos!', 'Sucesso total!', 'TÃÂ¡ na mÃÂ£o!', 'Handshake capturado! °Å¸ââ'],
                 attack: ['Hora do show!', 'Segura essa!', 'Enviando pacotes...', 'Deauth ativado!'],
-                sleep: ['Vou dar um cochilo...', 'Zzz...', 'AtÃ© mais...', 'Modo economia...']
+                sleep: ['Vou dar um cochilo...', 'Zzz...', 'AtÃÂ© mais...', 'Modo economia...']
             },
             color: '#00fff5'
         }

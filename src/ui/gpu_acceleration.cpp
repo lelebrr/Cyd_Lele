@@ -5,10 +5,11 @@
 
 #include "gpu_acceleration.h"
 #include <debug_log.h>
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
 #include <esp_private/gdma.h>
 #include <soc/gdma_struct.h>
+#endif
 #include <string.h>
-
 
 GPUAccelerator gpuAccel;
 

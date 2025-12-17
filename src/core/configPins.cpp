@@ -11,7 +11,7 @@ String getMacAddress() {
     return String(macStr);
 }
 
-void leleConfigPins::fromJson(JsonObject obj) {
+void LeleConfigPins::fromJson(JsonObject obj) {
     int count = 0;
     String mac = getMacAddress();
 
@@ -34,9 +34,7 @@ void leleConfigPins::fromJson(JsonObject obj) {
     }
 
     // Dual NRF (Optional)
-    if (!root["NRF24_2_Pins"].isNull()) {
-        NRF24_2_bus.fromJson(root["NRF24_2_Pins"].as<JsonObject>());
-    }
+    if (!root["NRF24_2_Pins"].isNull()) { NRF24_2_bus.fromJson(root["NRF24_2_Pins"].as<JsonObject>()); }
 
     if (!root["SDCard_Pins"].isNull()) {
         SDCARD_bus.fromJson(root["SDCard_Pins"].as<JsonObject>());
@@ -80,7 +78,7 @@ void leleConfigPins::fromJson(JsonObject obj) {
     if (count > 0) saveFile();
 }
 
-void leleConfigPins::toJson(JsonObject obj) const {
+void LeleConfigPins::toJson(JsonObject obj) const {
     JsonObject root = obj[getMacAddress()].to<JsonObject>();
 
     JsonObject _CC1101 = root["CC1101_Pins"].to<JsonObject>();
@@ -108,7 +106,7 @@ void leleConfigPins::toJson(JsonObject obj) const {
     gps_bus.toJson(_gps);
 }
 
-void leleConfigPins::loadFile(JsonDocument &jsonDoc, bool checkFS) {
+void LeleConfigPins::loadFile(JsonDocument &jsonDoc, bool checkFS) {
     FS *fs;
     if (checkFS) {
         if (!getFsStorage(fs)) return;
@@ -135,14 +133,14 @@ void leleConfigPins::loadFile(JsonDocument &jsonDoc, bool checkFS) {
     serializeJsonPretty(jsonDoc, Serial);
 }
 
-void leleConfigPins::fromFile(bool checkFS) {
+void LeleConfigPins::fromFile(bool checkFS) {
     JsonDocument jsonDoc;
     loadFile(jsonDoc, checkFS);
 
     if (!jsonDoc.isNull()) fromJson(jsonDoc.as<JsonObject>());
 }
 
-void leleConfigPins::createFile() {
+void LeleConfigPins::createFile() {
     JsonDocument jsonDoc;
     toJson(jsonDoc.to<JsonObject>());
     serializeJsonPretty(jsonDoc, Serial);
@@ -165,7 +163,7 @@ void leleConfigPins::createFile() {
     if (setupSdCard()) copyToFs(LittleFS, SD, filepath, false);
 }
 
-void leleConfigPins::saveFile() {
+void LeleConfigPins::saveFile() {
     JsonDocument jsonDoc;
     loadFile(jsonDoc);
 
@@ -191,14 +189,14 @@ void leleConfigPins::saveFile() {
     if (setupSdCard()) copyToFs(LittleFS, SD, filepath, false);
 }
 
-void leleConfigPins::factoryReset() {
+void LeleConfigPins::factoryReset() {
     FS *fs = &LittleFS;
     fs->rename(String(filepath), "/bak." + String(filepath).substring(1));
     if (setupSdCard()) SD.rename(String(filepath), "/bak." + String(filepath).substring(1));
     ESP.restart();
 }
 
-void leleConfigPins::validateConfig() {
+void LeleConfigPins::validateConfig() {
     validateSpiPins(CC1101_bus);
     validateSpiPins(NRF24_bus);
     validateSpiPins(NRF24_2_bus);
@@ -208,13 +206,13 @@ void leleConfigPins::validateConfig() {
     validateUARTPins(gps_bus);
 }
 
-void leleConfigPins::setCC1101Pins(SPIPins value) {
+void LeleConfigPins::setCC1101Pins(SPIPins value) {
     CC1101_bus = value;
     validateSpiPins(CC1101_bus);
     saveFile();
 }
 
-void leleConfigPins::setNrf24Pins(SPIPins value, int radio_id) {
+void LeleConfigPins::setNrf24Pins(SPIPins value, int radio_id) {
     if (radio_id == 0) {
         NRF24_bus = value;
         validateSpiPins(NRF24_bus);
@@ -225,27 +223,27 @@ void leleConfigPins::setNrf24Pins(SPIPins value, int radio_id) {
     saveFile();
 }
 
-void leleConfigPins::setSDCardPins(SPIPins value) {
+void LeleConfigPins::setSDCardPins(SPIPins value) {
     SDCARD_bus = value;
     validateSpiPins(SDCARD_bus);
     saveFile();
 }
 
-void leleConfigPins::setSpiPins(SPIPins value) {
+void LeleConfigPins::setSpiPins(SPIPins value) {
     validateSpiPins(value);
     saveFile();
 }
 
-void leleConfigPins::setI2CPins(I2CPins value) {
+void LeleConfigPins::setI2CPins(I2CPins value) {
     validateI2CPins(value);
     saveFile();
 }
 
-void leleConfigPins::setUARTPins(UARTPins value) {
+void LeleConfigPins::setUARTPins(UARTPins value) {
     validateUARTPins(value);
     saveFile();
 }
-void leleConfigPins::validateSpiPins(SPIPins value) {
+void LeleConfigPins::validateSpiPins(SPIPins value) {
     if (value.sck < 0 || value.sck > GPIO_PIN_COUNT) value.sck = GPIO_NUM_NC;
     if (value.miso < 0 || value.miso > GPIO_PIN_COUNT) value.miso = GPIO_NUM_NC;
     if (value.mosi < 0 || value.mosi > GPIO_PIN_COUNT) value.mosi = GPIO_NUM_NC;
@@ -254,12 +252,12 @@ void leleConfigPins::validateSpiPins(SPIPins value) {
     if (value.io2 < 0 || value.io2 > GPIO_PIN_COUNT) value.io2 = GPIO_NUM_NC;
 }
 
-void leleConfigPins::validateI2CPins(I2CPins value) {
+void LeleConfigPins::validateI2CPins(I2CPins value) {
     if (value.sda < 0 || value.sda > GPIO_PIN_COUNT) value.sda = GPIO_NUM_NC;
     if (value.scl < 0 || value.scl > GPIO_PIN_COUNT) value.scl = GPIO_NUM_NC;
 }
 
-void leleConfigPins::validateUARTPins(UARTPins value) {
+void LeleConfigPins::validateUARTPins(UARTPins value) {
     if (value.rx < 0 || value.rx > GPIO_PIN_COUNT) value.rx = GPIO_NUM_NC;
     if (value.tx < 0 || value.tx > GPIO_PIN_COUNT) value.tx = GPIO_NUM_NC;
 }

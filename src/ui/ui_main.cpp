@@ -25,12 +25,13 @@
 #include "ui_settings.h"
 #include <debug_log.h>
 
-
 // Objetos LVGL
 static lv_obj_t *scr_main = nullptr;
 static lv_obj_t *lbl_mood = nullptr;
 static lv_obj_t *mascot_container = nullptr;
 static lv_obj_t *dragon_emoji = nullptr;
+
+GlobalState g_state; // Define global state definition
 
 // Estado da UI
 static UIScreen current_screen = UI_SCREEN_MAIN;

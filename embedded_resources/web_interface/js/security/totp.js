@@ -1,4 +1,4 @@
-﻿/**
+ï»¿/**
  * WAVEPWN - 2FA TOTP Authentication (Dica 62)
  * Google Authenticator compatible TOTP
  */
@@ -117,12 +117,12 @@ function renderTOTPSetup(containerId) {
 
     container.innerHTML = `
         <div class="totp-setup">
-            <h3>ðŸ” AutenticaÃ§Ã£o 2FA</h3>
+            <h3>°Å¸âÂ AutenticaÃÂ§ÃÂ£o 2FA</h3>
             ${hasSecret ? `
                 <div class="totp-enabled">
-                    <div class="status success">âœ“ 2FA Ativado</div>
+                    <div class="status success">âÅâ 2FA Ativado</div>
                     <div class="form-group">
-                        <label>CÃ³digo de verificaÃ§Ã£o</label>
+                        <label>CÃÂ³digo de verificaÃÂ§ÃÂ£o</label>
                         <input type="text" id="totp-verify" maxlength="6" placeholder="000000">
                     </div>
                     <button class="btn btn-primary" onclick="testTOTP()">Verificar</button>
@@ -147,15 +147,15 @@ function enableTOTP() {
     modal.className = 'totp-modal';
     modal.innerHTML = `
         <div class="totp-modal-content">
-            <h3>ðŸ“± Configure o Google Authenticator</h3>
+            <h3>°Å¸âÂ± Configure o Google Authenticator</h3>
             <p>Escaneie o QR code ou insira a chave manualmente:</p>
             <div id="totp-qr" class="qr-container"></div>
             <div class="secret-key">
                 <code>${secret}</code>
-                <button class="btn btn-sm" onclick="copySecret('${secret}')">ðŸ“‹</button>
+                <button class="btn btn-sm" onclick="copySecret('${secret}')">°Å¸ââ¹</button>
             </div>
             <div class="form-group">
-                <label>CÃ³digo de verificaÃ§Ã£o</label>
+                <label>CÃÂ³digo de verificaÃÂ§ÃÂ£o</label>
                 <input type="text" id="totp-confirm" maxlength="6" placeholder="000000">
             </div>
             <div class="modal-actions">
@@ -188,7 +188,7 @@ async function confirmTOTP() {
         renderTOTPSetup('totp-container');
         showToast('2FA ativado com sucesso!', 'success');
     } else {
-        showToast('CÃ³digo invÃ¡lido', 'error');
+        showToast('CÃÂ³digo invÃÂ¡lido', 'error');
     }
 }
 
@@ -199,7 +199,7 @@ function cancelTOTP() {
 }
 
 function disableTOTP() {
-    if (!confirm('Desativar autenticaÃ§Ã£o 2FA?')) return;
+    if (!confirm('Desativar autenticaÃÂ§ÃÂ£o 2FA?')) return;
     TOTP.secret = null;
     localStorage.removeItem('wavepwn-totp-secret');
     fetch('/api/security/totp', { method: 'DELETE' });
@@ -211,7 +211,7 @@ async function testTOTP() {
     if (!input) return;
 
     const valid = await verifyTOTPCode(input.value.trim());
-    showToast(valid ? 'CÃ³digo vÃ¡lido! âœ“' : 'CÃ³digo invÃ¡lido âœ—', valid ? 'success' : 'error');
+    showToast(valid ? 'CÃÂ³digo vÃÂ¡lido! âÅâ' : 'CÃÂ³digo invÃÂ¡lido âÅâ', valid ? 'success' : 'error');
 }
 
 function closeTOTPModal() {

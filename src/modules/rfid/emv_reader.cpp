@@ -77,7 +77,7 @@ std::vector<uint8_t> EMVReader::emv_ask_for_aid() {
         /* Select Application */
         uint8_t ask_for_aid_apdu[] = {0x00, 0xA4, 0x04, 0x00, 0x0e, 0x32, 0x50, 0x41, 0x59, 0x2e,
                                       0x53, 0x59, 0x53, 0x2e, 0x44, 0x44, 0x46, 0x30, 0x31, 0x00};
-        if (nfc->EMVinDataExchange(ask_for_aid_apdu, sizeof(ask_for_aid_apdu), response, &response_len)) {
+        if (nfc->inDataExchange(ask_for_aid_apdu, sizeof(ask_for_aid_apdu), response, &response_len)) {
             std::vector<uint8_t> response_vector(&response[0], &response[response_len]);
             BerTlv Tlv;
             Tlv.SetTlv(response_vector);
@@ -99,7 +99,7 @@ std::vector<uint8_t> EMVReader::emv_ask_for_app_name() {
     std::vector<uint8_t> app_name;
     uint8_t ask_for_aid_apdu[] = {0x00, 0xA4, 0x04, 0x00, 0x0e, 0x32, 0x50, 0x41, 0x59, 0x2e,
                                   0x53, 0x59, 0x53, 0x2e, 0x44, 0x44, 0x46, 0x30, 0x31, 0x00};
-    if (nfc->EMVinDataExchange(ask_for_aid_apdu, sizeof(ask_for_aid_apdu), response, &response_len)) {
+    if (nfc->inDataExchange(ask_for_aid_apdu, sizeof(ask_for_aid_apdu), response, &response_len)) {
         std::vector<uint8_t> response_vector(&response[0], &response[response_len]);
         BerTlv Tlv;
         Tlv.SetTlv(response_vector);
@@ -122,7 +122,7 @@ std::vector<uint8_t> EMVReader::emv_ask_for_pdol(std::vector<uint8_t> *aid) {
     uint8_t ask_for_pdol[] = {0x00, 0xa4, 0x04, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x00};
     memcpy(ask_for_pdol + 5, aid->data(), 7);
 
-    if (nfc->EMVinDataExchange(ask_for_pdol, sizeof(ask_for_pdol), response, &response_len)) {
+    if (nfc->inDataExchange(ask_for_pdol, sizeof(ask_for_pdol), response, &response_len)) {
         std::vector<uint8_t> response_vector(&response[0], &response[response_len]);
 
         BerTlv Tlv;
@@ -190,7 +190,7 @@ void EMVReader::emv_read_visa(std::vector<uint8_t> *pdol_data, EMVCard *card) {
         0x00 // Len of response expected by the card(0 means all)
     };
 
-    if (nfc->EMVinDataExchange(payload, sizeof(payload), response, &response_len)) {
+    if (nfc->inDataExchange(payload, sizeof(payload), response, &response_len)) {
         std::vector<uint8_t> response_vector(&response[0], &response[response_len]);
 
         BerTlv Tlv;
@@ -222,7 +222,7 @@ std::vector<uint8_t> EMVReader::emv_get_processing_options_no_pdol() {
     std::vector<uint8_t> afl;
     uint8_t ask_for_afl[] = {0x80, 0xa8, 0x00, 0x00, 0x02, 0x83, 0x00, 0x00}; // Get AFL
 
-    if (nfc->EMVinDataExchange(ask_for_afl, sizeof(ask_for_afl), response, &response_len)) {
+    if (nfc->inDataExchange(ask_for_afl, sizeof(ask_for_afl), response, &response_len)) {
         std::vector<uint8_t> response_vector(&response[0], &response[response_len]);
         BerTlv Tlv;
         Tlv.SetTlv(response_vector);
@@ -241,7 +241,7 @@ std::vector<uint8_t> EMVReader::emv_read_record(uint8_t p1, uint8_t p2) {
 
     uint8_t read_afl[] = {0x00, 0xB2, p1, p2, 0x00};
 
-    if (nfc->EMVinDataExchange(read_afl, sizeof(read_afl), response, &response_len)) {
+    if (nfc->inDataExchange(read_afl, sizeof(read_afl), response, &response_len)) {
         result = std::vector<uint8_t>(&response[0], &response[response_len]);
     }
     return result;

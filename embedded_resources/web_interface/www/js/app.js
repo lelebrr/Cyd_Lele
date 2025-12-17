@@ -1,4 +1,4 @@
-﻿function app() {
+ï»¿function app() {
   return {
     loading: true,
     progress: 0,
@@ -14,10 +14,10 @@
       networks: 0
     },
     menuItems: [
-      { id: 'dashboard', label: 'Dashboard', icon: 'ðŸ“Š' },
-      { id: 'attacks', label: 'Attacks', icon: 'âš”ï¸' },
-      { id: 'terminal', label: 'Terminal', icon: 'ðŸ’»' },
-      { id: 'settings', label: 'Settings', icon: 'âš™ï¸' }
+      { id: 'dashboard', label: 'Dashboard', icon: '°Å¸âÅ ' },
+      { id: 'attacks', label: 'Attacks', icon: 'âÅ¡âÃ¯Â¸Â' },
+      { id: 'terminal', label: 'Terminal', icon: '°Å¸âÂ»' },
+      { id: 'settings', label: 'Settings', icon: 'âÅ¡â¢Ã¯Â¸Â' }
     ],
     socket: null,
     term: null,

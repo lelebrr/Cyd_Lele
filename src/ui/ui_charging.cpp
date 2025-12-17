@@ -1,7 +1,7 @@
 #include "ui_charging.h"
-#include "../hardware/system_hardware.h"
 #include "mascot_faces.h"
 #include "ui_helpers.h"
+#include "../hardware/system_hardware.h" // Para sys_hw
 
 
 static lv_obj_t *scr_charging = nullptr;

