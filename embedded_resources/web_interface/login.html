@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lele</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/theme.css">
+</head>
+
+<body>
+    <div class="dialog-background">
+        <form action="/login" method="POST">
+            <div class="dialog login">
+                <div class="dialog-head">
+                    Entrar
+                </div>
+                <div class="dialog-body">
+                    <div id="notice" style="display: none;font-weight: bold;padding-bottom: 5px;"></div>
+                    <label for="username" class="oinput-label">Usuário</label>
+                    <input type="text" name="username" id="username" class="oinput-text-submit"
+                        style="margin-bottom: 10px">
+                    <label for="password" class="oinput-label">Senha</label>
+                    <input type="password" name="password" class="oinput-text-submit">
+                </div>
+                <div class="dialog-footer">
+                    <input type="submit" class="btn-action" value="Entrar">
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('username').focus();
+
+        const params = new URLSearchParams(location.search);
+        const notice = document.getElementById('notice');
+        if (params.has('failed')) notice.style.display = 'block', notice.textContent = 'Falha no login - Tente novamente.';
+        else if (params.has('loggedout')) notice.style.display = 'block', notice.textContent = 'Você foi desconectado com sucesso.';
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1032 @@
+﻿#include "config.h"
+#include "sd_functions.h"
+
+JsonDocument leleConfig::toJson() const {
+    JsonDocument jsonDoc;
+    JsonObject setting = jsonDoc.to<JsonObject>();
+
+    setting["priColor"] = String(priColor, HEX);
+    setting["secColor"] = String(secColor, HEX);
+    setting["bgColor"] = String(bgColor, HEX);
+    setting["themeFile"] = themePath;
+    setting["themeOnSd"] = theme.fs;
+
+    setting["rot"] = rotation;
+    setting["dimmerSet"] = dimmerSet;
+    setting["bright"] = bright;
+    setting["tmz"] = tmz;
+    setting["soundEnabled"] = soundEnabled;
+    setting["soundVolume"] = soundVolume;
+    setting["wifiAtStartup"] = wifiAtStartup;
+    setting["instantBoot"] = instantBoot;
+
+#ifdef HAS_RGB_LED
+    setting["ledBright"] = ledBright;
+    setting["ledColor"] = String(ledColor, HEX);
+    setting["ledBlinkEnabled"] = ledBlinkEnabled;
+    setting["ledEffect"] = ledEffect;
+    setting["ledEffectSpeed"] = ledEffectSpeed;
+    setting["ledEffectDirection"] = ledEffectDirection;
+#endif
+
+    // WS2812B LEDs
+    setting["ws2812bEnabled"] = ws2812bEnabled;
+    setting["ws2812bBright"] = ws2812bBright;
+    setting["ws2812bColor"] = String(ws2812bColor, HEX);
+    setting["ws2812bEffect"] = ws2812bEffect;
+    setting["ws2812bEffectSpeed"] = ws2812bEffectSpeed;
+    setting["ws2812bNotifyErrors"] = ws2812bNotifyErrors;
+    setting["ws2812bNotifySuccess"] = ws2812bNotifySuccess;
+    setting["ws2812bNotifyCapture"] = ws2812bNotifyCapture;
+
+    // Sensor Temperatura
+    setting["tempEnabled"] = tempEnabled;
+    setting["tempWarning"] = tempWarning;
+    setting["tempCritical"] = tempCritical;
+    setting["tempShutdown"] = tempShutdown;
+    setting["tempAlertType"] = tempAlertType;
+    setting["tempAction"] = tempAction;
+    setting["tempShowOnBar"] = tempShowOnBar;
+
+    JsonObject _webUI = setting["webUI"].to<JsonObject>();
+    _webUI["user"] = webUI.user;
+    _webUI["pwd"] = webUI.pwd;
+    JsonObject _webUISessions = setting["webUISessions"].to<JsonObject>();
+    for (size_t i = 0; i < webUISessions.size(); i++) { _webUISessions[String(i + 1)] = webUISessions[i]; }
+
+    JsonObject _wifiAp = setting["wifiAp"].to<JsonObject>();
+    _wifiAp["ssid"] = wifiAp.ssid;
+    _wifiAp["pwd"] = wifiAp.pwd;
+    setting["wifiMAC"] = wifiMAC; //@IncursioHack
+
+    JsonArray _evilWifiNames = setting["evilWifiNames"].to<JsonArray>();
+    for (auto key : evilWifiNames) _evilWifiNames.add(key);
+
+    JsonObject _evilWifiEndpoints = setting["evilWifiEndpoints"].to<JsonObject>();
+    _evilWifiEndpoints["getCredsEndpoint"] = evilPortalEndpoints.getCredsEndpoint;
+    _evilWifiEndpoints["setSsidEndpoint"] = evilPortalEndpoints.setSsidEndpoint;
+    _evilWifiEndpoints["showEndpoints"] = evilPortalEndpoints.showEndpoints;
+    _evilWifiEndpoints["allowSetSsid"] = evilPortalEndpoints.allowSetSsid;
+    _evilWifiEndpoints["allowGetCreds"] = evilPortalEndpoints.allowGetCreds;
+
+    setting["evilWifiPasswordMode"] = evilPortalPasswordMode;
+
+    setting["bleName"] = bleName;
+
+    JsonObject _wifi = setting["wifi"].to<JsonObject>();
+    for (const auto &pair : wifi) { _wifi[pair.first] = pair.second; }
+
+    setting["irTx"] = irTx;
+    setting["irTxRepeats"] = irTxRepeats;
+    setting["irRx"] = irRx;
+
+    setting["rfTx"] = rfTx;
+    setting["rfRx"] = rfRx;
+    setting["rfModule"] = rfModule;
+    setting["rfFreq"] = rfFreq;
+    setting["rfFxdFreq"] = rfFxdFreq;
+    setting["rfScanRange"] = rfScanRange;
+
+    setting["rfidModule"] = rfidModule;
+
+    setting["iButton"] = iButton;
+
+    JsonArray _mifareKeys = setting["mifareKeys"].to<JsonArray>();
+    for (auto key : mifareKeys) _mifareKeys.add(key);
+
+    setting["gpsBaudrate"] = gpsBaudrate;
+
+    setting["startupApp"] = startupApp;
+    setting["wigleBasicToken"] = wigleBasicToken;
+    setting["devMode"] = devMode;
+    setting["colorInverted"] = colorInverted;
+
+    setting["badUSBBLEKeyboardLayout"] = badUSBBLEKeyboardLayout;
+    setting["badUSBBLEKeyDelay"] = badUSBBLEKeyDelay;
+
+    JsonArray dm = setting["disabledMenus"].to<JsonArray>();
+    for (int i = 0; i < disabledMenus.size(); i++) { dm.add(disabledMenus[i]); }
+
+    JsonArray qrArray = setting["qrCodes"].to<JsonArray>();
+    for (const auto &entry : qrCodes) {
+        JsonObject qrEntry = qrArray.add<JsonObject>();
+        qrEntry["menuName"] = entry.menuName;
+        qrEntry["content"] = entry.content;
+    }
+
+    return jsonDoc;
+}
+
+void leleConfig::fromFile(bool checkFS) {
+    FS *fs;
+    if (checkFS) {
+        if (!getFsStorage(fs)) {
+            log_i("Fail getting filesystem for config");
+            return;
+        }
+    } else {
+        if (checkLittleFsSize()) fs = &LittleFS;
+        else return;
+    }
+
+    if (!fs->exists(filepath)) {
+        log_i("Config file not found. Creating default config");
+        return saveFile();
+    }
+
+    File file;
+    file = fs->open(filepath, FILE_READ);
+    if (!file) {
+        log_i("Config file not found. Using default values");
+        return;
+    }
+
+    // Deserialize the JSON document
+    JsonDocument jsonDoc;
+    if (deserializeJson(jsonDoc, file)) {
+        Serial.println("Failed to read config file, using default configuration");
+        return;
+    }
+    file.close();
+
+    JsonObject setting = jsonDoc.as<JsonObject>();
+    int count = 0;
+
+    if (!setting["priColor"].isNull()) {
+        priColor = strtoul(setting["priColor"], nullptr, 16);
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["secColor"].isNull()) {
+        secColor = strtoul(setting["secColor"], nullptr, 16);
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["bgColor"].isNull()) {
+        bgColor = strtoul(setting["bgColor"], nullptr, 16);
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["themeFile"].isNull()) {
+        themePath = setting["themeFile"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["themeOnSd"].isNull()) {
+        theme.fs = setting["themeOnSd"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["rot"].isNull()) {
+        rotation = setting["rot"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["dimmerSet"].isNull()) {
+        dimmerSet = setting["dimmerSet"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["bright"].isNull()) {
+        bright = setting["bright"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["tmz"].isNull()) {
+        tmz = setting["tmz"].as<float>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["soundEnabled"].isNull()) {
+        soundEnabled = setting["soundEnabled"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["soundVolume"].isNull()) {
+        soundVolume = setting["soundVolume"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["wifiAtStartup"].isNull()) {
+        wifiAtStartup = setting["wifiAtStartup"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["instantBoot"].isNull()) {
+        instantBoot = setting["instantBoot"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+#ifdef HAS_RGB_LED
+    if (!setting["ledBright"].isNull()) {
+        ledBright = setting["ledBright"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["ledColor"].isNull()) {
+        ledColor = strtoul(setting["ledColor"], nullptr, 16);
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["ledBlinkEnabled"].isNull()) {
+        ledBlinkEnabled = setting["ledBlinkEnabled"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["ledEffect"].isNull()) {
+        ledEffect = setting["ledEffect"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["ledEffectSpeed"].isNull()) {
+        ledEffectSpeed = setting["ledEffectSpeed"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["ledEffectDirection"].isNull()) {
+        ledEffectDirection = setting["ledEffectDirection"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+#endif
+
+    if (!setting["webUI"].isNull()) {
+        JsonObject webUIObj = setting["webUI"].as<JsonObject>();
+        webUI.user = webUIObj["user"].as<String>();
+        webUI.pwd = webUIObj["pwd"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["webUISessions"].isNull()) {
+        webUISessions.clear();
+        for (JsonPair kv : setting["webUISessions"].as<JsonObject>()) {
+            webUISessions.push_back(kv.value().as<String>());
+        }
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["wifiAp"].isNull()) {
+        JsonObject wifiApObj = setting["wifiAp"].as<JsonObject>();
+        wifiAp.ssid = wifiApObj["ssid"].as<String>();
+        wifiAp.pwd = wifiApObj["pwd"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    //@IncursioHack
+    if (!setting["wifiMAC"].isNull()) {
+        wifiMAC = setting["wifiMAC"].as<String>();
+    } else {
+        wifiMAC = "";
+        count++;
+        log_e("wifiMAC not found, using default");
+    }
+
+    // Wifi List
+    if (!setting["wifi"].isNull()) {
+        wifi.clear();
+        for (JsonPair kv : setting["wifi"].as<JsonObject>()) wifi[kv.key().c_str()] = kv.value().as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["evilWifiNames"].isNull()) {
+        evilWifiNames.clear();
+        JsonArray _evilWifiNames = setting["evilWifiNames"].as<JsonArray>();
+        for (JsonVariant key : _evilWifiNames) evilWifiNames.insert(key.as<String>());
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["evilWifiEndpoints"].isNull()) {
+        JsonObject evilPortalEndpointsObj = setting["evilWifiEndpoints"].as<JsonObject>();
+        evilPortalEndpoints.getCredsEndpoint = evilPortalEndpointsObj["getCredsEndpoint"].as<String>();
+        evilPortalEndpoints.setSsidEndpoint = evilPortalEndpointsObj["setSsidEndpoint"].as<String>();
+        evilPortalEndpoints.showEndpoints = evilPortalEndpointsObj["showEndpoints"].as<bool>();
+        evilPortalEndpoints.allowSetSsid = evilPortalEndpointsObj["allowSetSsid"].as<bool>();
+        evilPortalEndpoints.allowGetCreds = evilPortalEndpointsObj["allowGetCreds"].as<bool>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["evilWifiPasswordMode"].isNull()) {
+        int mode = setting["evilWifiPasswordMode"].as<int>();
+        if (mode >= 0 && mode <= 2) {
+            evilPortalPasswordMode = static_cast<EvilPortalPasswordMode>(mode);
+        } else {
+            evilPortalPasswordMode = FULL_PASSWORD;
+            log_w("Invalid evilWifiPasswordMode, using FULL_PASSWORD");
+        }
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["bleName"].isNull()) {
+        bleName = setting["bleName"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["irTx"].isNull()) {
+        irTx = setting["irTx"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["irTxRepeats"].isNull()) {
+        irTxRepeats = setting["irTxRepeats"].as<uint8_t>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["irRx"].isNull()) {
+        irRx = setting["irRx"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["rfTx"].isNull()) {
+        rfTx = setting["rfTx"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["rfRx"].isNull()) {
+        rfRx = setting["rfRx"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["rfModule"].isNull()) {
+        rfModule = setting["rfModule"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["rfFreq"].isNull()) {
+        rfFreq = setting["rfFreq"].as<float>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["rfFxdFreq"].isNull()) {
+        rfFxdFreq = setting["rfFxdFreq"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["rfScanRange"].isNull()) {
+        rfScanRange = setting["rfScanRange"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["rfidModule"].isNull()) {
+        rfidModule = setting["rfidModule"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["iButton"].isNull()) {
+        int val = setting["iButton"].as<int>();
+        if (val < GPIO_NUM_MAX) iButton = val;
+        else log_w("iButton pin not set");
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["mifareKeys"].isNull()) {
+        mifareKeys.clear();
+        JsonArray _mifareKeys = setting["mifareKeys"].as<JsonArray>();
+        for (JsonVariant key : _mifareKeys) mifareKeys.insert(key.as<String>());
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["gpsBaudrate"].isNull()) {
+        gpsBaudrate = setting["gpsBaudrate"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["startupApp"].isNull()) {
+        startupApp = setting["startupApp"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["wigleBasicToken"].isNull()) {
+        wigleBasicToken = setting["wigleBasicToken"].as<String>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["devMode"].isNull()) {
+        devMode = setting["devMode"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+    if (!setting["colorInverted"].isNull()) {
+        colorInverted = setting["colorInverted"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["badUSBBLEKeyboardLayout"].isNull()) {
+        badUSBBLEKeyboardLayout = setting["badUSBBLEKeyboardLayout"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["badUSBBLEKeyDelay"].isNull()) {
+        badUSBBLEKeyDelay = setting["badUSBBLEKeyDelay"].as<int>();
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["disabledMenus"].isNull()) {
+        disabledMenus.clear();
+        JsonArray dm = setting["disabledMenus"].as<JsonArray>();
+        for (JsonVariant e : dm) { disabledMenus.push_back(e.as<String>()); }
+    } else {
+        count++;
+        log_e("Fail");
+    }
+
+    if (!setting["qrCodes"].isNull()) {
+        qrCodes.clear();
+        JsonArray qrArray = setting["qrCodes"].as<JsonArray>();
+        for (JsonObject qrEntry : qrArray) {
+            String menuName = qrEntry["menuName"].as<String>();
+            String content = qrEntry["content"].as<String>();
+            qrCodes.push_back({menuName, content});
+        }
+    } else {
+        count++;
+        log_e("Fail to load qrCodes");
+    }
+
+    validateConfig();
+    if (count > 0) saveFile();
+
+    log_i("Using config from file");
+}
+
+void leleConfig::saveFile() {
+    FS *fs = &LittleFS;
+    JsonDocument jsonDoc = toJson();
+
+    // Open file for writing
+    File file = fs->open(filepath, FILE_WRITE);
+    if (!file) {
+        log_e("Failed to open config file");
+        file.close();
+        return;
+    };
+
+    // Serialize JSON to file
+    serializeJsonPretty(jsonDoc, Serial);
+    if (serializeJsonPretty(jsonDoc, file) < 5) log_e("Failed to write config file");
+    else log_i("config file written successfully");
+
+    file.close();
+
+    if (setupSdCard()) copyToFs(LittleFS, SD, filepath, false);
+}
+
+void leleConfig::factoryReset() {
+    FS *fs = &LittleFS;
+    fs->rename(String(filepath), "/bak." + String(filepath).substring(1));
+    if (setupSdCard()) SD.rename(String(filepath), "/bak." + String(filepath).substring(1));
+    ESP.restart();
+}
+
+void leleConfig::validateConfig() {
+    validateRotationValue();
+    validateDimmerValue();
+    validateBrightValue();
+    validateTmzValue();
+    validateSoundEnabledValue();
+    validateSoundVolumeValue();
+    validateWifiAtStartupValue();
+#ifdef HAS_RGB_LED
+    validateLedBrightValue();
+    validateLedColorValue();
+    validateLedBlinkEnabledValue();
+    validateLedEffectValue();
+    validateLedEffectSpeedValue();
+    validateLedEffectDirectionValue();
+#endif
+    validateRfScanRangeValue();
+    validateRfModuleValue();
+    validateRfidModuleValue();
+    validateMifareKeysItems();
+    validateGpsBaudrateValue();
+    validateDevModeValue();
+    validateColorInverted();
+    validateBadUSBBLEKeyboardLayout();
+    validateBadUSBBLEKeyDelay();
+    validateEvilEndpointCreds();
+    validateEvilEndpointSsid();
+    validateEvilPasswordMode();
+}
+
+void leleConfig::setUiColor(uint16_t primary, uint16_t *secondary, uint16_t *background) {
+    LeleTheme::_setUiColor(primary, secondary, background);
+    saveFile();
+}
+
+void leleConfig::setRotation(int value) {
+    rotation = value;
+    validateRotationValue();
+    saveFile();
+}
+
+void leleConfig::validateRotationValue() {
+    if (rotation < 0 || rotation > 3) rotation = 1;
+}
+
+void leleConfig::setDimmer(int value) {
+    dimmerSet = value;
+    validateDimmerValue();
+    saveFile();
+}
+
+void leleConfig::validateDimmerValue() {
+    if (dimmerSet < 0) dimmerSet = 10;
+    if (dimmerSet > 60) dimmerSet = 0;
+}
+
+void leleConfig::setBright(uint8_t value) {
+    bright = value;
+    validateBrightValue();
+    saveFile();
+}
+
+void leleConfig::validateBrightValue() {
+    if (bright > 100) bright = 100;
+}
+
+void leleConfig::setTmz(float value) {
+    tmz = value;
+    validateTmzValue();
+    saveFile();
+}
+
+void leleConfig::validateTmzValue() {
+    if (tmz < -12 || tmz > 14) tmz = 0;
+}
+
+void leleConfig::setSoundEnabled(int value) {
+    soundEnabled = value;
+    validateSoundEnabledValue();
+    saveFile();
+}
+
+void leleConfig::setSoundVolume(int value) {
+    soundVolume = value;
+    validateSoundVolumeValue();
+    saveFile();
+}
+
+void leleConfig::validateSoundEnabledValue() {
+    if (soundEnabled > 1) soundEnabled = 1;
+}
+
+void leleConfig::validateSoundVolumeValue() {
+    if (soundVolume > 100) soundVolume = 100;
+}
+
+void leleConfig::setWifiAtStartup(int value) {
+    wifiAtStartup = value;
+    validateWifiAtStartupValue();
+    saveFile();
+}
+
+void leleConfig::validateWifiAtStartupValue() {
+    if (wifiAtStartup > 1) wifiAtStartup = 1;
+}
+
+#ifdef HAS_RGB_LED
+void leleConfig::setLedBright(int value) {
+    ledBright = value;
+    validateLedBrightValue();
+    saveFile();
+}
+
+void leleConfig::validateLedBrightValue() { ledBright = max(0, min(100, ledBright)); }
+
+void leleConfig::setLedColor(uint32_t value) {
+    ledColor = value;
+    validateLedColorValue();
+    saveFile();
+}
+
+void leleConfig::validateLedColorValue() {
+    ledColor = max<uint32_t>(0, min<uint32_t>(0xFFFFFFFF, ledColor));
+}
+
+void leleConfig::setLedBlinkEnabled(int value) {
+    ledBlinkEnabled = value;
+    validateLedBlinkEnabledValue();
+    saveFile();
+}
+
+void leleConfig::validateLedBlinkEnabledValue() {
+    if (ledBlinkEnabled > 1) ledBlinkEnabled = 1;
+}
+
+void leleConfig::setLedEffect(int value) {
+    ledEffect = value;
+    validateLedEffectValue();
+    saveFile();
+}
+
+void leleConfig::validateLedEffectValue() {
+    if (ledEffect < 0 || ledEffect > 5) ledEffect = 0;
+}
+
+void leleConfig::setLedEffectSpeed(int value) {
+    ledEffectSpeed = value;
+    validateLedEffectSpeedValue();
+    saveFile();
+}
+
+void leleConfig::validateLedEffectSpeedValue() {
+#ifdef HAS_ENCODER_LED
+    if (ledEffectSpeed > 11) ledEffectSpeed = 11;
+#else
+    if (ledEffectSpeed > 10) ledEffectSpeed = 10;
+#endif
+    if (ledEffectSpeed < 0) ledEffectSpeed = 1;
+}
+
+void leleConfig::setLedEffectDirection(int value) {
+    ledEffectDirection = value;
+    validateLedEffectDirectionValue();
+    saveFile();
+}
+
+void leleConfig::validateLedEffectDirectionValue() {
+    if (ledEffectDirection > 1 || ledEffectDirection == 0) ledEffectDirection = 1;
+    if (ledEffectDirection < -1) ledEffectDirection = -1;
+}
+#endif
+
+void leleConfig::setWebUICreds(const String &usr, const String &pwd) {
+    webUI.user = usr;
+    webUI.pwd = pwd;
+    saveFile();
+}
+
+void leleConfig::setWifiApCreds(const String &ssid, const String &pwd) {
+    wifiAp.ssid = ssid;
+    wifiAp.pwd = pwd;
+    saveFile();
+}
+
+void leleConfig::addWifiCredential(const String &ssid, const String &pwd) {
+    wifi[ssid] = pwd;
+    saveFile();
+}
+
+String leleConfig::getWifiPassword(const String &ssid) const {
+    auto it = wifi.find(ssid);
+    if (it != wifi.end()) return it->second;
+    return "";
+}
+
+void leleConfig::addEvilWifiName(String value) {
+    evilWifiNames.insert(value);
+    saveFile();
+}
+
+void leleConfig::removeEvilWifiName(String value) {
+    evilWifiNames.erase(value);
+    saveFile();
+}
+
+void leleConfig::setEvilEndpointCreds(String value) {
+    evilPortalEndpoints.getCredsEndpoint = value;
+    validateEvilEndpointCreds();
+    saveFile();
+}
+
+void leleConfig::validateEvilEndpointCreds() {
+    if (evilPortalEndpoints.getCredsEndpoint == evilPortalEndpoints.setSsidEndpoint) {
+        // on collision reset to defaults
+        evilPortalEndpoints.getCredsEndpoint = "/creds";
+    }
+    if (evilPortalEndpoints.getCredsEndpoint[0] != '/') {
+        evilPortalEndpoints.getCredsEndpoint = '/' + evilPortalEndpoints.getCredsEndpoint;
+    }
+}
+
+void leleConfig::setEvilEndpointSsid(String value) {
+    evilPortalEndpoints.setSsidEndpoint = value;
+    validateEvilEndpointCreds();
+    saveFile();
+}
+
+void leleConfig::validateEvilEndpointSsid() {
+    if (evilPortalEndpoints.getCredsEndpoint == evilPortalEndpoints.setSsidEndpoint) {
+        // on collision reset to defaults
+        evilPortalEndpoints.setSsidEndpoint = "/ssid";
+    }
+    if (evilPortalEndpoints.setSsidEndpoint[0] != '/') {
+        evilPortalEndpoints.setSsidEndpoint = '/' + evilPortalEndpoints.setSsidEndpoint;
+    }
+}
+
+void leleConfig::setEvilAllowEndpointDisplay(bool value) {
+    evilPortalEndpoints.showEndpoints = value;
+    saveFile();
+}
+
+void leleConfig::setEvilAllowGetCreds(bool value) {
+    evilPortalEndpoints.allowGetCreds = value;
+    saveFile();
+}
+
+void leleConfig::setEvilAllowSetSsid(bool value) {
+    evilPortalEndpoints.allowSetSsid = value;
+    saveFile();
+}
+
+void leleConfig::setEvilPasswordMode(EvilPortalPasswordMode value) {
+    evilPortalPasswordMode = value;
+    saveFile();
+}
+
+void leleConfig::validateEvilPasswordMode() {
+    if (evilPortalPasswordMode < 0 || evilPortalPasswordMode > 2) evilPortalPasswordMode = FULL_PASSWORD;
+}
+
+void leleConfig::setBleName(String value) {
+    bleName = value;
+    saveFile();
+}
+
+void leleConfig::setIrTxPin(int value) {
+    irTx = value;
+    saveFile();
+}
+
+void leleConfig::setIrTxRepeats(uint8_t value) {
+    irTxRepeats = value;
+    saveFile();
+}
+
+void leleConfig::setIrRxPin(int value) {
+    irRx = value;
+    saveFile();
+}
+
+void leleConfig::setRfTxPin(int value) {
+    rfTx = value;
+    saveFile();
+}
+
+void leleConfig::setRfRxPin(int value) {
+    rfRx = value;
+    saveFile();
+}
+
+void leleConfig::setRfModule(RFModules value) {
+    rfModule = value;
+    validateRfModuleValue();
+    saveFile();
+}
+
+void leleConfig::validateRfModuleValue() {
+    if (rfModule != M5_RF_MODULE && rfModule != CC1101_SPI_MODULE) { rfModule = M5_RF_MODULE; }
+}
+
+void leleConfig::setRfFreq(float value, int fxdFreq) {
+    rfFreq = value;
+    if (fxdFreq > 1) rfFxdFreq = fxdFreq;
+    saveFile();
+}
+
+void leleConfig::setRfFxdFreq(float value) {
+    rfFxdFreq = value;
+    saveFile();
+}
+
+void leleConfig::setRfScanRange(int value, int fxdFreq) {
+    rfScanRange = value;
+    rfFxdFreq = fxdFreq;
+    validateRfScanRangeValue();
+    saveFile();
+}
+
+void leleConfig::validateRfScanRangeValue() {
+    if (rfScanRange < 0 || rfScanRange > 3) rfScanRange = 3;
+}
+
+void leleConfig::setRfidModule(RFIDModules value) {
+    rfidModule = value;
+    validateRfidModuleValue();
+    saveFile();
+}
+
+void leleConfig::validateRfidModuleValue() {
+    if (rfidModule != M5_RFID2_MODULE && rfidModule != PN532_I2C_MODULE && rfidModule != PN532_SPI_MODULE &&
+        rfidModule != RC522_SPI_MODULE && rfidModule != PN532_I2C_SPI_MODULE) {
+        rfidModule = M5_RFID2_MODULE;
+    }
+}
+
+void leleConfig::setiButtonPin(int value) {
+    if (value < GPIO_NUM_MAX) {
+        iButton = value;
+        saveFile();
+    } else log_e("iButton: Gpio pin not set, incompatible with this device\n");
+}
+
+void leleConfig::addMifareKey(String value) {
+    if (value.length() != 12) return;
+    mifareKeys.insert(value);
+    validateMifareKeysItems();
+    saveFile();
+}
+
+void leleConfig::validateMifareKeysItems() {
+    for (auto key = mifareKeys.begin(); key != mifareKeys.end();) {
+        if (key->length() != 12) key = mifareKeys.erase(key);
+        else ++key;
+    }
+}
+
+void leleConfig::setGpsBaudrate(int value) {
+    gpsBaudrate = value;
+    validateGpsBaudrateValue();
+    saveFile();
+}
+
+void leleConfig::validateGpsBaudrateValue() {
+    if (gpsBaudrate != 9600 && gpsBaudrate != 19200 && gpsBaudrate != 57600 && gpsBaudrate != 38400 &&
+        gpsBaudrate != 115200)
+        gpsBaudrate = 9600;
+}
+
+void leleConfig::setStartupApp(String value) {
+    startupApp = value;
+    saveFile();
+}
+
+void leleConfig::setWigleBasicToken(String value) {
+    wigleBasicToken = value;
+    saveFile();
+}
+
+void leleConfig::setDevMode(int value) {
+    devMode = value;
+    validateDevModeValue();
+    saveFile();
+}
+
+void leleConfig::validateDevModeValue() {
+    if (devMode > 1) devMode = 1;
+}
+
+void leleConfig::setColorInverted(int value) {
+    colorInverted = value;
+    validateColorInverted();
+    saveFile();
+}
+
+void leleConfig::validateColorInverted() {
+    if (colorInverted > 1) colorInverted = 1;
+}
+
+void leleConfig::setBadUSBBLEKeyboardLayout(int value) {
+    badUSBBLEKeyboardLayout = value;
+    validateBadUSBBLEKeyboardLayout();
+    saveFile();
+}
+
+void leleConfig::validateBadUSBBLEKeyboardLayout() {
+    if (badUSBBLEKeyboardLayout < 0 || badUSBBLEKeyboardLayout > 13) badUSBBLEKeyboardLayout = 0;
+}
+
+void leleConfig::setBadUSBBLEKeyDelay(int value) {
+    badUSBBLEKeyDelay = value;
+    validateBadUSBBLEKeyDelay();
+    saveFile();
+}
+
+void leleConfig::validateBadUSBBLEKeyDelay() {
+    if (badUSBBLEKeyDelay < 20) badUSBBLEKeyDelay = 20;
+    if (badUSBBLEKeyDelay > 500) badUSBBLEKeyDelay = 500;
+}
+
+void leleConfig::addDisabledMenu(String value) {
+    // TODO: check if duplicate
+    disabledMenus.push_back(value);
+    saveFile();
+}
+
+void leleConfig::addQrCodeEntry(const String &menuName, const String &content) {
+    qrCodes.push_back({menuName, content});
+    saveFile();
+}
+
+void leleConfig::removeQrCodeEntry(const String &menuName) {
+    size_t writeIndex = 0;
+
+    for (size_t readIndex = 0; readIndex < qrCodes.size(); ++readIndex) {
+        const QrCodeEntry &entry = qrCodes[readIndex];
+
+        if (entry.menuName != menuName) {
+            if (writeIndex != readIndex) { qrCodes[writeIndex] = std::move(qrCodes[readIndex]); }
+            ++writeIndex;
+        }
+    }
+
+    if (writeIndex < qrCodes.size()) { qrCodes.erase(qrCodes.begin() + writeIndex, qrCodes.end()); }
+
+    saveFile();
+}
+
+void leleConfig::addWebUISession(const String &token) {
+    webUISessions.push_back(token);
+    // Limit to maximum 5 sessions - remove oldest (first element) if exceeded
+    if (webUISessions.size() > 5) { webUISessions.erase(webUISessions.begin()); }
+    saveFile();
+}
+
+void leleConfig::removeWebUISession(const String &token) {
+    for (auto it = webUISessions.begin(); it != webUISessions.end(); ++it) {
+        if (*it == token) {
+            webUISessions.erase(it);
+            break;
+        }
+    }
+    saveFile();
+}
+
+bool leleConfig::isValidWebUISession(const String &token) {
+    auto it = std::find(webUISessions.begin(), webUISessions.end(), token);
+
+    if (it == webUISessions.end()) {
+        return false; // Token not found
+    }
+
+    // Check if token is already at the end (most recent position)
+    if (it == webUISessions.end() - 1) {
+        return true; // Already most recent, no changes needed
+    }
+
+    // Move token to end and save
+    webUISessions.erase(it);
+    webUISessions.push_back(token);
+
+    // Limit to maximum 10 sessions
+    if (webUISessions.size() > 10) { webUISessions.erase(webUISessions.begin()); }
+
+    saveFile();
+    return true;
+}

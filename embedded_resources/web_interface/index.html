@@ -1,0 +1,2669 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" data-theme="cyberpunk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Lele Cyberpunk Command Center - Advanced WiFi Security Analysis">
+    <meta name="theme-color" content="#00fff5">
+    <title>Lele Command Center</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <!-- OFFLINE FONTS: Ensure fonts are in css/fonts or use system fonts like Orbitron if installed -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Orbitron..." rel="stylesheet"> -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/effects.css">
+    <link rel="stylesheet" href="css/themes/cyberpunk.css">
+    <link rel="stylesheet" href="css/themes/light.css">
+    <link rel="stylesheet" href="css/themes/dracula.css">
+    <link rel="stylesheet" href="css/themes/nord.css">
+    <link rel="stylesheet" href="css/themes/monokai.css">
+    <link rel="stylesheet" href="css/themes/solarized.css">
+    <link rel="stylesheet" href="css/themes/tokyo-night.css">
+    <link rel="stylesheet" href="css/themes/gruvbox.css">
+    <link rel="stylesheet" href="css/themes/one-dark.css">
+    <link rel="stylesheet" href="css/themes/hacker.css">
+    <link rel="stylesheet" href="css/themes/stealth.css">
+    <!-- Mobile-specific styles (must be last to override) -->
+    <link rel="stylesheet" href="css/mobile.css">
+
+    <!-- LOCAL LIBRARIES (OFFLINE READY) -->
+    <link rel="stylesheet" href="css/xterm.min.css">
+    <script src="js/xterm.min.js"></script>
+    <script src="js/xterm-addon-fit.min.js"></script>
+    <script src="js/chart.umd.min.js"></script>
+
+    <!-- CORE SYSTEM -->
+    <script src="js/wavesocket.js"></script>
+
+    <!-- MENU TOGGLE - Must be available before body loads -->
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.querySelector('.sidebar-overlay');
+            if (!sidebar) return;
+
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('open');
+                if (overlay) overlay.classList.add('active');
+            }
+        }
+        window.toggleSidebar = toggleSidebar;
+    </script>
+</head>
+
+<body>
+    <!-- Boot Animation Overlay -->
+    <div id="boot-overlay">
+        <img src="assets/logo_loading.png" alt="Lele Loading" class="boot-logo" id="boot-logo">
+        <div class="boot-title">Lele</div>
+        <div class="boot-text"></div>
+        <div class="boot-progress">
+            <div class="boot-progress-bar"></div>
+        </div>
+    </div>
+    <!-- Background Effects -->
+    <div id="background-effects">
+        <canvas id="matrix-canvas"></canvas>
+        <canvas id="particles-canvas"></canvas>
+    </div>
+    <div class="scanlines-overlay"></div>
+    <!-- Main App -->
+    <div id="app">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()"
+            ontouchend="toggleSidebar(); event.preventDefault();" aria-label="Abrir menu">â˜°</button>
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="assets/logo_dashboard.png" alt="Lele" class="brand-logo" id="brand-logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-view="dashboard" class="active"><span
+                            class="icon">ðŸ“Š</span><span>Dashboard</span></a></li>
+                <li><a href="#" data-view="attacks"><span class="icon">âš”ï¸</span><span>WiFi</span></a></li>
+                <li><a href="#" data-view="usb"><span class="icon">ðŸ”Œ</span><span>USB</span></a></li>
+
+                <li><a href="#" data-view="ir-remote"><span class="icon">ðŸ“º</span><span>Controle Remoto</span></a></li>
+                <li><a href="#" data-view="remote-access"><span class="icon">ðŸ–¥ï¸</span><span>Acesso Remoto</span><span
+                            class="badge-new">VNC</span></a></li>
+                <li><a href="#" data-view="files"><span class="icon">ðŸ“</span><span>Arquivos</span></a></li>
+                <li><a href="#" data-view="terminal"><span class="icon">ðŸ’»</span><span>Terminal</span></a></li>
+                <li><a href="#" data-view="tools"><span class="icon">ðŸ› ï¸</span><span>Ferramentas</span></a></li>
+                <li><a href="#" data-view="config"><span class="icon">âš™ï¸</span><span>Config</span></a></li>
+
+                <li><a href="#" data-view="help"><span class="icon">ðŸ“š</span><span>Help & Manual</span></a></li>
+            </ul>
+            <div class="connection-status" id="connection-status">
+                <span class="dot"></span> Desconectado
+            </div>
+        </nav>
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title" class="header-title-centered">Dashboard Lele</h1>
+                <div class="header-stats">
+                    <div class="stat-pill tooltip-wrap tooltip-bottom" title="NÃ­vel de bateria do dispositivo">
+                        <span class="icon">ðŸ”‹</span><span class="value" id="battery">--%</span>
+                        <span class="tooltip-text">Bateria do ESP32</span>
+                    </div>
+                    <div class="stat-pill tooltip-wrap tooltip-bottom" title="Temperatura interna do ESP32">
+                        <span class="icon">ðŸŒ¡ï¸</span><span class="value" id="temperature">--Â°C</span>
+                        <span class="tooltip-text">Temperatura do chip</span>
+                    </div>
+                    <div class="stat-pill tooltip-wrap tooltip-bottom" title="Tempo desde o Ãºltimo boot">
+                        <span class="icon">â±ï¸</span><span class="value" id="uptime">00:00:00</span>
+                        <span class="tooltip-text">Uptime do sistema</span>
+                    </div>
+                    <div class="stat-pill tooltip-wrap tooltip-bottom" title="Pacotes por segundo processados">
+                        <span class="icon">ðŸ“¡</span><span class="value" id="pps">0 PPS</span>
+                        <span class="tooltip-text">Throughput de pacotes</span>
+                    </div>
+                </div>
+            </header>
+            <div class="content-area">
+                <!-- DASHBOARD VIEW -->
+                <section id="dashboard" class="view active">
+                    <div class="grid grid-4 mb-3">
+                        <div class="card stat-card highlight tooltip-wrap">
+                            <div class="value" id="handshakes-count">0</div>
+                            <div class="label">Handshakes</div>
+                            <span class="tooltip-text">Handshakes WPA/WPA2 capturados para cracking offline</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="networks-count">0</div>
+                            <div class="label">Redes</div>
+                            <span class="tooltip-text">Redes WiFi detectadas no Ãºltimo scan</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="ble-count">0</div>
+                            <div class="label">BLE Devices</div>
+                            <span class="tooltip-text">Dispositivos Bluetooth Low Energy detectados</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="deauths-count">0</div>
+                            <div class="label">Deauths</div>
+                            <span class="tooltip-text">Pacotes de desautenticaÃ§Ã£o enviados</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-4 mb-3">
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="pmkid-count">0</div>
+                            <div class="label">PMKIDs</div>
+                            <span class="tooltip-text">PMKIDs capturados (mÃ©todo rÃ¡pido de cracking WPA)</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="ram-used">--</div>
+                            <div class="label">RAM Usada</div>
+                            <span class="tooltip-text">MemÃ³ria RAM utilizada pelo sistema ESP32</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="heap-free">--</div>
+                            <div class="label">Heap Livre</div>
+                            <span class="tooltip-text">MemÃ³ria heap disponÃ­vel para alocaÃ§Ã£o dinÃ¢mica</span>
+                        </div>
+                        <div class="card stat-card tooltip-wrap">
+                            <div class="value" id="sd-space">--</div>
+                            <div class="label">SD Card</div>
+                            <span class="tooltip-text">EspaÃ§o utilizado no cartÃ£o SD</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-2 gap-3">
+                        <div class="card">
+                            <div class="card-header" style="flex-wrap:wrap;">
+                                <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px;">
+                                    <span class="tooltip-wrap tooltip-bottom"
+                                        style="color:var(--warning);font-weight:600;">â­ <span id="mascot-xp">0</span>
+                                        XP (Lv.<span id="mascot-level">1</span>)<span class="tooltip-text">Pontos de
+                                            experiÃªncia ganhos por atividades. Aumenta o nÃ­vel do mascote</span></span>
+                                    <span class="tooltip-wrap tooltip-bottom" style="color:var(--text-muted);">ðŸŽ‚ <span
+                                            id="mascot-age">0d 0h</span><span class="tooltip-text">Tempo desde a
+                                            primeira inicializaÃ§Ã£o do sistema</span></span>
+                                </div>
+                                <h3>Mascote</h3><span id="mascot-name" style="color:var(--primary);">Lele</span>
+                            </div>
+                            <div class="dragon-container" style="text-align:center;">
+                                <img id="mascot-sprite" src="sprites/lele/lele_idle.png" alt="Lele"
+                                    style="width:120px;height:auto;filter:drop-shadow(0 0 15px var(--primary));display:block;margin:0 auto;">
+                                <div class="dragon-avatar" id="dragon-avatar" style="font-size:80px;display:none;">ðŸ‘¦
+                                </div>
+                                <div class="dragon-bubble" id="dragon-bubble"
+                                    style="padding:10px;margin-top:10px;border:1px solid var(--primary);border-radius:8px;font-size:0.9rem;">
+                                    Aguardando comandos...</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header tooltip-wrap tooltip-bottom">
+                                <h3>Atividade WiFi</h3><span id="attack-indicator">Idle</span>
+                                <span class="tooltip-text">GrÃ¡fico em tempo real da atividade de pacotes WiFi
+                                    capturados</span>
+                            </div>
+                            <div style="height: 200px;"><canvas id="signal-chart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-3 gap-3 mt-3">
+                        <div class="card">
+                            <div class="card-header tooltip-wrap tooltip-bottom">
+                                <h3>Canais WiFi</h3>
+                                <span class="tooltip-text">DistribuiÃ§Ã£o de redes WiFi por canal 2.4GHz (1-14)</span>
+                            </div>
+                            <div style="height:180px;"><canvas id="channel-chart"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header tooltip-wrap tooltip-bottom">
+                                <h3>Tipos de SeguranÃ§a</h3>
+                                <span class="tooltip-text">ClassificaÃ§Ã£o das redes por tipo de criptografia (WPA2, WPA3,
+                                    Open, etc.)</span>
+                            </div>
+                            <div style="height:180px;"><canvas id="security-chart"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header tooltip-wrap tooltip-bottom">
+                                <h3>Log do Sistema</h3>
+                                <span class="tooltip-text">Eventos e mensagens do sistema em tempo real</span>
+                            </div>
+                            <div class="terminal-body" id="log-container" style="height:180px;overflow-y:auto;">
+                                <div class="log-line">[SYSTEM] Iniciando...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ATTACKS VIEW -->
+                <section id="attacks" class="view">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3>âš”ï¸ Ataques WiFi</h3>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn btn-danger attack-btn"
+                                    onclick="sendCommand('deauth')"><span class="icon">âš¡</span>Deauth
+                                    Flood</button><span class="tooltip-text">Desconecta todos os clientes de uma rede
+                                    alvo enviando pacotes de desautenticaÃ§Ã£o</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('beacon')"><span class="icon">ðŸ“¡</span>Beacon
+                                    Flood</button><span class="tooltip-text">Cria centenas de redes WiFi falsas para
+                                    confundir scanners</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-primary attack-btn"
+                                    onclick="sendCommand('handshake')"><span class="icon">ðŸ¤</span>Capturar
+                                    HS</button><span class="tooltip-text">Captura o 4-way handshake WPA2 para cracking
+                                    offline</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#bd00ff;color:#fff;" onclick="sendCommand('pmkid')"><span
+                                        class="icon">ðŸ”‘</span>PMKID</button><span class="tooltip-text">Captura hash
+                                    PMKID sem precisar de cliente conectado</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-secondary attack-btn"
+                                    onclick="sendCommand('wps_pixie')"><span class="icon">âœ¨</span>WPS
+                                    Pixie</button><span class="tooltip-text">Explora vulnerabilidade WPS Pixie Dust
+                                    offline</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff6600;color:#fff;" onclick="sendCommand('evil_twin')"><span
+                                        class="icon">ðŸ‘¿</span>Evil Twin</button><span class="tooltip-text">Clona uma
+                                    rede existente para capturar credenciais</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#00a8ff;color:#fff;" onclick="sendCommand('karma')"><span
+                                        class="icon">ðŸŽ­</span>Karma</button><span class="tooltip-text">Responde a todas
+                                    solicitaÃ§Ãµes de probe request</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ffcc00;color:#000;" onclick="sendCommand('probe_flood')"><span
+                                        class="icon">ðŸ”</span>Probe Flood</button><span class="tooltip-text">Inunda o
+                                    espectro com requisiÃ§Ãµes de probe</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-secondary attack-btn"
+                                    onclick="sendCommand('hidden_reveal')"><span class="icon">ðŸ‘ï¸</span>Hidden
+                                    SSID</button><span class="tooltip-text">Revela redes WiFi com SSID oculto</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-secondary attack-btn"
+                                    onclick="sendCommand('channel_hop')"><span class="icon">ðŸ“»</span>Ch
+                                    Hopper</button><span class="tooltip-text">Monitora mÃºltiplos canais
+                                    alternadamente</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#00ff9d;color:#000;" onclick="sendCommand('auth_flood')"><span
+                                        class="icon">ðŸšª</span>Auth Flood</button><span class="tooltip-text">Inunda AP
+                                    com requisiÃ§Ãµes de autenticaÃ§Ã£o</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-danger attack-btn"
+                                    onclick="sendCommand('deassoc')"><span class="icon">ðŸ’”</span>Deassoc</button><span
+                                    class="tooltip-text">ForÃ§a desassociaÃ§Ã£o de clientes do AP</span></div>
+                            <!-- WPS Attacks (inside WiFi Attacks) -->
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff00ff;color:#fff;" onclick="sendCommand('wps_pixie')"><span
+                                        class="icon">âœ¨</span>Pixie Dust</button><span class="tooltip-text">Explora PRNG
+                                    fraco em roteadores vulnerÃ¡veis para extrair PIN offline via E-Hash</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff6600;color:#fff;" onclick="sendCommand('wps_bruteforce')"><span
+                                        class="icon">ðŸ”¢</span>WPS Brute</button><span class="tooltip-text">ForÃ§a bruta
+                                    no PIN WPS. Apenas 11.000 combinaÃ§Ãµes (4+3 dÃ­gitos + checksum)</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff0055;color:#fff;" onclick="sendCommand('wps_flood')"><span
+                                        class="icon">ðŸ’¥</span>WPS Flood</button><span class="tooltip-text">Inunda AP com
+                                    pacotes WPS NACK causando DoS</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:linear-gradient(135deg,#ff00ff,#ff6600);color:#fff;"
+                                    onclick="startAllWPS()"><span class="icon">ðŸŽ¯</span>TODOS WPS</button><span
+                                    class="tooltip-text">Executa Pixie Dust â†’ Brute-Force â†’ Flood em sequÃªncia</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom">
+                            <h3>ðŸŽ¯ Alvo</h3>
+                            <span class="tooltip-text">SeleÃ§Ã£o do alvo para ataques WiFi direcionados</span>
+                        </div>
+                        <div class="form-group tooltip-wrap tooltip-bottom"><label>Rede Alvo</label><select
+                                id="target-selector">
+                                <option value="FF:FF:FF:FF:FF:FF">Broadcast (Todos)</option>
+                            </select>
+                            <span class="tooltip-text">Selecione a rede WiFi alvo para ataques direcionados ou use
+                                Broadcast para todos</span>
+                        </div>
+                        <div class="tooltip-wrap tooltip-bottom"><button class="btn btn-primary"
+                                onclick="sendCommand('wifi_scan')">ðŸ” Escanear Redes</button>
+                            <span class="tooltip-text">Escaneia redes WiFi prÃ³ximas e popula a lista de alvos</span>
+                        </div>
+                    </div>
+
+                    <!-- HCXDump Tool Attack (Hunter) -->
+                    <div class="card mb-3" style="border:1px solid var(--primary);">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(0,255,157,0.1);">
+                            <h3>ðŸ’£ HCXDump (Hunter)</h3>
+                            <span class="tooltip-text">Modo caÃ§ador agressivo para captura automÃ¡tica de PMKIDs e
+                                Handshakes</span>
+                        </div>
+                        <div style="padding:10px;">
+                            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">
+                                Ataque agressivo (hcxdumptool) para capturar PMKIDs e Handshakes de todos os clientes
+                                prÃ³ximos.
+                                <strong>Modo CaÃ§ador Completo.</strong>
+                            </p>
+                            <div class="grid grid-2 gap-2">
+                                <div class="form-group tooltip-wrap tooltip-bottom"><label>Canais</label><select
+                                        id="hcx-channels">
+                                        <option value="0">Todos (Scan)</option>
+                                        <option value="1">Canal 1</option>
+                                        <option value="6">Canal 6</option>
+                                        <option value="11">Canal 11</option>
+                                    </select>
+                                    <span class="tooltip-text">Selecione canais especÃ­ficos ou todos para caÃ§ada
+                                        ampla</span>
+                                </div>
+                                <div class="form-group tooltip-wrap tooltip-bottom"><label>Active
+                                        Beaconing</label><select id="hcx-active">
+                                        <option value="1">Ativado (Agressivo)</option>
+                                        <option value="0">Desativado (Passivo)</option>
+                                    </select>
+                                    <span class="tooltip-text">Modo agressivo envia beacons para forÃ§ar respostas dos
+                                        APs</span>
+                                </div>
+                            </div>
+                            <div class="tooltip-wrap tooltip-bottom"><button class="btn btn-danger"
+                                    style="width:100%;font-weight:bold;animation:pulse 2s infinite;"
+                                    onclick="startHCXDump()">ðŸš€ INICIAR CAÃ‡ADA</button>
+                                <span class="tooltip-text">Inicia captura massiva e agressiva de handshakes/PMKIDs em
+                                    todos os alvos prÃ³ximos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRINTER CHAOS SECTION -->
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom"
+                            style="background:linear-gradient(135deg,rgba(255,0,85,0.2),rgba(0,255,245,0.1));">
+                            <h3>ðŸ–¨ï¸ Impressoras</h3>
+                            <span id="printer-count"
+                                style="background:var(--danger);padding:2px 8px;border-radius:10px;font-size:0.8rem;">0</span>
+                            <span class="tooltip-text">Ataques direcionados a impressoras de rede (IPP/LPD/RAW)</span>
+                        </div>
+                        <!-- Scanner -->
+                        <div class="form-group mt-2"><label>Faixa de IP</label>
+                            <select id="printer-ip-range" style="width:100%;">
+                                <option value="192.168.4">192.168.4.0/24 (AP Lele)</option>
+                                <option value="192.168.1">192.168.1.0/24 (Rede Local)</option>
+                                <option value="192.168.0">192.168.0.0/24</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary mb-3" style="width:100%;" onclick="startPrinterScan()">ðŸ”
+                            Escanear Impressoras</button>
+                        <div id="printer-scan-progress" style="display:none;margin-bottom:15px;">
+                            <div style="background:var(--bg-tertiary);border-radius:8px;overflow:hidden;height:15px;">
+                                <div id="printer-scan-bar"
+                                    style="background:var(--primary);height:100%;width:0%;transition:width 0.3s;"></div>
+                            </div>
+                        </div>
+                        <!-- Print Options -->
+                        <div style="background:var(--bg-tertiary);padding:15px;border-radius:8px;margin-bottom:15px;">
+                            <div class="form-group"><label>ðŸ“ Texto para Imprimir</label>
+                                <textarea id="printer-text" rows="3"
+                                    style="width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:10px;border-radius:8px;"
+                                    placeholder="VOCÃŠ FOI HACKEADO PELO DRAGÃƒO ðŸ‰">VOCÃŠ FOI HACKEADO PELO DRAGÃƒO ðŸ‰</textarea>
+                            </div>
+                            <div class="form-group"><label>ðŸ–¼ï¸ Imagem (PNG/JPG)</label>
+                                <input type="file" id="printer-image" accept="image/*"
+                                    style="width:100%;background:var(--bg-secondary);border:1px solid var(--border-color);color:var(--text-primary);padding:8px;border-radius:8px;">
+                            </div>
+                            <div class="grid grid-2 gap-2">
+                                <div class="form-group"><label>ðŸ“„ CÃ³pias</label>
+                                    <input type="number" id="printer-copies" value="1" min="1" max="999"
+                                        style="width:100%;">
+                                </div>
+                                <div class="form-group"><label>ðŸ“› Nome Novo</label>
+                                    <input type="text" id="printer-newname" value="HACKED BY Lele"
+                                        style="width:100%;">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Attack Buttons -->
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px;">
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('print_text')"><span
+                                        class="icon">ðŸ“</span>Texto</button><span class="tooltip-text">Imprime o texto
+                                    definido acima</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('print_image')"><span
+                                        class="icon">ðŸ–¼ï¸</span>Imagem</button><span class="tooltip-text">Imprime a
+                                    imagem selecionada</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('print_test')"><span class="icon">ðŸ”„</span>Loop</button><span
+                                    class="tooltip-text">Imprime pÃ¡gina de teste infinitamente</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('jam_queue')"><span class="icon">ðŸ“‘</span>Travar
+                                    Fila</button><span class="tooltip-text">Envia 500 pÃ¡ginas vazias para travar</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('rename')"><span class="icon">âœï¸</span>Renomear</button><span
+                                    class="tooltip-text">Altera nome da impressora</span></div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    onclick="printerAttack('fake_status')"><span class="icon">âš ï¸</span>Status
+                                    Falso</button><span class="tooltip-text">Define status como SEM PAPEL ou
+                                    ATOLADA</span></div>
+                        </div>
+                        <!-- Printers Table -->
+                        <div style="overflow-x:auto;max-height:300px;">
+                            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                                <thead>
+                                    <tr style="background:var(--bg-tertiary);">
+                                        <th style="padding:8px;">IP</th>
+                                        <th style="padding:8px;">Marca</th>
+                                        <th style="padding:8px;">Status</th>
+                                        <th style="padding:8px;">AÃ§Ã£o</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="printers-tbody">
+                                    <tr>
+                                        <td colspan="4" class="text-muted" style="padding:15px;text-align:center;">
+                                            Nenhuma impressora. Execute o scan.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Attack All Button -->
+                        <div class="tooltip-wrap tooltip-bottom"><button class="btn mt-3"
+                                style="width:100%;padding:15px;font-size:1.2rem;background:linear-gradient(135deg,#ff0055,#ff0000);color:#fff;border:none;border-radius:8px;"
+                                onclick="attackAllPrinters()">
+                                ðŸ–¨ï¸â˜ ï¸ IMPRIMIR EM TODAS â˜ ï¸ðŸ–¨ï¸
+                            </button>
+                            <span class="tooltip-text">Executa ataque de impressÃ£o em massa em todas as impressoras
+                                detectadas</span>
+                        </div>
+                    </div>
+                    <div class="card tooltip-wrap tooltip-bottom">
+                        <button class="btn btn-pwn" id="pwn-btn" onclick="pwnEverything()">â˜ ï¸ PWN EVERYTHING â˜ ï¸</button>
+                        <p class="text-center text-muted mt-2">Ativa todos os ataques por 60 segundos</p>
+                        <span class="tooltip-text">Ativa simultaneamente todos os ataques WiFi por 60 segundos - USE COM
+                            CUIDADO!</span>
+                    </div>
+                    <div class="mt-3 tooltip-wrap tooltip-bottom"><button class="btn btn-secondary" style="width:100%;"
+                            onclick="stopAllAttacks()">ðŸ›‘ PARAR TUDO</button>
+                        <span class="tooltip-text">Interrompe imediatamente todos os ataques em execuÃ§Ã£o</span>
+                    </div>
+
+                    <!-- REDES DETECTADAS (moved from separate view) -->
+                    <div class="card mt-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom">
+                            <h3>ðŸ“¶ Redes Detectadas</h3><button class="btn btn-sm btn-primary"
+                                onclick="sendCommand('wifi_scan')">ðŸ” Escanear</button>
+                            <span class="tooltip-text">Lista de redes WiFi detectadas pelo Ãºltimo scan com detalhes
+                                tÃ©cnicos</span>
+                        </div>
+                        <div class="table-container" style="overflow-x:auto;">
+                            <table id="networks-table">
+                                <thead>
+                                    <tr>
+                                        <th>SSID</th>
+                                        <th>BSSID</th>
+                                        <th>CH</th>
+                                        <th>Sinal</th>
+                                        <th>SeguranÃ§a</th>
+                                        <th>AÃ§Ãµes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Clique em Escanear</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- HANDSHAKES (moved from separate view) -->
+                    <div class="card mt-3" style="border: 2px solid var(--primary); background: rgba(0,255,245,0.05);">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background: rgba(0,255,245,0.1);">
+                            <h3>ðŸ¤ Handshakes Capturados</h3><button class="btn btn-sm btn-primary"
+                                onclick="loadHandshakes()">ðŸ”„ Atualizar</button>
+                            <span class="tooltip-text">Handshakes WPA/WPA2 capturados prontos para cracking de senha
+                                offline</span>
+                        </div>
+                        <div id="handshakes-list" style="min-height:200px;">
+                            <p class="text-muted">Carregando...</p>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom">
+                            <h3>ðŸ”“ Password Cracker</h3>
+                            <span class="tooltip-text">Quebra de senhas WPA/WPA2 usando dicionÃ¡rio local ou serviÃ§o
+                                online</span>
+                        </div>
+                        <div class="form-group"><label>Selecione Handshake</label><select id="crack-handshake-select">
+                                <option value="">Selecione...</option>
+                            </select></div>
+                        <div class="grid grid-2 gap-2">
+                            <button class="btn btn-danger" onclick="startCracking()">ðŸ”“ Crack Local</button>
+                            <button class="btn btn-primary" onclick="uploadSelectedHandshakeToOHC()">ðŸ“¤ Enviar para
+                                OHC</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- NETWORKS VIEW -->
+                <section id="networks" class="view">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Redes Detectadas</h3><button class="btn btn-sm btn-primary"
+                                onclick="sendCommand('wifi_scan')">ðŸ” Escanear</button>
+                        </div>
+                        <div class="table-container" style="overflow-x:auto;">
+                            <table id="networks-table">
+                                <thead>
+                                    <tr>
+                                        <th>SSID</th>
+                                        <th>BSSID</th>
+                                        <th>CH</th>
+                                        <th>Sinal</th>
+                                        <th>SeguranÃ§a</th>
+                                        <th>AÃ§Ãµes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Clique em Escanear</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BLUETOOTH VIEW -->
+                <section id="bluetooth" class="view">
+                    <div class="grid grid-2 gap-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Dispositivos BLE</h3><button class="btn btn-sm btn-primary"
+                                    onclick="sendCommand('ble_scan')">ðŸ” Scan</button>
+                            </div>
+                            <ul id="ble-list" class="simple-list" style="max-height:300px;overflow-y:auto;">
+                                <li class="text-muted">Nenhum dispositivo</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>BLE Spam Personalizado</h3>
+                            </div>
+                            <div class="form-group"><label>Tipo de Pacote</label>
+                                <select id="ble-packet-type">
+                                    <option value="0">Apple AirPods</option>
+                                    <option value="1">Apple AirTag</option>
+                                    <option value="2">Windows Swift Pair</option>
+                                    <option value="3">Google Fast Pair</option>
+                                    <option value="4">Samsung Buds</option>
+                                    <option value="5">Eddystone URL</option>
+                                    <option value="6">iBeacon</option>
+                                    <option value="7">Custom Payload</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary"
+                                onclick="sendCommand('ble_custom',{type:document.getElementById('ble-packet-type').value})">Iniciar
+                                Spam</button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3>ðŸ” Ferramentas BLE</h3>
+                        </div>
+                        <div class="grid grid-3 gap-2">
+                            <div class="tooltip-wrap"><button class="btn btn-secondary"
+                                    onclick="sendCommand('ble_skimmer')">ðŸ’³ Skimmer Detect</button><span
+                                    class="tooltip-text">Detecta skimmers Bluetooth em caixas eletrÃ´nicos/bomba de
+                                    gasolina</span></div>
+                            <div class="tooltip-wrap"><button class="btn btn-secondary"
+                                    onclick="sendCommand('ble_tracker')">ðŸ“ Tracker Hunt</button><span
+                                    class="tooltip-text">Procura por AirTags/SmartTags ocultos seguindo vocÃª</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-secondary"
+                                    onclick="sendCommand('ble_clone')">ðŸ“‹ Clone Device</button><span
+                                    class="tooltip-text">Clona o MAC e propaganda de um dispositivo BLE</span></div>
+                        </div>
+                    </div>
+
+                    <!-- BLUETOOTH CHAOS SECTION (Moved into Grid) -->
+                    <div class="card mb-3 mt-3" style="grid-column: 1 / -1;">
+                        <div class="card-header"
+                            style="background:linear-gradient(135deg,rgba(0,0,255,0.2),rgba(0,255,157,0.1));display:block;text-align:center;">
+                            <div style="font-size:3rem;margin-bottom:-10px;animation:float 3s ease-in-out infinite;">ðŸ¤–
+                            </div>
+                            <h3 style="text-shadow: 0 0 10px var(--primary);">ðŸ”Š Bluetooth Chaos</h3>
+                            <span id="ble-chaos-status" style="font-size:0.8rem;color:var(--text-muted);">Pronto para o
+                                caos</span>
+                        </div>
+
+                        <!-- Scanner -->
+                        <div style="padding:10px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:15px;">
+                            <div class="flex-between">
+                                <h4 style="margin:0;">Dispositivos de Ãudio</h4>
+                                <span id="ble-audio-count"
+                                    style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:0.8rem;color:#000;">0</span>
+                            </div>
+                            <button class="btn btn-primary mt-2" style="width:100%;"
+                                onclick="startBluetoothChaosScan()">ðŸ“¡
+                                Escanear Caixas de Som</button>
+                            <div id="ble-scan-progress" style="display:none;margin-top:10px;">
+                                <div
+                                    style="background:var(--bg-secondary);border-radius:8px;overflow:hidden;height:10px;">
+                                    <div id="ble-scan-bar"
+                                        style="background:var(--primary);height:100%;width:0%;transition:width 0.3s;box-shadow:0 0 10px var(--primary);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Target List -->
+                        <div
+                            style="max-height:200px;overflow-y:auto;margin-bottom:15px;border:1px solid var(--border-color);border-radius:8px;">
+                            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+                                <thead style="background:var(--bg-secondary);position:sticky;top:0;">
+                                    <tr>
+                                        <th style="padding:8px;">Nome</th>
+                                        <th style="padding:8px;">MAC</th>
+                                        <th style="padding:8px;">RSSI</th>
+                                        <th style="padding:8px;">AÃ§Ã£o</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ble-chaos-tbody">
+                                    <tr>
+                                        <td colspan="4" class="text-muted" style="padding:15px;text-align:center;">
+                                            Nenhuma caixa
+                                            encontrada.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Chaos Controls -->
+                        <div style="background:var(--bg-tertiary);padding:15px;border-radius:8px;margin-bottom:15px;">
+                            <div class="form-group"><label>ðŸ“› Nome Personalizado / Spam</label>
+                                <input type="text" id="ble-custom-name" value="Free AirPods Pro"
+                                    style="width:100%;color:var(--primary);font-weight:bold;">
+                            </div>
+
+                            <div class="grid grid-2 gap-2 mt-2">
+                                <div class="tooltip-wrap"><button class="btn attack-btn"
+                                        style="background:var(--danger);"
+                                        onclick="bluetoothAttack('connection_flood')"><span class="icon">ðŸŒŠ</span>Flood
+                                        ConexÃ£o</button><span class="tooltip-text">150+ req/s: Trava a caixa e
+                                        desconecta
+                                        usuÃ¡rios</span></div>
+                                <div class="tooltip-wrap"><button class="btn attack-btn"
+                                        style="background:var(--warning);color:#000;"
+                                        onclick="bluetoothAttack('disconnect')"><span
+                                            class="icon">âœ‚ï¸</span>Derrubar</button><span class="tooltip-text">Expulsa
+                                        quem estÃ¡
+                                        conectado (Exploit connection params)</span></div>
+                                <div class="tooltip-wrap"><button class="btn attack-btn" style="background:#bd00ff;"
+                                        onclick="bluetoothAttack('fake_spam')"><span class="icon">ðŸ‘»</span>Fake
+                                        Spam</button><span class="tooltip-text">Spam com nome personalizado que trava
+                                        Bluetooth
+                                        alheio</span></div>
+                                <div class="tooltip-wrap"><button class="btn attack-btn" style="background:#00a8ff;"
+                                        onclick="bluetoothAttack('rename')"><span
+                                            class="icon">âœï¸</span>Renomear</button><span class="tooltip-text">Muda o
+                                        nome da caixa permanentemente (se vulnerÃ¡vel)</span></div>
+                                <div class="tooltip-wrap"><button class="btn attack-btn"
+                                        style="background:#ffcc00;color:#000;"
+                                        onclick="bluetoothAttack('audio_glitch')"><span class="icon">ðŸ”Š</span>Audio
+                                        Glitch</button><span class="tooltip-text">Envia Ã¡udio corrompido (chiado
+                                        infinito)</span></div>
+                                <div class="tooltip-wrap"><button class="btn attack-btn"
+                                        style="background:#00ff9d;color:#000;"
+                                        onclick="bluetoothAttack('force_pair')"><span class="icon">ðŸ”—</span>ForÃ§ar
+                                        Pair</button><span class="tooltip-text">Flood de pedidos de pareamento</span>
+                                </div>
+                            </div>
+                            <button class="btn attack-btn mt-2" style="width:100%;background:#ffffff;color:#000;"
+                                onclick="bluetoothAttack('device_flood')"><span class="icon">ðŸ§Ÿ</span>Device Flood (30+
+                                Clones)</button>
+                        </div>
+
+                        <!-- NUKE BUTTON -->
+                        <button class="btn glitch-btn"
+                            style="width:100%;padding:20px;font-size:1.3rem;background:linear-gradient(45deg,#ff0000,#ff0055);text-transform:uppercase;font-weight:900;letter-spacing:2px;"
+                            onclick="attackAllBluetooth()">
+                            â˜ ï¸ TODOS OS ATAQUES â˜ ï¸
+                        </button>
+                    </div>
+                </section>
+
+                <!-- HANDSHAKES VIEW -->
+                <section id="handshakes" class="view">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ¤ Handshakes Capturados</h3><button class="btn btn-sm btn-primary"
+                                onclick="loadHandshakes()">ðŸ”„ Atualizar</button>
+                        </div>
+                        <div id="handshakes-list" style="min-height:200px;">
+                            <p class="text-muted">Carregando...</p>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3>ðŸ”“ Password Cracker</h3>
+                        </div>
+                        <div class="form-group"><label>Selecione Handshake</label><select id="crack-handshake-select">
+                                <option value="">Selecione...</option>
+                            </select></div>
+                        <div class="grid grid-2 gap-2">
+                            <button class="btn btn-danger" onclick="startCracking()">ðŸ”“ Crack Local</button>
+                            <button class="btn btn-primary" onclick="uploadSelectedHandshakeToOHC()">ðŸ“¤ Enviar para
+                                OHC</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TERMINAL VIEW -->
+                <section id="terminal" class="view">
+                    <div class="card" style="padding:0;">
+                        <div class="terminal">
+                            <div class="terminal-header"><span class="dot red"></span><span
+                                    class="dot yellow"></span><span class="dot green"></span><span
+                                    style="margin-left:10px;color:var(--text-muted);">Lele Terminal</span></div>
+                            <div class="terminal-body" id="terminal-output"
+                                style="height:400px;overflow-y:auto;padding:15px;font-family:var(--font-mono);background:#000;">
+                                <div>Welcome to Lele Terminal v2.0</div>
+                                <div>Type 'help' for available commands.</div>
+                                <div>---</div>
+                            </div>
+                            <div class="terminal-input"><span class="prompt">$</span><input type="text"
+                                    id="terminal-input" placeholder="Enter command..."
+                                    onkeydown="if(event.key==='Enter')sendTerminalCommand()">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- USB VIEW -->
+                <section id="usb" class="view">
+                    <div class="card mb-3"
+                        style="text-align:center;background:linear-gradient(135deg,rgba(138,43,226,0.2),rgba(75,0,130,0.1));">
+                        <div style="font-size:80px;margin-bottom:10px;">ðŸ”ŒðŸ’£</div>
+                        <h2 style="color:var(--primary);margin:0;">USB ATTACKS</h2>
+                        <p class="text-muted">BadUSB, HID Emulation & Rubber Ducky Scripts</p>
+                    </div>
+
+                    <!-- PAYLOADS ORGANIZADOS POR CATEGORIA -->
+
+                    <!-- DOMAIN & ACTIVE DIRECTORY (10 payloads) -->
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(138,43,226,0.1);">
+                            <h3>ðŸ‘‘ Domain & Active Directory</h3>
+                            <span class="tooltip-text">Ataques avanÃ§ados focados em ambientes Active Directory
+                                corporativos</span>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#8b00ff;color:#fff;"
+                                    onclick="sendCommand('usb_zerologon_dcsync_golden')"><span
+                                        class="icon">ðŸ’¥</span>ZeroLogon DCSync</button>
+                                <span class="tooltip-text">CVE-2020-1472 â†’ reseta krbtgt + DCSync + Golden Ticket
+                                    (domÃ­nio em 12s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#7700dd;color:#fff;"
+                                    onclick="sendCommand('usb_petitpotam_ntlm_relay')"><span
+                                        class="icon">ðŸ”</span>PetitPotam Relay</button>
+                                <span class="tooltip-text">ForÃ§a autenticaÃ§Ã£o NTLM â†’ relay SMB â†’ usuÃ¡rio oculto +
+                                    persistence</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#6600bb;color:#fff;"
+                                    onclick="sendCommand('usb_kerberoasting_silver')"><span
+                                        class="icon">ðŸŽ«</span>Kerberoasting</button>
+                                <span class="tooltip-text">Solicita TGS â†’ cria Silver Ticket para acesso a
+                                    serviÃ§os</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#5500aa;color:#fff;"
+                                    onclick="sendCommand('usb_pass_the_certificate')"><span
+                                        class="icon">ðŸ“œ</span>Pass-Certificate</button>
+                                <span class="tooltip-text">Usa certificado roubado para autenticaÃ§Ã£o Kerberos
+                                    PKINIT</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#440088;color:#fff;"
+                                    onclick="sendCommand('usb_shadow_credentials')"><span class="icon">ðŸ‘»</span>Shadow
+                                    Creds</button>
+                                <span class="tooltip-text">Cria certificado em msDS-KeyCredentialLink â†’ auth como
+                                    admin</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#330077;color:#fff;"
+                                    onclick="sendCommand('usb_rbcd_attack')"><span class="icon">ðŸ”—</span>RBCD
+                                    Attack</button>
+                                <span class="tooltip-text">Configura delegaÃ§Ã£o restrita para controle de mÃ¡quinas</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#220066;color:#fff;"
+                                    onclick="sendCommand('usb_laps_extract')"><span class="icon">ðŸ”‘</span>LAPS
+                                    Extract</button>
+                                <span class="tooltip-text">Extrai senhas admin local do LAPS via LDAP</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#110055;color:#fff;" onclick="sendCommand('usb_gpo_abuse')"><span
+                                        class="icon">ðŸ“‹</span>GPO Abuse</button>
+                                <span class="tooltip-text">Cria tarefa via GPO executada como SYSTEM no gpupdate</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#000044;color:#fff;"
+                                    onclick="sendCommand('usb_certify_abuse')"><span class="icon">ðŸ“„</span>Certify
+                                    Abuse</button>
+                                <span class="tooltip-text">Template vulnerÃ¡vel â†’ certificado â†’ Domain Admin</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#000033;color:#fff;"
+                                    onclick="sendCommand('usb_bitlocker_ldap')"><span class="icon">ðŸ”</span>BitLocker
+                                    LDAP</button>
+                                <span class="tooltip-text">Extrai chaves de recuperaÃ§Ã£o BitLocker do domÃ­nio via
+                                    LDAP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EXPLOITATION & PRIVILEGE ESCALATION (10 payloads) -->
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(255,0,0,0.1);">
+                            <h3>âš¡ Exploitation & Privilege Escalation</h3>
+                            <span class="tooltip-text">Exploits conhecidos (CVEs) e tÃ©cnicas de escalaÃ§Ã£o de
+                                privilÃ©gios</span>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn btn-danger attack-btn"
+                                    onclick="sendCommand('usb_printnightmare')"><span
+                                        class="icon">ðŸ–¨ï¸</span>PrintNightmare</button>
+                                <span class="tooltip-text">CVE-2021-34527 â†’ DLL maliciosa â†’ CMD SYSTEM + reverse
+                                    shell</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-danger attack-btn"
+                                    onclick="sendCommand('usb_eternalblue')"><span
+                                        class="icon">ðŸ’£</span>EternalBlue</button>
+                                <span class="tooltip-text">CVE-2017-0144 SMBv1 â†’ DoublePulsar backdoor +
+                                    propagaÃ§Ã£o</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-danger attack-btn"
+                                    onclick="sendCommand('usb_bluekeep')"><span class="icon">ðŸ”µ</span>BlueKeep
+                                    RDP</button>
+                                <span class="tooltip-text">CVE-2019-0708 â†’ overflow RDP â†’ SYSTEM + backdoor + porta
+                                    3389</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#cc0000;color:#fff;"
+                                    onclick="sendCommand('usb_token_impersonation')"><span class="icon">ðŸŽ­</span>Token
+                                    Impersonation</button>
+                                <span class="tooltip-text">Rouba token do lsass â†’ impersonaÃ§Ã£o permanente como
+                                    SYSTEM</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#aa0000;color:#fff;" onclick="sendCommand('usb_lsass_dump')"><span
+                                        class="icon">ðŸ’¾</span>LSASS Dump</button>
+                                <span class="tooltip-text">rundll32 comsvcs.dll â†’ dump memÃ³ria LSASS sem gravar
+                                    disco</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#880000;color:#fff;"
+                                    onclick="sendCommand('usb_hello_bruteforce')"><span class="icon">ðŸ”¢</span>Hello PIN
+                                    Brute</button>
+                                <span class="tooltip-text">Extrai PINs Windows Hello da pasta NGC + brute force
+                                    offline</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#660000;color:#fff;"
+                                    onclick="sendCommand('usb_rogue_winrm')"><span class="icon">âš™ï¸</span>Rogue
+                                    WinRM</button>
+                                <span class="tooltip-text">Ativa WinRM + usuÃ¡rio admin oculto + porta 5985</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#440000;color:#fff;"
+                                    onclick="sendCommand('usb_rprn_coerce')"><span class="icon">ðŸ–¨ï¸</span>MS-RPRN
+                                    Coerce</button>
+                                <span class="tooltip-text">ForÃ§a coerÃ§Ã£o de autenticaÃ§Ã£o via Print Spooler RPC</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#330000;color:#fff;"
+                                    onclick="sendCommand('usb_webclient_abuse')"><span class="icon">ðŸŒ</span>WebClient
+                                    Abuse</button>
+                                <span class="tooltip-text">Ativa WebClient â†’ autenticaÃ§Ã£o WebDAV â†’ NTLM relay</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#220000;color:#fff;" onclick="sendCommand('usb_samr_dump')"><span
+                                        class="icon">ðŸ‘¤</span>SAMR Dump</button>
+                                <span class="tooltip-text">Dump remoto via SAMR de todos hashes NTLM locais (sem
+                                    disco)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LOGIN SCREEN BYPASSES (7 payloads) -->
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(255,165,0,0.1);">
+                            <h3>ðŸ”“ Login Screen Bypasses</h3>
+                            <span class="tooltip-text">TÃ©cnicas que funcionam na tela de login do Windows (lock
+                                screen)</span>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('usb_utilman_bypass')"><span class="icon">â™¿</span>Utilman
+                                    Bypass</button>
+                                <span class="tooltip-text">Substitui Utilman.exe â†’ CMD como SYSTEM na tela de login
+                                    (Win+U)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('usb_sethc_bypass')"><span class="icon">â¬†ï¸</span>Sticky
+                                    Keys</button>
+                                <span class="tooltip-text">5x Shift â†’ CMD como SYSTEM na tela de login</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('usb_netuser_add')"><span class="icon">ðŸ‘¤</span>Add
+                                    User</button>
+                                <span class="tooltip-text">Cria usuÃ¡rio 'tempadmin' senha 123 no grupo
+                                    Administrators</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('usb_password_reset')"><span class="icon">ðŸ”‘</span>Reset
+                                    Password</button>
+                                <span class="tooltip-text">Reseta senha de qualquer conta local via CMD SYSTEM</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn btn-warning attack-btn"
+                                    onclick="sendCommand('usb_bitlocker_suspend')"><span class="icon">ðŸ”’</span>BitLocker
+                                    Suspend</button>
+                                <span class="tooltip-text">Suspende BitLocker temporariamente ou tenta unlock com
+                                    recovery key</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff8800;color:#fff;font-weight:bold;"
+                                    onclick="sendCommand('usb_login_godmode')"><span class="icon">ðŸ‘‘</span>LOGIN GOD
+                                    MODE</button>
+                                <span class="tooltip-text">COMBO: Utilman â†’ user $$:123 â†’ RDP + porta 3389 â†’ limpa logs
+                                    (12s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#cc6600;color:#fff;"
+                                    onclick="sendCommand('usb_sam_dump_offline')"><span class="icon">ðŸ’¾</span>SAM
+                                    Dump</button>
+                                <span class="tooltip-text">Copia SAM/SYSTEM/SECURITY â†’ C:\temp â†’ exfil offline
+                                    Mimikatz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CRYPTO & CREDENTIALS HUNTERS (10 payloads) -->
+                    <div class="card mb-3">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(255,215,0,0.1);">
+                            <h3>ðŸ’° Crypto & Credentials Hunters</h3>
+                            <span class="tooltip-text">Busca e extraÃ§Ã£o de carteiras cripto, senhas, tokens e 2FA</span>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ffd700;color:#000;"
+                                    onclick="sendCommand('usb_crypto_hunter')"><span class="icon">â‚¿</span>Crypto
+                                    Hunter</button>
+                                <span class="tooltip-text">Electrum, Exodus, MetaMask, Binance â†’ extrai seeds + chaves
+                                    (18s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ffcc00;color:#000;"
+                                    onclick="sendCommand('usb_seed_finder')"><span class="icon">ðŸ”</span>Seed
+                                    Finder</button>
+                                <span class="tooltip-text">Busca BIP39 12/24 palavras em txt/pdf/docx/screenshots
+                                    (22s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ffbb00;color:#000;"
+                                    onclick="sendCommand('usb_browser_master_pw')"><span class="icon">ðŸŒ</span>Browser
+                                    Master PW</button>
+                                <span class="tooltip-text">Quebra master PW Chrome/Edge/Firefox â†’ 1000+ creds + cookies
+                                    (14s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ffaa00;color:#000;"
+                                    onclick="sendCommand('usb_rdp_vpn_creds')"><span class="icon">ðŸ–¥ï¸</span>RDP &
+                                    VPN</button>
+                                <span class="tooltip-text">RDP, OpenVPN, Wireguard, NordVPN, PuTTY, WinSCP (11s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff9900;color:#000;" onclick="sendCommand('usb_2fa_backup')"><span
+                                        class="icon">ðŸ”</span>2FA Backup</button>
+                                <span class="tooltip-text">CÃ³digos backup Google/Microsoft/Authy em arquivos
+                                    (16s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff8800;color:#000;"
+                                    onclick="sendCommand('usb_discord_telegram')"><span
+                                        class="icon">ðŸ’¬</span>Discord/Telegram</button>
+                                <span class="tooltip-text">Tokens Discord + Telegram Desktop â†’ login sem 2FA (9s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff7700;color:#000;"
+                                    onclick="sendCommand('usb_gaming_accounts')"><span
+                                        class="icon">ðŸŽ®</span>Gaming</button>
+                                <span class="tooltip-text">Steam + Epic + Battle.net + Origin â†’ saldo + skins
+                                    (13s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff6600;color:#000;"
+                                    onclick="sendCommand('usb_banking_pix')"><span class="icon">ðŸ¦</span>Banking
+                                    PIX</button>
+                                <span class="tooltip-text">Chaves PIX + tokens Nubank/ItaÃº/Bradesco/BB/Caixa
+                                    (15s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff5500;color:#fff;"
+                                    onclick="sendCommand('usb_vaults_crack')"><span
+                                        class="icon">ðŸ”“</span>Vaults</button>
+                                <span class="tooltip-text">KeePass/Bitwarden/LastPass â†’ brute 500k wordlist (20s)</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:#ff4400;color:#fff;font-weight:bold;"
+                                    onclick="sendCommand('usb_chrome_lazagne')"><span class="icon">âš¡</span>LaZagne
+                                    ESP32</button>
+                                <span class="tooltip-text">LaZagne â†’ Chrome todas senhas â†’ USB serial ESP32 direto
+                                    (6s)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DESTRUCTIVE TIMERS (2 payloads) -->
+                    <div class="card mb-3" style="border:3px solid #ff0000;">
+                        <div class="card-header tooltip-wrap tooltip-bottom" style="background:rgba(255,0,0,0.2);">
+                            <h3 style="color:#ff0000;">â° Destructive Timers âš ï¸</h3>
+                            <span class="tooltip-text">âš ï¸ PERIGO: Ataques destrutivos programados por data/hora - USAR
+                                COM EXTREMO CUIDADO</span>
+                        </div>
+                        <div class="attack-grid">
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:linear-gradient(135deg,#ff0000,#8b0000);color:#fff;font-weight:bold;border:2px solid #ff0000;"
+                                    onclick="confirm('âš ï¸ DEATH CLOCK: DestruiÃ§Ã£o IRREVERSÃVEL do sistema! Confirma?') && sendCommand('usb_death_clock')">
+                                    <span class="icon">â˜ ï¸</span>DEATH CLOCK</button>
+                                <span class="tooltip-text">Agenda para data/hora â†’ deleta winlogon + ntoskrnl + SAM +
+                                    MBR/GPT â†’ BRICK TOTAL</span>
+                            </div>
+                            <div class="tooltip-wrap"><button class="btn attack-btn"
+                                    style="background:linear-gradient(135deg,#ff4400,#cc0000);color:#fff;font-weight:bold;border:2px solid #ff4400;"
+                                    onclick="confirm('âš ï¸ RANSOM TIMER: CRIPTOGRAFIA SEM CHAVE DE RECUPERAÃ‡ÃƒO! Confirma?') && sendCommand('usb_ransom_timer')">
+                                    <span class="icon">ðŸ”’</span>RANSOM TIMER</button>
+                                <span class="tooltip-text">Agenda criptografia ChaCha20+RSA â†’ user folders + drives +
+                                    rede â†’ nota resgate</span>
+                            </div>
+                        </div>
+                        <div
+                            style="background:#ffe6e6;border:1px solid #ff0000;border-radius:8px;padding:10px;margin-top:10px;">
+                            <p style="margin:0;font-size:0.75rem;color:#cc0000;text-align:center;">
+                                <strong>âš ï¸ AVISO LEGAL:</strong> Estes payloads podem causar danos IRREVERSÃVEIS. Use
+                                APENAS em ambiente controlado com permissÃ£o por escrito.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3>ðŸ–±ï¸ HID Emulation</h3>
+                        </div>
+                        <div class="grid grid-2 gap-2">
+                            <div>
+                                <label
+                                    style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;display:block;">Teclado</label>
+                                <div class="form-group"><input type="text" id="hid-keyboard-text"
+                                        placeholder="Digite o texto a enviar..." style="width:100%;margin-bottom:8px;">
+                                </div>
+                                <button class="btn btn-primary" style="width:100%;"
+                                    onclick="sendCommand('hid_type',{text:document.getElementById('hid-keyboard-text').value})">âŒ¨ï¸
+                                    Enviar DigitaÃ§Ã£o</button>
+                            </div>
+                            <div>
+                                <label
+                                    style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;display:block;">Mouse</label>
+                                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;">
+                                    <button class="btn btn-secondary"
+                                        onclick="sendCommand('hid_mouse',{action:'click_left'})">ðŸ–±ï¸ Click
+                                        Esquerdo</button>
+                                    <button class="btn btn-secondary"
+                                        onclick="sendCommand('hid_mouse',{action:'click_right'})">ðŸ–±ï¸ Click
+                                        Direito</button>
+                                    <button class="btn btn-secondary"
+                                        onclick="sendCommand('hid_mouse',{action:'scroll_up'})">â¬†ï¸ Scroll Up</button>
+                                    <button class="btn btn-secondary"
+                                        onclick="sendCommand('hid_mouse',{action:'scroll_down'})">â¬‡ï¸ Scroll
+                                        Down</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ¦† Rubber Ducky Scripts</h3>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:15px;">Upload e execute
+                            scripts Ducky (.txt) para automaÃ§Ã£o de ataques</p>
+                        <input type="file" id="ducky-upload" accept=".txt" style="display:none;"
+                            onchange="uploadDuckyScript(this.files[0])">
+                        <div class="drop-zone" onclick="document.getElementById('ducky-upload').click()"
+                            style="border:2px dashed var(--primary);padding:40px;text-align:center;border-radius:var(--border-radius);cursor:pointer;margin-bottom:15px;">
+                            <p>ðŸ¦† Clique ou arraste script .txt aqui</p>
+                        </div>
+                        <div id="ducky-scripts-list"
+                            style="min-height:100px;background:var(--bg-tertiary);border-radius:8px;padding:10px;margin-bottom:15px;">
+                            <p class="text-muted" style="text-align:center;margin:20px 0;">Nenhum script carregado</p>
+                        </div>
+                        <button class="btn btn-danger" style="width:100%;" onclick="executeDuckyScript()">ðŸš€ Executar
+                            Script Selecionado</button>
+                    </div>
+                </section>
+
+                <!-- FILES VIEW -->
+                <section id="files" class="view">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ“ Gerenciador de Arquivos (SD)</h3>
+                            <div style="display:flex;gap:10px;">
+                                <button class="btn btn-sm btn-secondary" onclick="refreshFiles()">ðŸ”„
+                                    Atualizar</button>
+                                <button class="btn btn-sm btn-primary" onclick="createFolder()">ðŸ“ Nova
+                                    Pasta</button>
+                            </div>
+                        </div>
+                        <div id="file-breadcrumb" style="padding:10px;color:var(--text-muted);font-size:0.85rem;">ðŸ“‚
+                            /
+                        </div>
+                        <div id="file-browser" style="min-height:300px;max-height:500px;overflow-y:auto;">
+                            <p class="text-muted">Carregando arquivos...</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-2 gap-3 mt-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ“¤ Upload de Arquivo</h3>
+                            </div>
+                            <input type="file" id="file-upload" style="display:none;"
+                                onchange="uploadFile(this.files[0])">
+                            <div class="drop-zone" onclick="document.getElementById('file-upload').click()"
+                                style="border:2px dashed var(--border-color);padding:40px;text-align:center;border-radius:var(--border-radius);cursor:pointer;">
+                                <p>ðŸ“‚ Clique ou arraste arquivos aqui</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ“¦ OTA Update</h3>
+                            </div>
+                            <input type="file" id="ota-upload" accept=".bin" style="display:none;"
+                                onchange="uploadOTA(this.files[0])">
+                            <div class="drop-zone" onclick="document.getElementById('ota-upload').click()"
+                                style="border:2px dashed var(--warning);padding:40px;text-align:center;border-radius:var(--border-radius);cursor:pointer;">
+                                <p>ðŸ“¦ Arraste o arquivo .bin aqui</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- IR REMOTE CONTROL VIEW -->
+                <section id="ir-remote" class="view">
+                    <div class="grid grid-2 gap-3">
+                        <!-- Visual Remote Control -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ“º Controle Universal</h3>
+                            </div>
+                            <div class="form-group" style="margin-bottom:15px;">
+                                <label>Dispositivo</label>
+                                <select id="ir-device-type" onchange="loadIRBrand()">
+                                    <option value="tv">ðŸ“º TV</option>
+                                    <option value="tvbox">ðŸ“¦ TV Box</option>
+                                    <option value="ac">â„ï¸ Ar Condicionado</option>
+                                    <option value="led">ðŸ’¡ Fita LED RGB</option>
+                                    <option value="fan">ðŸŒ€ Ventilador</option>
+                                    <option value="soundbar">ðŸ”Š Soundbar</option>
+                                    <option value="projector">ðŸŽ¥ Projetor</option>
+                                    <option value="dvd">ðŸ“€ DVD/Blu-ray</option>
+                                    <option value="receiver">ðŸ“¡ Receptor</option>
+                                    <option value="custom">â­ Personalizado</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:20px;">
+                                <label>Marca</label>
+                                <select id="ir-brand">
+                                    <option value="lg">LG</option>
+                                    <option value="samsung">Samsung</option>
+                                    <option value="sony">Sony</option>
+                                    <option value="philips">Philips</option>
+                                    <option value="panasonic">Panasonic</option>
+                                    <option value="toshiba">Toshiba</option>
+                                    <option value="aoc">AOC</option>
+                                    <option value="tcl">TCL</option>
+                                    <option value="philco">Philco</option>
+                                    <option value="semp">Semp</option>
+                                    <option value="xiaomi">Xiaomi Mi Box</option>
+                                    <option value="amazon">Amazon Fire TV</option>
+                                    <option value="roku">Roku</option>
+                                    <option value="appletv">Apple TV</option>
+                                    <option value="chromecast">Chromecast</option>
+                                    <option value="mxq">MXQ</option>
+                                    <option value="x96">X96</option>
+                                    <option value="h96">H96</option>
+                                    <option value="t95">T95</option>
+                                    <option value="tx3">TX3</option>
+                                </select>
+                            </div>
+                            <!-- Dynamic Remote Container -->
+                            <div id="ir-remote-container" class="ir-remote-visual"
+                                style="background:linear-gradient(145deg,#1a1a24,#2a2a34);border-radius:20px;padding:20px;max-width:280px;margin:0 auto;transition:all 0.3s ease;">
+                                <!-- LED Indicator -->
+                                <div style="text-align:center;margin-bottom:10px;">
+                                    <div id="ir-led" class="ir-led"
+                                        style="width:12px;height:12px;background:#400;border-radius:50%;margin:0 auto;box-shadow:0 0 5px #400;transition:all 0.15s;">
+                                    </div>
+                                    <div style="font-size:0.65rem;color:var(--text-muted);margin-top:4px;">IR LED
+                                    </div>
+                                </div>
+
+                                <!-- TV Remote Layout -->
+                                <div id="remote-layout-tv" class="remote-layout" style="display:block;opacity:1;">
+                                    <div style="text-align:center;margin-bottom:15px;">
+                                        <button class="ir-btn ir-power" onclick="sendIR('power')"
+                                            title="Ligar/Desligar">â»</button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px;">
+                                        <button class="ir-btn" onclick="sendIR('input')">ðŸ“¥</button>
+                                        <button class="ir-btn" onclick="sendIR('mute')">ðŸ”‡</button>
+                                        <button class="ir-btn" onclick="sendIR('menu')">â˜°</button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:15px;">
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('up')">â–²</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('left')">â—€</button>
+                                        <button class="ir-btn ir-ok" onclick="sendIR('ok')">OK</button>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('right')">â–¶</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('down')">â–¼</button>
+                                        <div></div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                                        <div style="text-align:center;">
+                                            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;">
+                                                VOL
+                                            </div>
+                                            <button class="ir-btn" onclick="sendIR('vol_up')">+</button>
+                                            <button class="ir-btn" onclick="sendIR('vol_down')"
+                                                style="margin-top:5px;">âˆ’</button>
+                                        </div>
+                                        <div style="text-align:center;">
+                                            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;">
+                                                CH
+                                            </div>
+                                            <button class="ir-btn" onclick="sendIR('ch_up')">+</button>
+                                            <button class="ir-btn" onclick="sendIR('ch_down')"
+                                                style="margin-top:5px;">âˆ’</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:15px;">
+                                        <button class="ir-btn ir-num" onclick="sendIR('1')">1</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('2')">2</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('3')">3</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('4')">4</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('5')">5</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('6')">6</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('7')">7</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('8')">8</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('9')">9</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('back')">â®Œ</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('0')">0</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('info')">â„¹</button>
+                                    </div>
+                                </div>
+
+                                <!-- LED Strip Remote Layout (44-Key Style) -->
+                                <div id="remote-layout-led" class="remote-layout" style="display:none;">
+                                    <!-- Top Control Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+                                        <button class="ir-btn" style="background:#222;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('led_bright_up')">â˜€ï¸ UP</button>
+                                        <button class="ir-btn" style="background:#222;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('led_bright_down')">ðŸŒ™ DN</button>
+                                        <button class="ir-btn" style="background:#222;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('led_play')">â–¶ï¸</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff3333,#990000);padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('led_power')">â»</button>
+                                    </div>
+                                    <!-- Main Color Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">
+                                        <button class="ir-btn led-color" style="background:#ff0000;height:32px;"
+                                            onclick="sendIR('led_red')"></button>
+                                        <button class="ir-btn led-color" style="background:#00ff00;height:32px;"
+                                            onclick="sendIR('led_green')"></button>
+                                        <button class="ir-btn led-color" style="background:#0000ff;height:32px;"
+                                            onclick="sendIR('led_blue')"></button>
+                                        <button class="ir-btn led-color"
+                                            style="background:#ffffff;height:32px;border:1px solid #555;"
+                                            onclick="sendIR('led_white')"></button>
+                                    </div>
+                                    <!-- Color Palette 5x4 Grid -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">
+                                        <button class="ir-btn led-color" style="background:#ff3300;height:28px;"
+                                            onclick="sendIR('led_c1')"></button>
+                                        <button class="ir-btn led-color" style="background:#00ff66;height:28px;"
+                                            onclick="sendIR('led_c2')"></button>
+                                        <button class="ir-btn led-color" style="background:#0066ff;height:28px;"
+                                            onclick="sendIR('led_c3')"></button>
+                                        <button class="ir-btn led-color" style="background:#ffcccc;height:28px;"
+                                            onclick="sendIR('led_c4')"></button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">
+                                        <button class="ir-btn led-color" style="background:#ff6600;height:28px;"
+                                            onclick="sendIR('led_orange')"></button>
+                                        <button class="ir-btn led-color" style="background:#00ffcc;height:28px;"
+                                            onclick="sendIR('led_c5')"></button>
+                                        <button class="ir-btn led-color" style="background:#3300ff;height:28px;"
+                                            onclick="sendIR('led_c6')"></button>
+                                        <button class="ir-btn led-color" style="background:#ffddee;height:28px;"
+                                            onclick="sendIR('led_c7')"></button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">
+                                        <button class="ir-btn led-color" style="background:#ff9900;height:28px;"
+                                            onclick="sendIR('led_c8')"></button>
+                                        <button class="ir-btn led-color" style="background:#00ffff;height:28px;"
+                                            onclick="sendIR('led_cyan')"></button>
+                                        <button class="ir-btn led-color" style="background:#6600ff;height:28px;"
+                                            onclick="sendIR('led_c9')"></button>
+                                        <button class="ir-btn led-color" style="background:#ccffff;height:28px;"
+                                            onclick="sendIR('led_c10')"></button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">
+                                        <button class="ir-btn led-color" style="background:#ffcc00;height:28px;"
+                                            onclick="sendIR('led_yellow')"></button>
+                                        <button class="ir-btn led-color" style="background:#66ccff;height:28px;"
+                                            onclick="sendIR('led_c11')"></button>
+                                        <button class="ir-btn led-color" style="background:#9933ff;height:28px;"
+                                            onclick="sendIR('led_purple')"></button>
+                                        <button class="ir-btn led-color" style="background:#ccccff;height:28px;"
+                                            onclick="sendIR('led_c12')"></button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px;">
+                                        <button class="ir-btn led-color" style="background:#ffff00;height:28px;"
+                                            onclick="sendIR('led_c13')"></button>
+                                        <button class="ir-btn led-color" style="background:#3399ff;height:28px;"
+                                            onclick="sendIR('led_c14')"></button>
+                                        <button class="ir-btn led-color" style="background:#ff00ff;height:28px;"
+                                            onclick="sendIR('led_magenta')"></button>
+                                        <button class="ir-btn led-color" style="background:#ff99cc;height:28px;"
+                                            onclick="sendIR('led_pink')"></button>
+                                    </div>
+                                    <!-- Speed/Brightness Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+                                        <button class="ir-btn" style="background:#333;padding:8px;font-size:0.65rem;"
+                                            onclick="sendIR('led_speed_up')">â¬† QUICK</button>
+                                        <button class="ir-btn" style="background:#333;padding:8px;font-size:0.65rem;"
+                                            onclick="sendIR('led_speed_down')">â¬‡ SLOW</button>
+                                        <button class="ir-btn" style="background:#333;padding:8px;font-size:0.65rem;"
+                                            onclick="sendIR('led_diy1')">DIY1</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00cc00,#006600);padding:8px;font-size:0.65rem;"
+                                            onclick="sendIR('led_auto')">AUTO</button>
+                                    </div>
+                                    <!-- Effects Row -->
+                                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff6600,#cc3300);padding:10px;font-size:0.65rem;"
+                                            onclick="sendIR('led_jump3')">JUMP3</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#0066ff,#003399);padding:10px;font-size:0.65rem;"
+                                            onclick="sendIR('led_jump7')">JUMP7</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff00ff,#990099);padding:10px;font-size:0.65rem;"
+                                            onclick="sendIR('led_fade3')">FADE3</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00ffff,#009999);padding:10px;font-size:0.65rem;"
+                                            onclick="sendIR('led_fade7')">FADE7</button>
+                                    </div>
+                                </div>
+                                <!-- Fan Remote Layout (Qualitronix Style) -->
+                                <div id="remote-layout-fan" class="remote-layout" style="display:none;">
+                                    <!-- Top Row: Power and Light -->
+                                    <div
+                                        style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff3333,#990000);padding:18px;font-size:1.2rem;border-radius:50%;"
+                                            onclick="sendIR('fan_power')">â»</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#3399ff,#0055aa);padding:18px;font-size:1.2rem;border-radius:50%;"
+                                            onclick="sendIR('fan_light')">ðŸŒ€</button>
+                                    </div>
+                                    <!-- Speed Up/Down with visual indicator -->
+                                    <div style="text-align:center;margin-bottom:15px;">
+                                        <div style="font-size:0.75rem;color:var(--accent-cyan);margin-bottom:8px;">
+                                            ðŸŒ€
+                                            VELOCIDADE</div>
+                                        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                                            <button class="ir-btn"
+                                                style="width:70px;height:50px;background:linear-gradient(135deg,#00aacc,#006688);font-size:1.5rem;"
+                                                onclick="sendIR('fan_speed_up')">â–²</button>
+                                            <div style="font-size:2rem;font-weight:bold;color:var(--accent-cyan);padding:5px 0;"
+                                                id="fan-speed-display">3</div>
+                                            <button class="ir-btn"
+                                                style="width:70px;height:50px;background:linear-gradient(135deg,#006688,#003344);font-size:1.5rem;"
+                                                onclick="sendIR('fan_speed_down')">â–¼</button>
+                                        </div>
+                                    </div>
+                                    <!-- Timer and Reverse Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                                        <button class="ir-btn" style="background:#444;padding:12px;font-size:0.8rem;"
+                                            onclick="sendIR('fan_timer')">â±ï¸ TIMER</button>
+                                        <button class="ir-btn" style="background:#444;padding:12px;font-size:0.8rem;"
+                                            onclick="sendIR('fan_reverse')">ðŸ”„ REVERSO</button>
+                                    </div>
+                                    <!-- Timer Buttons -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+                                        <button class="ir-btn" style="background:#555;padding:10px;font-size:0.75rem;"
+                                            onclick="sendIR('fan_timer_1h')">1H</button>
+                                        <button class="ir-btn" style="background:#555;padding:10px;font-size:0.75rem;"
+                                            onclick="sendIR('fan_timer_2h')">2H</button>
+                                        <button class="ir-btn" style="background:#555;padding:10px;font-size:0.75rem;"
+                                            onclick="sendIR('fan_timer_4h')">4H</button>
+                                    </div>
+                                    <!-- Oscillate and Lamp -->
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00cc66,#009944);padding:15px;font-size:0.8rem;"
+                                            onclick="sendIR('fan_oscillate')">â†”ï¸ OSCILAR</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ffcc00,#cc9900);padding:15px;font-size:0.8rem;color:#000;"
+                                            onclick="sendIR('fan_lamp')">ðŸ’¡ ON/OFF</button>
+                                    </div>
+                                </div>
+
+                                <!-- AC Remote Layout (With LCD Display) -->
+                                <div id="remote-layout-ac" class="remote-layout" style="display:none;">
+                                    <!-- LCD Display Style -->
+                                    <div
+                                        style="background:linear-gradient(145deg,#d4dfc2,#c5d0b3);border-radius:8px;padding:15px;margin-bottom:15px;text-align:center;">
+                                        <div style="font-size:0.6rem;color:#333;text-align:right;">M1</div>
+                                        <div style="font-size:3.5rem;font-weight:bold;color:#222;font-family:'LCD',monospace;line-height:1;"
+                                            id="ac-temp-display">25<span
+                                                style="font-size:1.5rem;vertical-align:top;">Â°C</span></div>
+                                        <div
+                                            style="display:flex;justify-content:space-around;margin-top:5px;font-size:0.65rem;color:#444;">
+                                            <span>â„ï¸</span><span>ðŸŒ€</span><span>â±ï¸</span>
+                                        </div>
+                                    </div>
+                                    <!-- Power Button -->
+                                    <div style="text-align:center;margin-bottom:12px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#0099ff,#0055aa);padding:12px 30px;font-size:0.85rem;border-radius:8px;"
+                                            onclick="sendIR('ac_power')">â» LIGA/DESL</button>
+                                    </div>
+                                    <!-- Mode and Swing Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                                        <button class="ir-btn" style="background:#444;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('ac_mode')">ðŸ“‹ MODO</button>
+                                        <button class="ir-btn" style="background:#444;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('ac_ventilar')">ðŸŒ€ VENTILAR</button>
+                                        <button class="ir-btn" style="background:#444;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('ac_swing')">â†•ï¸ OSCILAR</button>
+                                    </div>
+                                    <!-- Temperature Controls -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff6600,#cc3300);padding:15px;font-size:1.2rem;"
+                                            onclick="adjustACTemp(1)">ðŸ”¥ +</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#0099cc,#006699);padding:15px;font-size:1.2rem;"
+                                            onclick="adjustACTemp(-1)">â„ï¸ âˆ’</button>
+                                    </div>
+                                    <!-- Fan Speed and Timer -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px;">
+                                        <button class="ir-btn" style="background:#444;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('ac_fan')">ðŸŒ¬ï¸ VENTILAÃ‡ÃƒO</button>
+                                        <button class="ir-btn" style="background:#444;padding:10px;font-size:0.7rem;"
+                                            onclick="sendIR('ac_timer')">â±ï¸ TIMER</button>
+                                    </div>
+                                    <!-- Mode Icons Row -->
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;">
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#0099cc,#006699);padding:10px;font-size:0.9rem;"
+                                            onclick="sendIR('ac_cool')">â„ï¸</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#ff6600,#cc3300);padding:10px;font-size:0.9rem;"
+                                            onclick="sendIR('ac_heat')">â˜€ï¸</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00aa66,#006644);padding:10px;font-size:0.9rem;"
+                                            onclick="sendIR('ac_dry')">ðŸ’§</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00cc99,#009966);padding:10px;font-size:0.9rem;"
+                                            onclick="sendIR('ac_auto')">ðŸ”„</button>
+                                    </div>
+                                    <!-- Sleep and ECO -->
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                        <button class="ir-btn" style="background:#333;padding:10px;font-size:0.75rem;"
+                                            onclick="sendIR('ac_sleep')">ðŸ˜´ SLEEP</button>
+                                        <button class="ir-btn"
+                                            style="background:linear-gradient(135deg,#00cc66,#009944);padding:10px;font-size:0.75rem;"
+                                            onclick="sendIR('ac_eco')">ðŸŒ¿ ECO</button>
+                                    </div>
+                                </div>
+
+                                <!-- Soundbar Remote Layout -->
+                                <div id="remote-layout-soundbar" class="remote-layout" style="display:none;">
+                                    <div style="text-align:center;margin-bottom:15px;">
+                                        <button class="ir-btn ir-power"
+                                            style="background:linear-gradient(135deg,#ff0066,#990033);width:100%;border-radius:12px;padding:15px;"
+                                            onclick="sendIR('sb_power')">âš¡ POWER</button>
+                                    </div>
+                                    <div style="text-align:center;margin:20px 0;">
+                                        <div style="font-size:1.2rem;margin-bottom:10px;">ðŸ”Š VOLUME</div>
+                                        <div style="display:flex;justify-content:center;gap:15px;">
+                                            <button class="ir-btn"
+                                                style="width:60px;height:60px;font-size:2rem;background:linear-gradient(135deg,#00cc66,#009944);"
+                                                onclick="sendIR('sb_vol_up')">+</button>
+                                            <button class="ir-btn"
+                                                style="width:60px;height:60px;font-size:2rem;background:linear-gradient(135deg,#cc3300,#990000);"
+                                                onclick="sendIR('sb_vol_down')">âˆ’</button>
+                                        </div>
+                                        <button class="ir-btn" style="margin-top:10px;padding:10px 25px;"
+                                            onclick="sendIR('sb_mute')">ðŸ”‡ MUTE</button>
+                                    </div>
+                                    <div
+                                        style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;text-align:center;">
+                                        ðŸ“¡ FONTE</div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:15px;">
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#0066ff,#0033cc);font-size:0.8rem;"
+                                            onclick="sendIR('sb_bluetooth')">ðŸ“¶ BT</button>
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#ff6600,#cc3300);font-size:0.8rem;"
+                                            onclick="sendIR('sb_hdmi')">ðŸ“º HDMI</button>
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#00cc66,#009944);font-size:0.8rem;"
+                                            onclick="sendIR('sb_aux')">ðŸŽµ AUX</button>
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#9933ff,#6600cc);font-size:0.8rem;"
+                                            onclick="sendIR('sb_optical')">ðŸ’¿ OPT</button>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+                                        <button class="ir-btn" style="padding:12px;" onclick="sendIR('sb_bass_up')">ðŸ”Š
+                                            BASS+</button>
+                                        <button class="ir-btn" style="padding:12px;" onclick="sendIR('sb_bass_down')">ðŸ”Š
+                                            BASSâˆ’</button>
+                                    </div>
+                                </div>
+
+                                <!-- Projector Remote Layout -->
+                                <div id="remote-layout-projector" class="remote-layout" style="display:none;">
+                                    <div style="text-align:center;margin-bottom:15px;">
+                                        <button class="ir-btn ir-power"
+                                            style="background:linear-gradient(135deg,#ffcc00,#cc9900);width:100%;border-radius:12px;padding:15px;color:#000;"
+                                            onclick="sendIR('proj_power')">âš¡ POWER</button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:15px;">
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('proj_up')">â–²</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('proj_left')">â—€</button>
+                                        <button class="ir-btn ir-ok" onclick="sendIR('proj_ok')">OK</button>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('proj_right')">â–¶</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('proj_down')">â–¼</button>
+                                        <div></div>
+                                    </div>
+                                    <div
+                                        style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;text-align:center;">
+                                        ðŸ“¡ FONTE</div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:15px;">
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#0066ff,#0033cc);"
+                                            onclick="sendIR('proj_hdmi')">ðŸ“º HDMI</button>
+                                        <button class="ir-btn"
+                                            style="padding:12px;background:linear-gradient(135deg,#00cc66,#009944);"
+                                            onclick="sendIR('proj_vga')">ðŸ’» VGA</button>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                        <button class="ir-btn" onclick="sendIR('proj_vol_up')">ðŸ”Š VOL+</button>
+                                        <button class="ir-btn" onclick="sendIR('proj_vol_down')">ðŸ”Š VOLâˆ’</button>
+                                        <button class="ir-btn" onclick="sendIR('proj_menu')">â˜° MENU</button>
+                                        <button class="ir-btn" onclick="sendIR('proj_freeze')">â„ï¸ FREEZE</button>
+                                    </div>
+                                </div>
+
+                                <!-- Receiver Remote Layout -->
+                                <div id="remote-layout-receiver" class="remote-layout" style="display:none;">
+                                    <div style="text-align:center;margin-bottom:15px;">
+                                        <button class="ir-btn ir-power"
+                                            style="background:linear-gradient(135deg,#009933,#006622);width:100%;border-radius:12px;padding:15px;"
+                                            onclick="sendIR('rcv_power')">âš¡ POWER</button>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:15px;">
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('rcv_up')">â–²</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('rcv_left')">â—€</button>
+                                        <button class="ir-btn ir-ok" onclick="sendIR('rcv_ok')">OK</button>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('rcv_right')">â–¶</button>
+                                        <div></div>
+                                        <button class="ir-btn ir-nav" onclick="sendIR('rcv_down')">â–¼</button>
+                                        <div></div>
+                                    </div>
+                                    <div
+                                        style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;">
+                                        <div style="text-align:center;">
+                                            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;">
+                                                VOL
+                                            </div>
+                                            <button class="ir-btn" onclick="sendIR('rcv_vol_up')">+</button>
+                                            <button class="ir-btn" onclick="sendIR('rcv_vol_down')"
+                                                style="margin-top:5px;">âˆ’</button>
+                                        </div>
+                                        <div style="text-align:center;">
+                                            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;">
+                                                CH
+                                            </div>
+                                            <button class="ir-btn" onclick="sendIR('rcv_ch_up')">+</button>
+                                            <button class="ir-btn" onclick="sendIR('rcv_ch_down')"
+                                                style="margin-top:5px;">âˆ’</button>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+                                        <button class="ir-btn ir-num" onclick="sendIR('1')">1</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('2')">2</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('3')">3</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('4')">4</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('5')">5</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('6')">6</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('7')">7</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('8')">8</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('9')">9</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('rcv_guide')">ðŸ“‹</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('0')">0</button>
+                                        <button class="ir-btn ir-num" onclick="sendIR('rcv_info')">â„¹</button>
+                                    </div>
+                                </div>
+
+                                <!-- TV Box uses TV layout -->
+                                <!-- DVD/Blu-ray uses TV layout -->
+                                <!-- Custom uses TV layout -->
+                            </div>
+                            <style>
+                                .ir-btn {
+                                    background: var(--bg-tertiary);
+                                    border: 1px solid var(--border-color);
+                                    color: var(--text-primary);
+                                    padding: 12px;
+                                    border-radius: 8px;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    font-size: 1rem;
+                                }
+
+                                .ir-btn:hover {
+                                    background: var(--primary);
+                                    color: #000;
+                                    transform: scale(1.05);
+                                }
+
+                                .ir-btn:active {
+                                    transform: scale(0.95);
+                                }
+
+                                .ir-power {
+                                    background: #ff0055;
+                                    color: #fff;
+                                    width: 50px;
+                                    height: 50px;
+                                    border-radius: 50%;
+                                    font-size: 1.5rem;
+                                }
+
+                                .ir-power:hover {
+                                    background: #ff3377;
+                                }
+
+                                .remote-layout {
+                                    transition: opacity 0.3s ease;
+                                }
+
+                                .ir-ok {
+                                    background: var(--primary);
+                                    color: #000;
+                                    border-radius: 50%;
+                                    width: 45px;
+                                    height: 45px;
+                                }
+
+                                .ir-nav {
+                                    width: 40px;
+                                    height: 40px;
+                                }
+
+                                .ir-num {
+                                    font-size: 0.9rem;
+                                    padding: 10px;
+                                }
+
+                                .led-color:hover {
+                                    transform: scale(1.15);
+                                    box-shadow: 0 0 20px currentColor;
+                                }
+
+                                .remote-layout {
+                                    transition: opacity 0.3s, transform 0.3s;
+                                }
+                            </style>
+                        </div>
+                        <!-- Features Panel -->
+                        <div>
+                            <!-- Auto-Find Remote -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h3>ðŸ” Encontrar Controle</h3>
+                                </div>
+                                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:15px;">Descubra
+                                    automaticamente qual controle funciona para seu dispositivo.</p>
+                                <div class="form-group"><label>Marca</label>
+                                    <select id="ir-autofind-brand">
+                                        <option value="lg">LG</option>
+                                        <option value="samsung">Samsung</option>
+                                        <option value="sony">Sony</option>
+                                        <option value="philips">Philips</option>
+                                        <option value="panasonic">Panasonic</option>
+                                        <option value="toshiba">Toshiba</option>
+                                        <option value="aoc">AOC</option>
+                                        <option value="tcl">TCL</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" style="width:100%;" onclick="startAutoFind()">ðŸš€
+                                    Iniciar
+                                    Busca AutomÃ¡tica</button>
+                                <div id="ir-autofind-status"
+                                    style="display:none;margin-top:15px;padding:15px;background:var(--bg-tertiary);border-radius:8px;">
+                                    <div id="ir-autofind-text">Testando cÃ³digo 1 de 50...</div>
+                                    <div style="margin-top:10px;">
+                                        <button class="btn btn-success" onclick="autoFindYes()">âœ…
+                                            Funcionou!</button>
+                                        <button class="btn btn-danger" onclick="autoFindNo()">âŒ NÃ£o</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Record Remote -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h3>âºï¸ Gravar Controle</h3>
+                                </div>
+                                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:15px;">Grave os
+                                    botÃµes
+                                    do seu controle original apontando para o sensor IR.</p>
+                                <div class="form-group"><label>Nome do Controle</label><input type="text"
+                                        id="ir-record-name" placeholder="Ex: TV Sala"></div>
+                                <div id="ir-record-status"
+                                    style="display:none;margin-bottom:15px;padding:15px;background:var(--bg-tertiary);border-radius:8px;">
+                                    <div id="ir-record-text">Pressione o botÃ£o no controle original...</div>
+                                    <div style="font-size:2rem;text-align:center;margin:10px 0;" id="ir-record-btn">
+                                        POWER</div>
+                                </div>
+                                <div id="ir-record-buttons" style="display:none;margin-bottom:15px;">
+                                    <div style="display:flex;flex-wrap:wrap;gap:5px;" id="ir-recorded-list"></div>
+                                </div>
+                                <button class="btn btn-warning" style="width:100%;" onclick="startRecording()">âºï¸
+                                    Iniciar GravaÃ§Ã£o</button>
+                            </div>
+                            <!-- Saved Remotes -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>ðŸ’¾ Controles Salvos</h3>
+                                </div>
+                                <div id="ir-saved-list" style="min-height:60px;">
+                                    <p class="text-muted">Nenhum controle salvo</p>
+                                </div>
+                                <button class="btn btn-secondary mt-2" onclick="loadSavedRemotes()">ðŸ”„
+                                    Atualizar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- TV Nuke -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3>â˜ ï¸ TV NUKE</h3>
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:15px;">Envia sinais de
+                            desligar para TODAS as marcas de TV conhecidas. Perfeito para lojas e lugares pÃºblicos!
+                        </p>
+                        <button class="btn btn-danger" style="width:100%;" onclick="sendCommand('tv_nuke')">â˜ ï¸
+                            DESLIGAR
+                            TODAS AS TVs</button>
+                    </div>
+                </section>
+
+                <!-- TOOLS VIEW -->
+                <section id="tools" class="view">
+                    <div class="grid grid-2 gap-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ–¼ï¸ Wallpapers</h3>
+                            </div>
+                            <div id="wallpaper-gallery"
+                                style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:300px;overflow-y:auto;">
+                            </div>
+                            <input type="file" id="wallpaper-upload" accept=".png" style="display:none;"
+                                onchange="uploadWallpaper(this.files[0])">
+                            <button class="btn btn-secondary mt-2"
+                                onclick="document.getElementById('wallpaper-upload').click()">ðŸ“¤ Upload PNG</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>â° Attack Timeline</h3>
+                            </div>
+                            <div id="attack-timeline" style="min-height:150px;">
+                                <p class="text-muted">Nenhum ataque agendado</p>
+                            </div>
+                            <button class="btn btn-secondary mt-2" onclick="scheduleAttack()">âž• Agendar
+                                Ataque</button>
+                        </div>
+
+                        <!-- Handshake Scheduler -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ“… Agendador de Upload</h3>
+                            </div>
+                            <p class="text-muted" style="font-size:0.8rem;">Envio automÃ¡tico de handshakes nÃ£o
+                                quebrados
+                                para OnlineHashCrack.</p>
+                            <div class="form-group">
+                                <label>Agendar Envio</label>
+                                <select id="hs-schedule-time">
+                                    <option value="next_connect">PrÃ³xima conexÃ£o Web</option>
+                                    <option value="30">Daqui a 30 minutos</option>
+                                    <option value="60">Daqui a 1 hora</option>
+                                    <option value="120">Daqui a 2 horas</option>
+                                    <option value="720">Daqui a 12 horas</option>
+                                    <option value="1440">Daqui a 24 horas</option>
+                                </select>
+                            </div>
+                            <div class="form-check" style="margin:10px 0;">
+                                <input type="checkbox" id="hs-auto-upload">
+                                <label for="hs-auto-upload" style="display:inline;">Auto-upload quando
+                                    online</label>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveHandshakeSchedule()">ðŸ’¾ Salvar
+                                Agendamento</button>
+                        </div>
+
+                        <!-- Sound Manager -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ”Š Gerenciador de Sons</h3>
+                            </div>
+                            <p class="text-muted" style="font-size:0.8rem;">Sons para ataques Bluetooth/Glitch.</p>
+                            <div id="sound-list"
+                                style="max-height:150px;overflow-y:auto;background:var(--bg-tertiary);border-radius:8px;padding:10px;margin-bottom:10px;">
+                                <div class="text-muted">Carregando sons...</div>
+                            </div>
+                            <input type="file" id="sound-upload" accept=".wav,.mp3" style="display:none;"
+                                onchange="uploadSoundToSD(this.files[0])">
+                            <button class="btn btn-secondary" style="width:100%;"
+                                onclick="document.getElementById('sound-upload').click()">ðŸ“¤ Upload Som
+                                (SD)</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>âŒš Watch Controller</h3>
+                            </div>
+                            <div class="grid grid-2 gap-2">
+                                <button class="btn btn-secondary" onclick="sendCommand('watch_screenshot')">ðŸ“¸
+                                    Screenshot</button>
+                                <button class="btn btn-secondary" onclick="sendCommand('watch_vibrate')">ðŸ“³
+                                    Vibrar</button>
+                                <button class="btn btn-secondary" onclick="sendCommand('watch_beep')">ðŸ””
+                                    Beep</button>
+                                <button class="btn btn-secondary" onclick="sendCommand('watch_led')">ðŸ’¡ LED
+                                    Flash</button>
+                            </div>
+                        </div>
+
+                        <!-- OTA Update Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>ðŸ“¦ OTA Update</h3>
+                            </div>
+                            <p class="text-muted" style="font-size:0.85rem;margin-bottom:15px;">Atualize o firmware
+                                do
+                                Lele via WiFi.</p>
+                            <a href="/update.html" target="_blank" class="btn btn-primary"
+                                style="width:100%;text-decoration:none;display:block;text-align:center;">ðŸš€ Abrir
+                                PÃ¡gina
+                                de Update</a>
+                        </div>
+                    </div>
+            </div>
+            </section>
+
+            <!-- REMOTE ACCESS VIEW -->
+            <section id="remote-access" class="view">
+                <div class="remote-access-container"
+                    style="height:calc(100vh - 150px);display:flex;flex-direction:column;">
+                    <div class="card mb-3" style="flex-shrink:0;">
+                        <div class="card-header">
+                            <h3>ðŸ–¥ï¸ Acesso Remoto â€” Lele VNC</h3>
+                            <a href="/remote.html" target="_blank" class="btn btn-sm btn-secondary">â†— Abrir em Nova
+                                Aba</a>
+                        </div>
+                        <p class="text-muted" style="font-size:0.85rem;padding:0 15px 15px;">Controle a tela do
+                            Lele diretamente pelo navegador. Toque na tela abaixo para interagir.</p>
+                    </div>
+                    <div class="card" style="flex:1;min-height:0;padding:0;overflow:hidden;">
+                        <iframe src="/remote.html"
+                            style="width:100%;height:100%;border:none;border-radius:12px;"></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONFIG VIEW -->
+
+
+            <!-- CONFIG VIEW -->
+            <section id="config" class="view">
+                <div class="grid grid-2 gap-3">
+                    <!-- Display & Theme -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸŽ¨ Display & Tema</h3>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group"><label>Brilho: <span id="brightness-value">100%</span></label><input
+                                    type="range" id="brightness-slider" min="0" max="255" value="255"
+                                    oninput="setBrightness(this.value)"></div>
+                            <div class="form-group"><label>Tema da Web</label>
+                                <select id="theme-selector" onchange="setTheme(this.value)">
+                                    <option value="cyberpunk">ðŸŒƒ Cyberpunk 2077</option>
+                                    <option value="stealth">ðŸª– Stealth Mode</option>
+                                    <option value="hacker">ðŸ’š Hacker Vision</option>
+                                    <option value="light">â˜€ï¸ Light Mode</option>
+                                    <option value="dracula">ðŸ§› Dracula</option>
+                                    <option value="nord">â„ï¸ Nord</option>
+                                    <option value="monokai">ðŸŽ¨ Monokai</option>
+                                    <option value="solarized">ðŸŒ… Solarized</option>
+                                    <option value="tokyo-night">ðŸŒƒ Tokyo Night</option>
+                                    <option value="gruvbox">ðŸ‚ Gruvbox</option>
+                                    <option value="one-dark">âš« One Dark</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matrix Animation Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ’š Fundo Animado (Matrix)</h3>
+                        </div>
+                        <div class="settings-section">
+                            <div class="form-group">
+                                <label>Velocidade: <span id="matrix-speed-value">50ms</span></label>
+                                <input type="range" id="matrix-speed-slider" min="20" max="100" value="50"
+                                    oninput="updateMatrixSpeed(this.value)">
+                                <small style="color:var(--text-muted);font-size:0.75rem;display:block;margin-top:5px;">
+                                    Menor = Mais rÃ¡pido | Maior = Mais lento
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>Cor do Fundo</label>
+                                <div style="display:flex;gap:10px;align-items:center;">
+                                    <input type="color" id="matrix-bg-color" value="#0a0a0f"
+                                        oninput="updateMatrixBgColor(this.value)">
+                                    <input type="range" id="matrix-bg-opacity" min="0" max="100" value="5"
+                                        oninput="updateMatrixBgOpacity(this.value)" style="flex:1;">
+                                    <span id="matrix-bg-opacity-value"
+                                        style="min-width:40px;font-size:0.85rem;">5%</span>
+                                </div>
+                                <small style="color:var(--text-muted);font-size:0.75rem;display:block;margin-top:5px;">
+                                    Cor base + opacidade do rastro
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>Cor das Letras</label>
+                                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                    <input type="color" id="matrix-text-color" value="#00fff5"
+                                        oninput="updateMatrixTextColor(this.value)"
+                                        style="height:40px;border-radius:8px;">
+                                    <div style="display:flex;gap:5px;flex:1;flex-wrap:wrap;">
+                                        <button class="btn btn-sm btn-secondary" onclick="setMatrixTextColor('#00fff5')"
+                                            style="background:#00fff5;color:#000;min-width:60px;">Cyan</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="setMatrixTextColor('#00ff00')"
+                                            style="background:#00ff00;color:#000;min-width:60px;">Green</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="setMatrixTextColor('#39ff14')"
+                                            style="background:#39ff14;color:#000;min-width:60px;">Neon</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="setMatrixTextColor('#ff00ff')"
+                                            style="background:#ff00ff;color:#000;min-width:60px;">Pink</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-2 gap-2" style="margin-top:15px;">
+                                <button class="btn btn-primary" onclick="saveMatrixSettings()">ðŸ’¾ Salvar</button>
+                                <button class="btn btn-secondary" onclick="resetMatrixSettings()">ðŸ”„ Restaurar
+                                    PadrÃ£o</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mascot Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸŽ­ Mascote</h3>
+                        </div>
+                        <div class="form-group"><label>Escolha o Mascote</label>
+                            <select id="mascot-selector" onchange="MascotSystem.setMascot(this.value)">
+                                <option value="dragon" disabled>ðŸ‰ Neura (DragÃ£o) - Em Breve</option>
+                                <option value="lele" selected>ðŸ‘¦ Lele (Garoto)</option>
+                                <option value="lisa" disabled>ðŸ‘§ Lisa (Garota) - Em Breve</option>
+                                <option value="cat" disabled>ðŸ± Shadow (Gato) - Em Breve</option>
+                                <option value="robot" disabled>ðŸ¤– X-9000 (RobÃ´) - Em Breve</option>
+                                <option value="skull" disabled>ðŸ’€ Reaper (Caveira) - Em Breve</option>
+                                <option value="ghost" disabled>ðŸ‘» Phantom (Fantasma) - Em Breve</option>
+                                <option value="phoenix" disabled>ðŸ¦… Blaze (FÃªnix) - Em Breve</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Personalidade</label>
+                            <select id="mascot-personality">
+                                <option value="aggressive">ðŸ”¥ Agressivo</option>
+                                <option value="calm">ðŸ˜Œ Calmo</option>
+                                <option value="sarcastic">ðŸ˜ SarcÃ¡stico</option>
+                                <option value="evil">ðŸ‘¿ Maligno</option>
+                            </select>
+                        </div>
+                        <!-- Mascot Wallpaper Upload -->
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>ðŸ–¼ï¸ Wallpaper do Mascote</label>
+                            <div id="mascot-wallpaper-preview"
+                                style="width:100%;height:80px;background:var(--bg-tertiary);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;border:1px dashed var(--border-color);">
+                                <span style="color:var(--text-muted)">Nenhum wallpaper</span>
+                            </div>
+                            <input type="file" id="mascot-wallpaper-upload" accept="image/*" style="display:none;"
+                                onchange="uploadMascotWallpaper(this.files[0])">
+                            <div class="grid grid-2 gap-2">
+                                <button class="btn btn-secondary"
+                                    onclick="document.getElementById('mascot-wallpaper-upload').click()">ðŸ“¤
+                                    Upload</button>
+                                <button class="btn btn-danger" onclick="removeMascotWallpaper()">ðŸ—‘ï¸
+                                    Remover</button>
+                            </div>
+                            <p style="font-size:0.65rem;color:var(--text-muted);margin-top:5px;">Wallpaper aparece
+                                no Dashboard atrÃ¡s do mascote. Cada mascote tem seu prÃ³prio wallpaper.</p>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;margin-top:10px;"
+                            onclick="saveMascotConfig()">ðŸ’¾
+                            Salvar Mascote</button>
+                    </div>
+                    <!-- AP Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ“¡ Access Point</h3>
+                        </div>
+                        <div class="form-group"><label>Nome do AP (SSID)</label><input type="text" id="ap-ssid"
+                                placeholder="Lele_AP"></div>
+                        <div class="form-group"><label>Senha do AP</label><input type="password" id="ap-password"
+                                placeholder="********"></div>
+                        <div class="form-group"><label>Canal</label><select id="ap-channel">
+                                <option value="1">1</option>
+                                <option value="6" selected>6</option>
+                                <option value="11">11</option>
+                            </select></div>
+                        <div class="form-group"><label>IP do Gateway (Web)</label><select id="ap-ip">
+                                <option value="192.168.4.1" selected>192.168.4.1 (PadrÃ£o)</option>
+                                <option value="10.0.0.1">10.0.0.1 (Stealth)</option>
+                                <option value="172.16.0.1">172.16.0.1 (Corp)</option>
+                                <option value="192.168.1.1">192.168.1.1 (Home)</option>
+                            </select></div>
+                        <button class="btn btn-primary" onclick="saveAPConfig()">ðŸ’¾ Salvar AP</button>
+                    </div>
+                    <!-- Dashboard Security -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ” SeguranÃ§a Dashboard</h3>
+                        </div>
+                        <div class="form-group"><label>UsuÃ¡rio</label><input type="text" id="dash-username"
+                                placeholder="admin">
+                        </div>
+                        <div class="form-group"><label>Senha Atual</label><input type="password" id="dash-password-old"
+                                placeholder="Senha atual"></div>
+                        <div class="form-group"><label>Nova Senha</label><input type="password" id="dash-password-new"
+                                placeholder="Nova senha"></div>
+                        <button class="btn btn-warning" onclick="saveDashboardAuth()">ðŸ” Alterar
+                            Credenciais</button>
+                    </div>
+                    <!-- Sound & Volume -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ”Š Som & Volume</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Volume Master: <span id="volume-value">80%</span></label>
+                            <div class="volume-control">
+                                <span class="volume-icon" onclick="toggleMute()">ðŸ”Š</span>
+                                <input type="range" id="volume-slider" min="0" max="100" value="80"
+                                    oninput="setVolume(this.value)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="flex items-center gap-2"><input type="checkbox" id="sound-enabled" checked
+                                    onchange="toggleSound(this.checked)"><span>Sons Habilitados</span></label>
+                        </div>
+                        <button class="btn btn-secondary" onclick="playTestSound()">ðŸ”” Testar Som</button>
+                    </div>
+                    <!-- OpenAI Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>ðŸ¤– OpenAI API</h3>
+                        </div>
+                        <div class="form-group"><label>API Key</label><input type="password" id="openai-key"
+                                placeholder="sk-..."></div>
+                        <div class="form-group"><label>Modelo</label>
+                            <select id="openai-model">
+                                <option value="gpt-4o-mini">GPT-4o Mini (RÃ¡pido)</option>
+                                <option value="gpt-4o">GPT-4o (AvanÃ§ado)</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Max Tokens: <span id="openai-tokens-val">500</span></label><input
+                                type="range" id="openai-tokens" min="100" max="2000" value="500"
+                                oninput="document.getElementById('openai-tokens-val').textContent=this.value"></div>
+                        <button class="btn btn-primary" onclick="saveOpenAIConfig()">ðŸ’¾ Salvar OpenAI</button>
+                    </div>
+                </div>
+                <!-- OnlineHashCrack -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ðŸ”“ OnlineHashCrack</h3>
+                    </div>
+                    <div class="form-group"><label>Email</label>
+                        <input type="email" id="ohc-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group"><label>API Key (Opcional)</label>
+                        <input type="text" id="ohc-key" placeholder="Chave da API (se receber)">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveOHCConfig()">ðŸ’¾ Salvar Config</button>
+                    <!-- OHC Stats Box -->
+                    <div id="ohc-stats-box"
+                        style="margin-top:15px;background:var(--bg-tertiary);padding:10px;border-radius:8px;display:none;">
+                        <h4
+                            style="margin:0 0 10px 0;font-size:0.9rem;border-bottom:1px solid var(--border-color);padding-bottom:5px;">
+                            ðŸ“Š Uso Mensal</h4>
+                        <div style="font-size:0.85rem;">
+                            <div style="display:flex;justify-content:space-between;"><span>Tarefas:</span> <span
+                                    id="ohc-usage">0 / 100</span></div>
+                            <div style="background:#333;height:6px;border-radius:3px;margin:5px 0;overflow:hidden;">
+                                <div id="ohc-progress" style="background:var(--primary);height:100%;width:0%;">
+                                </div>
+                            </div>
+                            <div
+                                style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:0.75rem;">
+                                <span>0 tasks</span><span>100 tasks</span>
+                            </div>
+                            <div style="margin-top:5px;font-size:0.8rem;color:var(--text-muted);">Reset em: <span
+                                    id="ohc-reset">--/--/----</span></div>
+                            <div style="margin-top:5px;font-size:0.8rem;color:var(--text-muted);">Key: <span
+                                    id="ohc-key-display">****</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- WiFi Power -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ðŸ“¶ PotÃªncia WiFi TX</h3>
+                    </div>
+                    <div class="form-group"><label>PotÃªncia: <span id="txpower-value">20dBm</span></label><input
+                            type="range" id="txpower-slider" min="8" max="20" value="20"
+                            oninput="setTxPower(this.value)"></div>
+                </div>
+                <!-- Discord -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ðŸ”” Discord Webhook</h3>
+                    </div>
+                    <div class="form-group"><label>URL do Webhook</label><input type="text" id="discord-webhook-input"
+                            placeholder="https://discord.com/api/webhooks/..."></div>
+                    <div class="grid grid-2 gap-2">
+                        <button class="btn btn-secondary"
+                            onclick="setDiscordWebhook(document.getElementById('discord-webhook-input').value)">ðŸ’¾
+                            Salvar</button>
+                        <button class="btn btn-primary"
+                            onclick="sendDiscordNotification('Teste do Lele! ðŸ‰','success')">ðŸ§ª
+                            Testar</button>
+                    </div>
+                </div>
+                <!-- Modules -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ðŸ”Œ MÃ³dulos</h3>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:15px;">
+                        <label class="flex items-center justify-between"><span>WiFi</span><label class="switch"><input
+                                    type="checkbox" checked
+                                    onchange="sendCommand('toggle_wifi',{enabled:this.checked})"><span
+                                    class="slider round"></span></label></label>
+                        <label class="flex items-center justify-between"><span>Bluetooth</span><label
+                                class="switch"><input type="checkbox" checked
+                                    onchange="sendCommand('toggle_ble',{enabled:this.checked})"><span
+                                    class="slider round"></span></label></label>
+                        <label class="flex items-center justify-between"><span>GPS (se houver)</span><label
+                                class="switch"><input type="checkbox"
+                                    onchange="sendCommand('toggle_gps',{enabled:this.checked})"><span
+                                    class="slider round"></span></label></label>
+                        <label class="flex items-center justify-between"><span>IR Blaster</span><label
+                                class="switch"><input type="checkbox" checked
+                                    onchange="sendCommand('toggle_ir',{enabled:this.checked})"><span
+                                    class="slider round"></span></label></label>
+                    </div>
+                </div>
+    </div>
+    <!-- System Actions -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>âš™ï¸ Sistema</h3>
+        </div>
+        <div class="grid grid-4 gap-2">
+            <button class="btn btn-secondary" onclick="sendCommand('reboot')">ðŸ”„ Reiniciar</button>
+            <button class="btn btn-secondary" onclick="sendCommand('backup')">ðŸ’¾ Backup</button>
+            <button class="btn btn-secondary" onclick="exportLogs()">ðŸ“‹ Exportar Logs</button>
+            <button class="btn btn-danger"
+                onclick="if(confirm('Isso apagarÃ¡ TODAS as configuraÃ§Ãµes!'))sendCommand('factory_reset')">âš ï¸
+                Factory Reset</button>
+        </div>
+    </div>
+    <!-- About -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>â„¹ï¸ Sobre</h3>
+        </div>
+        <div class="grid grid-2 gap-2" style="font-size:0.85rem;">
+            <div><strong>Firmware:</strong> <span id="fw-version">v2.0.0</span></div>
+            <div><strong>Hardware:</strong> ESP32-S3 Touch AMOLED 1.8</div>
+            <div><strong>MAC WiFi:</strong> <span id="mac-wifi">--:--:--:--:--:--</span></div>
+            <div><strong>MAC BLE:</strong> <span id="mac-ble">--:--:--:--:--:--</span></div>
+        </div>
+    </div>
+    </div>
+    </section>
+
+    <!-- HELP VIEW -->
+    <section id="help" class="view">
+        <div class="card mb-3"
+            style="text-align:center;background:linear-gradient(135deg,rgba(0,255,245,0.1),rgba(157,0,255,0.1));">
+            <div style="font-size:60px;margin:10px 0;">ðŸ“š</div>
+            <h2 style="color:var(--primary);margin:0;">Manual do Lele</h2>
+            <p class="text-muted">Guia completo de todos os ataques e funcionalidades</p>
+        </div>
+
+        <!-- WiFi Attacks -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(255,0,85,0.1);">
+                <h3>âš”ï¸ Ataques WiFi</h3>
+            </div>
+            <div style="padding:15px;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead style="background:var(--bg-tertiary);">
+                        <tr>
+                            <th style="padding:10px;text-align:left;">Ataque</th>
+                            <th style="padding:10px;text-align:left;">O que faz</th>
+                            <th style="padding:10px;text-align:left;">Como usar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>âš¡ Deauth Flood</strong></td>
+                            <td style="padding:10px;">Desconecta todos os dispositivos de uma rede WiFi enviando pacotes
+                                de desautenticaÃ§Ã£o em massa.</td>
+                            <td style="padding:10px;">1. Escanear redes<br>2. Selecionar alvo<br>3. Clicar em Deauth
+                                Flood</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>âš¡ Smart Deauth</strong></td>
+                            <td style="padding:10px;">Deauth inteligente que primeiro detecta clientes conectados e
+                                depois os desconecta individualmente.</td>
+                            <td style="padding:10px;">Comando: <code>smart_deauth</code><br>Mais preciso que o Flood
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>âš¡ Turbo Deauth</strong></td>
+                            <td style="padding:10px;">Deauth em modo turbo com CPU a 240MHz e envio rÃ¡pido de pacotes.
+                                Usa mais bateria.</td>
+                            <td style="padding:10px;">Comando: <code>turbo_deauth</code><br>Para dispositivos teimosos
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ“¡ Beacon Flood</strong></td>
+                            <td style="padding:10px;">Cria dezenas de redes WiFi falsas para confundir scanners e
+                                esconder a rede real.</td>
+                            <td style="padding:10px;">Clicar em Beacon Flood<br>AparecerÃ£o 30+ redes fake</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ¤ Capturar Handshake</strong></td>
+                            <td style="padding:10px;">Captura o 4-way handshake WPA/WPA2 quando um cliente se
+                                (re)conecta Ã  rede.</td>
+                            <td style="padding:10px;">1. Selecionar rede alvo<br>2. Iniciar captura<br>3. Aguardar
+                                cliente reconectar</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ”‘ PMKID</strong></td>
+                            <td style="padding:10px;">Captura hash PMKID do Access Point sem precisar de cliente
+                                conectado.</td>
+                            <td style="padding:10px;">Mais rÃ¡pido que handshake<br>Funciona em 60% dos roteadores</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ‘¿ Evil Twin</strong></td>
+                            <td style="padding:10px;">Clona uma rede WiFi e cria portal captivo para capturar senhas dos
+                                usuÃ¡rios.</td>
+                            <td style="padding:10px;">1. Selecionar rede para clonar<br>2. Escolher tipo de portal<br>3.
+                                Aguardar vÃ­tima conectar</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸŽ­ Karma/Mana</strong></td>
+                            <td style="padding:10px;">Responde a todas as solicitaÃ§Ãµes de probe request, fazendo
+                                dispositivos conectarem automaticamente.</td>
+                            <td style="padding:10px;">Explora auto-connect de celulares<br>Muito eficaz em locais
+                                pÃºblicos</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ” Probe Flood</strong></td>
+                            <td style="padding:10px;">Inunda o espectro WiFi com requisiÃ§Ãµes de probe para causar
+                                confusÃ£o.</td>
+                            <td style="padding:10px;">Comando: <code>probe_flood</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ‘ï¸ Hidden SSID</strong></td>
+                            <td style="padding:10px;">Revela redes WiFi com SSID oculto forÃ§ando respostas.</td>
+                            <td style="padding:10px;">Comando: <code>hidden_ssid</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ’£ HCX Dump</strong></td>
+                            <td style="padding:10px;">Modo caÃ§ador agressivo que captura PMKIDs e Handshakes de
+                                mÃºltiplas redes simultaneamente.</td>
+                            <td style="padding:10px;">Melhor ataque para captura em massa<br>Salva arquivos para hashcat
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;"><strong>â˜ ï¸ PWN Everything</strong></td>
+                            <td style="padding:10px;">Ativa todos os ataques simultaneamente por 60 segundos.</td>
+                            <td style="padding:10px;">âš ï¸ USE COM CUIDADO<br>Alto consumo de bateria</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WPS Attacks -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(255,0,255,0.1);">
+                <h3>âœ¨ Ataques WPS</h3>
+            </div>
+            <div style="padding:15px;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead style="background:var(--bg-tertiary);">
+                        <tr>
+                            <th style="padding:10px;text-align:left;">Ataque</th>
+                            <th style="padding:10px;text-align:left;">O que faz</th>
+                            <th style="padding:10px;text-align:left;">Tempo Estimado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>âœ¨ Pixie Dust</strong></td>
+                            <td style="padding:10px;">Explora vulnerabilidade no PRNG de roteadores para extrair PIN WPS
+                                offline via E-Hash.</td>
+                            <td style="padding:10px;">~30 segundos<br>(se vulnerÃ¡vel)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ”¢ WPS Bruteforce</strong></td>
+                            <td style="padding:10px;">Tenta todos os PINs WPS possÃ­veis (11.000 combinaÃ§Ãµes: 4+3 dÃ­gitos
+                                + checksum).</td>
+                            <td style="padding:10px;">4-10 horas<br>(dependendo de lockout)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;"><strong>ðŸ’¥ WPS Flood</strong></td>
+                            <td style="padding:10px;">Inunda o AP com pacotes WPS NACK causando DoS no serviÃ§o WPS.</td>
+                            <td style="padding:10px;">Imediato<br>DoS temporÃ¡rio</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top:15px;padding:10px;background:var(--bg-tertiary);border-radius:8px;">
+                    <strong>ðŸ’¡ Dica:</strong> Nem todos os roteadores sÃ£o vulnerÃ¡veis a Pixie Dust. Roteadores modernos
+                    geralmente tÃªm WPS desabilitado ou com proteÃ§Ã£o anti-bruteforce.
+                </div>
+            </div>
+        </div>
+
+        <!-- BLE Attacks -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(0,168,255,0.1);">
+                <h3>ðŸ”Š Ataques Bluetooth (BLE)</h3>
+            </div>
+            <div style="padding:15px;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead style="background:var(--bg-tertiary);">
+                        <tr>
+                            <th style="padding:10px;text-align:left;">Ataque</th>
+                            <th style="padding:10px;text-align:left;">O que faz</th>
+                            <th style="padding:10px;text-align:left;">Alvos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ“¡ BLE Scan</strong></td>
+                            <td style="padding:10px;">Escaneia dispositivos Bluetooth Low Energy prÃ³ximos.</td>
+                            <td style="padding:10px;">Todos dispositivos BLE</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ¤– BLE Chaos</strong></td>
+                            <td style="padding:10px;">Spam massivo de pacotes BLE: Apple AirPods, Windows Swift Pair,
+                                Google Fast Pair, Samsung Buds.</td>
+                            <td style="padding:10px;">iPhones, Android, Windows</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸŒŠ Connection Flood</strong></td>
+                            <td style="padding:10px;">Envia 150+ requisiÃ§Ãµes/segundo para travar caixas de som e fones
+                                Bluetooth.</td>
+                            <td style="padding:10px;">Caixas de som, Fones</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ’³ Skimmer Detect</strong></td>
+                            <td style="padding:10px;">Detecta possÃ­veis skimmers Bluetooth em caixas eletrÃ´nicos e
+                                bombas de gasolina.</td>
+                            <td style="padding:10px;">âš ï¸ Ferramenta de seguranÃ§a</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;"><strong>ðŸ“ Tracker Hunt</strong></td>
+                            <td style="padding:10px;">Procura por AirTags/SmartTags ocultos que possam estar te
+                                rastreando.</td>
+                            <td style="padding:10px;">âš ï¸ Ferramenta de seguranÃ§a</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- IR Remote -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(255,102,0,0.1);">
+                <h3>ðŸ“º Controle IR (Infravermelho)</h3>
+            </div>
+            <div style="padding:15px;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead style="background:var(--bg-tertiary);">
+                        <tr>
+                            <th style="padding:10px;text-align:left;">FunÃ§Ã£o</th>
+                            <th style="padding:10px;text-align:left;">O que faz</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ“º TV Nuke</strong></td>
+                            <td style="padding:10px;">Envia cÃ³digos de Power Off para 100+ marcas de TVs. Liga/desliga
+                                TVs em locais pÃºblicos.</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ”Š Volume Up/Down</strong></td>
+                            <td style="padding:10px;">Controla volume de TVs e soundbars.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;"><strong>â„ï¸ AC Control</strong></td>
+                            <td style="padding:10px;">Controla ar condicionados (Gree, LG, Samsung, Daikin).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- USB Attacks -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(138,43,226,0.1);">
+                <h3>ðŸ”Œ Ataques USB (BadUSB)</h3>
+            </div>
+            <div style="padding:15px;">
+                <p style="margin-bottom:15px;">O Lele pode se passar por um teclado USB (HID) e executar scripts
+                    automaticamente quando conectado a um computador.</p>
+                <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                    <thead style="background:var(--bg-tertiary);">
+                        <tr>
+                            <th style="padding:10px;text-align:left;">Categoria</th>
+                            <th style="padding:10px;text-align:left;">Exemplos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ‘‘ Domain/AD</strong></td>
+                            <td style="padding:10px;">ZeroLogon DCSync, PetitPotam Relay, Kerberoast, Pass-the-Hash</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ•¸ï¸ ExfiltraÃ§Ã£o</strong></td>
+                            <td style="padding:10px;">Dump de senhas WiFi, cookies, credenciais do navegador, histÃ³rico
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:10px;"><strong>ðŸ”“ EscalaÃ§Ã£o</strong></td>
+                            <td style="padding:10px;">Bypass UAC, criaÃ§Ã£o de admin, persistÃªncia no registro</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;"><strong>ðŸ’€ DestruiÃ§Ã£o</strong></td>
+                            <td style="padding:10px;">Fork Bomb, apagar MBR, ransomware fake (âš ï¸ cuidado!)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Commands Reference -->
+        <div class="card mb-3">
+            <div class="card-header" style="background:rgba(0,255,157,0.1);">
+                <h3>ðŸ’» ReferÃªncia de Comandos (Terminal/WebSocket)</h3>
+            </div>
+            <div style="padding:15px;font-family:var(--font-mono);font-size:0.8rem;">
+                <div style="columns:2;column-gap:20px;">
+                    <div style="margin-bottom:10px;"><strong>WiFi:</strong><br>
+                        <code>wifi_scan</code> - Escanear redes<br>
+                        <code>deauth</code> - Deauth flood<br>
+                        <code>smart_deauth</code> - Deauth inteligente<br>
+                        <code>turbo_deauth</code> - Deauth turbo<br>
+                        <code>beacon</code> - Beacon flood<br>
+                        <code>handshake</code> - Capturar handshake<br>
+                        <code>pmkid</code> - Capturar PMKID<br>
+                        <code>evil_twin</code> - Iniciar Evil Twin<br>
+                        <code>karma</code> - Karma/Mana attack<br>
+                        <code>probe_flood</code> - Probe flood<br>
+                        <code>hidden_ssid</code> - Revelar SSIDs<br>
+                        <code>ghost_ap</code> - Ghost AP<br>
+                        <code>hcx_dump</code> - HCX Dump mode<br>
+                        <code>stop</code> - Parar todos ataques
+                    </div>
+                    <div style="margin-bottom:10px;"><strong>WPS:</strong><br>
+                        <code>wps_scan</code> - Scan redes WPS<br>
+                        <code>wps_pixie</code> - Pixie Dust<br>
+                        <code>wps_brute</code> - Bruteforce PIN<br>
+                        <code>wps_stop</code> - Parar WPS
+                    </div>
+                    <div style="margin-bottom:10px;"><strong>BLE:</strong><br>
+                        <code>ble_scan</code> - Escanear BLE<br>
+                        <code>ble_chaos</code> - Spam BLE<br>
+                        <code>ble_skimmer</code> - Detectar skimmers<br>
+                        <code>ble_tracker</code> - CaÃ§ar trackers<br>
+                        <code>ble_stop</code> - Parar BLE
+                    </div>
+                    <div style="margin-bottom:10px;"><strong>Sistema:</strong><br>
+                        <code>reboot</code> - Reiniciar<br>
+                        <code>backup</code> - Fazer backup<br>
+                        <code>set_txpower X</code> - PotÃªncia WiFi
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card">
+            <div class="card-header" style="background:rgba(255,204,0,0.1);">
+                <h3>ðŸ’¡ Dicas de Uso</h3>
+            </div>
+            <div style="padding:15px;">
+                <ul style="list-style:none;padding:0;margin:0;">
+                    <li style="padding:8px 0;border-bottom:1px solid var(--border-color);">âœ… <strong>Sempre selecione um
+                            alvo</strong> antes de iniciar ataques direcionados</li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--border-color);">âœ… <strong>Use apenas em redes
+                            prÃ³prias</strong> ou com autorizaÃ§Ã£o explÃ­cita</li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--border-color);">âœ… <strong>Handshakes</strong>
+                        sÃ£o salvos em <code>/sdcard/captures/</code></li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--border-color);">âœ… <strong>Para crackear
+                            senhas</strong>, use hashcat no PC com os arquivos capturados</li>
+                    <li style="padding:8px 0;border-bottom:1px solid var(--border-color);">âœ… <strong>PotÃªncia
+                            TX</strong>: 8-10 dBm economiza bateria, 20 dBm mÃ¡ximo alcance</li>
+                    <li style="padding:8px 0;">âš ï¸ <strong>NÃ£o seja idiota</strong> - esta Ã© uma ferramenta educacional
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    </div>
+    </main>
+    </div>
+    <!-- Scripts -->
+    <script src="js/websocket.js"></script>
+    <script src="js/effects/matrix-rain.js"></script>
+    <script src="js/effects/particles.js"></script>
+    <script src="js/effects/heatmap.js"></script>
+    <script src="js/effects/network-3d.js"></script>
+    <script src="js/components/dragon.js"></script>
+    <script src="js/components/mascots.js"></script>
+    <script src="js/eastereggs.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/voice-control.js"></script>
+    <script src="js/theme-editor.js"></script>
+    <script src="js/pages/handshakes.js"></script>
+    <script src="js/pages/password-strength.js"></script>
+    <script src="js/pages/captive-portal.js"></script>
+    <script src="js/pages/attack-timeline.js"></script>
+    <script src="js/pages/evil-twin-builder.js"></script>
+    <script src="js/pages/mascot-selector.js"></script>
+    <script src="js/pages/watch-controller.js"></script>
+    <script src="js/pages/wallpapers.js"></script>
+    <script src="js/pages/sounds.js"></script>
+    <script src="js/pages/notifications.js"></script>
+    <script src="js/security/totp.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/attacks.js"></script>
+</body>
+
+</html>
