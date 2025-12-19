@@ -238,7 +238,7 @@ void* OptimizationManager::allocateOptimized(size_t size) {
 }
 
 String OptimizationManager::getPerformanceMetrics() {
-    char metrics[512];
+    char metrics[256]; // Reduzido de 512
     snprintf(metrics, sizeof(metrics),
         "CPU: %lu MHz | WiFi: %u dBm | BLE: %u | "
         "Mem: %lu/%lu KB | PSRAM: %lu KB | Buffers: %lu/%lu",

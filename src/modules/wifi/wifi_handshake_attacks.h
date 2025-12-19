@@ -75,14 +75,14 @@ enum WiFiCaptureAttack {
 /**
  * @brief Estrutura de handshake capturado
  */
-struct CapturedHandshake {
+struct __attribute__((packed)) CapturedHandshake {
     uint8_t bssid[6];
     uint8_t client_mac[6];
     char ssid[33];
     uint8_t anonce[32];
     uint8_t snonce[32];
     uint8_t mic[16];
-    uint8_t eapol_frame[256];
+    uint8_t eapol_frame[128]; // Reduzido de 256 para economizar memória (max WPA2 ~120 bytes)
     uint16_t eapol_len;
     bool is_complete;
     bool has_pmkid;
@@ -92,7 +92,7 @@ struct CapturedHandshake {
 /**
  * @brief Estrutura de PMKID capturado
  */
-struct CapturedPMKID {
+struct __attribute__((packed)) CapturedPMKID {
     uint8_t bssid[6];
     uint8_t client_mac[6];
     char ssid[33];

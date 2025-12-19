@@ -12,7 +12,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // HANDSHAKE DATA STRUCTURE
 // ═══════════════════════════════════════════════════════════════════════════
-struct HandshakeData {
+struct __attribute__((packed)) HandshakeData {
     char ssid[33];      // SSID do AP
     uint8_t bssid[6];   // MAC do AP
     uint8_t station[6]; // MAC da estação

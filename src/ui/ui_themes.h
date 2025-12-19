@@ -264,8 +264,8 @@ inline const ThemeColors &getTheme() {
 #define THEME_TEXT_DIM getTheme().text_dim
 #define THEME_RADIUS getTheme().radius
 
-// Nomes dos temas para UI
-static const char *theme_names[] = {
+// Nomes dos temas para UI (PROGMEM - economiza DRAM)
+static const char* const theme_names[] PROGMEM = {
     "Hacker Dark",
     "CyberPunk",
     "Matrix",

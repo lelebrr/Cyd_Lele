@@ -129,12 +129,12 @@ public:
 private:
   Language _currentLang;
 
-  // Tabelas de strings para cada idioma
-  static const char *_strings_ptbr[];
-  static const char *_strings_en[];
-  static const char *_strings_es[];
+  // Tabelas de strings para cada idioma (PROGMEM)
+  static const char* const _strings_ptbr[] PROGMEM;
+  static const char* const _strings_en[] PROGMEM;
+  static const char* const _strings_es[] PROGMEM;
 
-  const char **getTable() const;
+  const char* const* getTable() const;
 };
 
 extern LanguageManager lang;

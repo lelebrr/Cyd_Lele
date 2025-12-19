@@ -582,7 +582,7 @@ void ConsoleAttackManager::stopAttack() {
 }
 
 String ConsoleAttackManager::getStatistics() const {
-    char stats[256];
+    char stats[128]; // Reduzido de 256
     snprintf(stats, sizeof(stats),
         "Scanned: %d\nVulnerable: %d\nSuccessful: %d\nFailed: %d\nCurrent State: %d",
         totalScanned, vulnerableFound, attacksSuccessful, attacksFailed, currentState);

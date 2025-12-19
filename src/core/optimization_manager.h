@@ -67,8 +67,9 @@ struct OptimizationConfig {
  */
 class BufferPool {
 private:
-    static const size_t MAX_BUFFERS = 10;
-    static const size_t BUFFER_SIZE = 1024;
+    // Otimização Massiva: Reduzido de 10x1024 (10KB) para 2x256 (512B)
+    static const size_t MAX_BUFFERS = 2;     // Reduzido de 10
+    static const size_t BUFFER_SIZE = 256;   // Reduzido de 1024
     uint8_t buffers[MAX_BUFFERS][BUFFER_SIZE];
     bool used[MAX_BUFFERS];
     SemaphoreHandle_t mutex;

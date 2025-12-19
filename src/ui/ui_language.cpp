@@ -8,9 +8,9 @@
 LanguageManager lang;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PORTUGUÊS BRASILEIRO
+// PORTUGUÊS BRASILEIRO (PROGMEM - economiza DRAM)
 // ═══════════════════════════════════════════════════════════════════════════
-const char *LanguageManager::_strings_ptbr[] = {
+const char* const LanguageManager::_strings_ptbr[] PROGMEM = {
     // Menu Principal
     "Scan WiFi",
     "Scan BLE",
@@ -76,9 +76,9 @@ const char *LanguageManager::_strings_ptbr[] = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ENGLISH
+// ENGLISH (PROGMEM - economiza DRAM)
 // ═══════════════════════════════════════════════════════════════════════════
-const char *LanguageManager::_strings_en[] = {
+const char* const LanguageManager::_strings_en[] PROGMEM = {
     // Main Menu
     "WiFi Scan",
     "BLE Scan",
@@ -144,9 +144,9 @@ const char *LanguageManager::_strings_en[] = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ESPAÑOL
+// ESPAÑOL (PROGMEM - economiza DRAM)
 // ═══════════════════════════════════════════════════════════════════════════
-const char *LanguageManager::_strings_es[] = {
+const char* const LanguageManager::_strings_es[] PROGMEM = {
     // Menu Principal
     "Escanear WiFi",
     "Escanear BLE",
@@ -231,11 +231,11 @@ const char *LanguageManager::get(StringId id) const {
   if (id >= STR_COUNT)
     return "???";
 
-  const char **table = getTable();
+  const char* const* table = getTable();
   return table[id];
 }
 
-const char **LanguageManager::getTable() const {
+const char* const* LanguageManager::getTable() const {
   switch (_currentLang) {
   case LANG_EN_US:
     return _strings_en;

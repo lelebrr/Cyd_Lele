@@ -14,8 +14,8 @@ BootThemeManager bootThemes;
 #define LCD_WIDTH 368
 #define LCD_HEIGHT 448
 
-// Mensagens de status reais
-static const char *BOOT_STATUS[] = {
+// Mensagens de status reais (PROGMEM - economiza DRAM)
+static const char* const BOOT_STATUS[] PROGMEM = {
     "Initializing hardware...",
     "Loading NEURA9 model...",
     "Starting WiFi engine...",

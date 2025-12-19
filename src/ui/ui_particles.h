@@ -8,8 +8,8 @@
 #include <Arduino.h>
 #include <lvgl.h>
 
-// Configuração de partículas
-#define MAX_PARTICLES 50
+// Configuração de partículas (Otimizado)
+#define MAX_PARTICLES 30  // Reduzido de 50 para economizar DRAM
 #define PARTICLE_MIN_SIZE 2
 #define PARTICLE_MAX_SIZE 6
 

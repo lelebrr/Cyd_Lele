@@ -22,8 +22,8 @@ enum BootAnimState {
   BOOT_ANIM_COMPLETE
 };
 
-// Mensagens de status durante boot
-static const char *boot_messages[] = {
+// Mensagens de status durante boot (PROGMEM - economiza DRAM)
+static const char* const boot_messages[] PROGMEM = {
     "Initializing hardware...", "Loading NEURA9 AI...",
     "Starting WiFi engine...", "Activating BLE module...", "LeleWatch Ready!"};
 

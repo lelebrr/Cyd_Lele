@@ -20,8 +20,8 @@ VoiceAvatar voiceAvatar;
 #define AVATAR_GLOW_PURPLE lv_color_hex(0x9933ff)
 #define AVATAR_TEXT_COLOR lv_color_hex(0xcccccc)
 
-// Faces ASCII simples
-static const char* FACE_ASCII[] = {
+// Faces ASCII simples (PROGMEM - economiza DRAM)
+static const char* const FACE_ASCII[] PROGMEM = {
     "(•‿•)",   // FACE_HAPPY
     "(╥_╥)",   // FACE_SAD
     "(★‿★)",   // FACE_EXCITED
