@@ -1,6 +1,7 @@
 ﻿# 📁 Estrutura do Projeto
 
-Documentação completa de todas as pastas e arquivos do **Lele Origin 1.0**.
+**Mapa de arquivos e diretórios do projeto.**
+Última atualização: 2025-12-19
 
 ---
 
@@ -27,6 +28,7 @@ CYD 28/
 ## 📦 src/ - Código Fonte Principal
 
 ### src/main.cpp
+
 Ponto de entrada do firmware. Inicializa display, WiFi, e loop principal.
 
 ### src/core/ - Núcleo do Sistema
@@ -229,6 +231,7 @@ boards/
 ```
 
 **Ambientes disponíveis:**
+
 - `CYD-2USB` - Cheap Yellow Display 2 USB (padrão)
 
 ---
@@ -246,6 +249,7 @@ embedded_resources/
 ```
 
 **Funcionalidades:**
+
 - Gerenciador de arquivos
 - Navegador do dispositivo (tela remota)
 - Upload de arquivos

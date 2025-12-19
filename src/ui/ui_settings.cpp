@@ -20,7 +20,7 @@
 #include "ui_settings_ai.h"
 #include "ui_settings_attack.h"
 #include "ui_settings_display.h"
-#include "ui_settings_dragon.h"
+// #include "ui_settings_dragon.h" - Removed
 #include "ui_settings_network.h"
 #include "ui_settings_system.h"
 #include "ui_themes.h"
@@ -56,12 +56,13 @@ static void on_system_click(lv_event_t *e) {
   ui_settings_system_show();
 }
 
+/*
 static void on_dragon_click(lv_event_t *e) {
   audioDriver.playSound(SOUND_CLICK);
   settings_screen_active = false;
   ui_settings_dragon_show();
-  ui_settings_dragon_show();
 }
+*/
 
 static void on_ai_click(lv_event_t *e) {
   audioDriver.playSound(SOUND_CLICK);
@@ -170,7 +171,7 @@ lv_obj_t *ui_settings_create() {
   create_grid_button(content, "📡", "Wireless", on_network_click, 1, 0);
   create_grid_button(content, "⚔️", "Ataques", on_attack_click, 0, 1);
   create_grid_button(content, "🔋", "Sistema", on_system_click, 1, 1);
-  create_grid_button(content, "🐉", "Dragão", on_dragon_click, 0, 2);
+  // create_grid_button(content, "🐉", "Dragão", on_dragon_click, 0, 2); // Removed
   create_grid_button(content, "🧠", "AI Voice", on_ai_click, 1, 2);
 
   return scr_settings;
@@ -191,7 +192,7 @@ void ui_settings_update() {
 bool ui_settings_is_active() {
   return settings_screen_active || ui_settings_display_is_active() ||
          ui_settings_network_is_active() || ui_settings_attack_is_active() ||
-         ui_settings_system_is_active() || ui_settings_dragon_is_active() ||
+         ui_settings_system_is_active() || 
          ui_settings_ai_is_active();
 }
 

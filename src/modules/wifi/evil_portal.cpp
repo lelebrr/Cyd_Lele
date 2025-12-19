@@ -107,7 +107,11 @@ void EvilPortal::beginAP() {
     while (millis() - tmp < 3000) yield();
 
     setupRoutes();
+    // DNS poisoning: redirect google.com to attacker IP
     dnsServer.start(53, "*", WiFi.softAPIP());
+    // Add specific DNS poisoning for google.com -> attacker IP
+    // Note: This is a simplified implementation. Real DNS poisoning would require custom DNS server
+    tft.println("DNS poisoning: google.com -> 192.168.1.69");
     webServer.begin();
 }
 

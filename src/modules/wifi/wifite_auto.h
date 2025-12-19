@@ -47,7 +47,13 @@ void wifite_menu();
 int wifite_scan(bool withClientCount = true);
 
 // Obtém lista de redes
-std::vector<WifiteNetwork>& wifite_get_networks();
+#define MAX_WIFITE_NETWORKS 50
+
+// Obtém rede por índice
+WifiteNetwork* wifite_get_network(int index);
+
+// Obtém contagem de redes
+int wifite_get_network_count();
 
 // Ataque automatizado
 void wifite_auto_attack(WifiteMode mode);

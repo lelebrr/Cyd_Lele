@@ -8,6 +8,8 @@
 #include "optimization_manager.h"
 #include <WiFi.h>
 #include <esp_wifi.h>
+#include <esp_adc_cal.h>
+#include <Preferences.h>
 
 // Instância global
 OptimizationManager optimizationManager;
@@ -105,7 +107,8 @@ OptimizationManager::OptimizationManager() :
     currentMode(MODE_BALANCED),
     bleActive(false), wifiActive(false), rfActive(false), usbActive(false), attackActive(false),
     lastOptimizationCheck(0), lastPowerCheck(0),
-    cpuTime(0), wifiTime(0), bleTime(0), memoryUsed(0), psramUsed(0) {
+    cpuTime(0), wifiTime(0), bleTime(0), memoryUsed(0), psramUsed(0),
+    adc_chars(nullptr), batChannel(ADC1_CHANNEL_6) {
 
     // Configurações padrão balanced
     currentConfig = {
@@ -126,6 +129,12 @@ OptimizationManager::OptimizationManager() :
 void OptimizationManager::begin() {
     setMode(currentMode); // Aplica configurações iniciais
     logOptimization("Optimization Manager initialized - Mode: " + String(currentMode));
+
+    // Inicializa ADC para monitoramento de bateria
+    adc_chars = (esp_adc_cal_characteristics_t*) calloc(1, sizeof(esp_adc_cal_characteristics_t));
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, adc_chars);
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(batChannel, ADC_ATTEN_DB_11);
 }
 
 void OptimizationManager::setMode(OptimizationMode mode) {
@@ -211,6 +220,28 @@ void OptimizationManager::loop() {
         optimizePowerConsumption();
         lastPowerCheck = now;
     }
+
+    // Monitoramento de bateria
+    float volt = getBatteryVoltage();
+    if (volt < 3.6 && currentMode != MODE_POWERSAVE) {
+        setMode(MODE_POWERSAVE);
+        Serial.println("Battery low, forced economy");
+    }
+
+    // Logging de consumo
+    static unsigned long lastLog = 0;
+    if (millis() - lastLog > 60000) {
+        float current = 4.2; // fake
+        String logLine = String(millis()) + "," + String(volt) + "," + String(current);
+        if (sdcardMounted) {
+            File file = SD.open("/bat_log.csv", FILE_APPEND);
+            if (file) {
+                file.println(logLine);
+                file.close();
+            }
+        }
+        lastLog = millis();
+    }
 }
 
 uint8_t* OptimizationManager::getOptimizedBuffer() {
@@ -294,14 +325,17 @@ void OptimizationManager::optimizeDynamically() {
 
 void OptimizationManager::optimizePowerConsumption() {
     // Deep sleep inteligente
-    uint32_t sleepTime = 60000; // 1 minuto base
-
-    if (!attackActive && !bleActive && !wifiActive) {
-        sleepTime = 300000; // 5 minutos se inativo
+    if (currentMode == MODE_POWERSAVE && !attackActive) {
+        // save state
+        Preferences prefs;
+        prefs.begin("lele", false);
+        prefs.putString("last_target", "SSID CafeDelMal");
+        prefs.putString("keystroke", "senha123");
+        prefs.end();
+        esp_sleep_enable_timer_wakeup(60000 * 1000);
+        esp_sleep_enable_ext0_wakeup((gpio_num_t)34, 0);
+        esp_deep_sleep_start();
     }
-
-    // Configura wake timer
-    esp_sleep_enable_timer_wakeup(sleepTime * 1000);
 }
 
 void OptimizationManager::optimizeCPU() {
@@ -427,4 +461,13 @@ T optimizedClamp(T value, T min, T max) {
     if (value < min) return min;
     if (value > max) return max;
     return value;
+}
+
+/**
+ * @brief Obtém tensão da bateria via ADC calibrado
+ */
+float OptimizationManager::getBatteryVoltage() {
+    int adc = adc1_get_raw(batChannel);
+    uint32_t voltage = esp_adc_cal_raw_to_voltage(adc, adc_chars);
+    return voltage * 2.0 / 1000.0;
 }

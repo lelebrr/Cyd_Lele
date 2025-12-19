@@ -1,8 +1,4 @@
-﻿# 📚 Documentação Lele Origin 1.0
-
-Bem-vindo à documentação oficial do **Lele Origin 1.0** - um firmware versátil para ESP32 focado em operações de segurança ofensiva e Red Team.
-
-> 📅 **Última atualização:** 2025-12-17
+﻿> 📅 **Última atualização:** 2025-12-19
 
 ## 📖 Índice de Documentação
 

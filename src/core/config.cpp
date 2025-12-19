@@ -312,7 +312,8 @@ void LeleConfig::fromFile(bool checkFS) {
     // Wifi List
     if (!setting["wifi"].isNull()) {
         wifi.clear();
-        for (JsonPair kv : setting["wifi"].as<JsonObject>()) wifi[kv.key().c_str()] = kv.value().as<String>();
+        JsonObject wifiObj = setting["wifi"].as<JsonObject>();
+        for (JsonPair kv : wifiObj) wifi[kv.key().c_str()] = kv.value().as<String>();
     } else {
         count++;
         log_e("Fail");
@@ -515,13 +516,20 @@ void LeleConfig::fromFile(bool checkFS) {
 }
 
 void LeleConfig::saveFile() {
-    FS *fs = &LittleFS;
+    // ZERO TRACE ENFORCEMENT: Never write config to Internal Flash
+    if (!setupSdCard()) {
+        log_e("[ZERO TRACE] SD Not Mounted. Aborting save to internal memory.");
+        return;
+    }
+    
+    FS *fs = &SD;
+
     JsonDocument jsonDoc = toJson();
 
     // Open file for writing
     File file = fs->open(filepath, FILE_WRITE);
     if (!file) {
-        log_e("Failed to open config file");
+        log_e("Failed to open config file on SD");
         file.close();
         return;
     };
@@ -529,11 +537,9 @@ void LeleConfig::saveFile() {
     // Serialize JSON to file
     serializeJsonPretty(jsonDoc, Serial);
     if (serializeJsonPretty(jsonDoc, file) < 5) log_e("Failed to write config file");
-    else log_i("config file written successfully");
+    else log_i("config file written successfully to SD");
 
     file.close();
-
-    if (setupSdCard()) copyToFs(LittleFS, SD, filepath, false);
 }
 
 void LeleConfig::factoryReset() {

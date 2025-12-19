@@ -37,7 +37,7 @@ private:
     String filename = "";
     TinyGPSPlus gps;
     HardwareSerial GPSserial = HardwareSerial(2); // Uses UART2 for GPS
-    std::set<String> registeredMACs;              // Store and track registered MAC
+    std::set<uint64_t> registeredMACs;            // Store and track registered MAC (as uint64_t for RAM saving)
     int wifiNetworkCount = 0;                     // Counter fo wifi networks
     bool rxPinReleased = false;
 

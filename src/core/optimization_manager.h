@@ -12,6 +12,7 @@
 #include <vector>
 #include <WiFi.h>
 #include <esp_bt.h>
+#include <esp_adc_cal.h>
 
 // ============================================================================
 // ENUMS E CONSTANTES DE OTIMIZAÇÃO
@@ -135,6 +136,10 @@ private:
     size_t memoryUsed;
     size_t psramUsed;
 
+    // ADC para monitoramento de bateria
+    esp_adc_cal_characteristics_t *adc_chars;
+    adc1_channel_t batChannel;
+
 public:
     OptimizationManager();
 
@@ -213,6 +218,11 @@ public:
      * @brief Obtém métricas de performance
      */
     String getPerformanceMetrics();
+
+    /**
+     * @brief Obtém tensão da bateria
+     */
+    float getBatteryVoltage();
 
 private:
     // ============================================================================

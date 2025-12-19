@@ -1,6 +1,7 @@
 # ⚡ WPS Attacks - Guia Completo
 
-> Manual detalhado dos ataques WPS implementados no Lele Origin.
+> **Ataques específicos ao protocolo WPS.**
+> Última atualização: 2025-12-19
 
 ---
 
@@ -21,7 +22,7 @@
 
 **WPS (Wi-Fi Protected Setup)** é um padrão que facilita conexão WiFi sem digitar senhas longas.
 
-### Métodos WPS:
+### Métodos WPS
 
 | Método | Como funciona | Segurança |
 |--------|---------------|-----------|
@@ -29,9 +30,10 @@
 | **PBC** | Aperta botão no roteador | ✅ Mais seguro |
 | **NFC** | Aproxima dispositivo | ✅ Seguro |
 
-### Por que é vulnerável:
+### Por que é vulnerável
 
 O PIN de 8 dígitos (10^8 combinações) na verdade são **duas metades verificadas separadamente**:
+
 - Primeira metade: 4 dígitos (10^4 = 10.000 tentativas)
 - Segunda metade: 3 dígitos + checksum (10^3 = 1.000 tentativas)
 
@@ -52,12 +54,13 @@ O PIN de 8 dígitos (10^8 combinações) na verdade são **duas metades verifica
 
 ## 📱 Como Usar
 
-### Localização no Menu:
+### Localização no Menu
+
 ```
 WiFi → WPS Attacks
 ```
 
-### Fluxo completo:
+### Fluxo completo
 
 1. **Scan WPS APs**
    - Escaneia por 10 segundos
@@ -85,10 +88,11 @@ WiFi → WPS Attacks
 
 ## 🔮 Pixie Dust Attack
 
-### O que é:
+### O que é
+
 Ataque **offline** que explora geração fraca de números aleatórios em alguns chipsets.
 
-### Como funciona:
+### Como funciona
 
 ```
 1. Captura M1-M3 do handshake WPS
@@ -97,7 +101,7 @@ Ataque **offline** que explora geração fraca de números aleatórios em alguns
 4. Se seed baixo → PIN descoberto em segundos
 ```
 
-### Chipsets vulneráveis:
+### Chipsets vulneráveis
 
 | Fabricante | Modelos | Vulnerável |
 |------------|---------|------------|
@@ -107,7 +111,7 @@ Ataque **offline** que explora geração fraca de números aleatórios em alguns
 | Atheros | AR9285 | ⚠️ Alguns |
 | Mediatek | MT7620 | ❌ Não |
 
-### Display durante ataque:
+### Display durante ataque
 
 ```
 PIXIE DUST
@@ -122,7 +126,7 @@ Seed: 15847/32768
 ━━━━━━━━━━━━━━━━
 ```
 
-### Resultado:
+### Resultado
 
 | Status | Significado |
 |--------|-------------|
@@ -134,10 +138,11 @@ Seed: 15847/32768
 
 ## 🔢 PIN Brute-force
 
-### O que é:
+### O que é
+
 Ataque **online** que testa PINs sequencialmente (estilo Reaver/Bully).
 
-### Fluxo:
+### Fluxo
 
 ```
 1. Envia M1 com PIN tentativa
@@ -147,7 +152,7 @@ Ataque **online** que testa PINs sequencialmente (estilo Reaver/Bully).
 5. Se M8: SUCESSO! → extrai PSK
 ```
 
-### Tempo estimado:
+### Tempo estimado
 
 | Cenário | Tempo |
 |---------|-------|
@@ -155,7 +160,7 @@ Ataque **online** que testa PINs sequencialmente (estilo Reaver/Bully).
 | Com lockout (60s) | 12-24 horas |
 | Primeira metade rápida | Menos que metade do tempo |
 
-### Display:
+### Display
 
 ```
 PIN BRUTE-FORCE
@@ -169,7 +174,7 @@ Testando segunda...
 [ESC para parar]
 ```
 
-### Problemas comuns:
+### Problemas comuns
 
 | Problema | Causa | Solução |
 |----------|-------|---------|
@@ -181,15 +186,17 @@ Testando segunda...
 
 ## 💥 WPS DoS Flood
 
-### O que faz:
+### O que faz
+
 Inunda o AP com requisições WPS inválidas, travando o serviço WPS.
 
-### Uso:
+### Uso
+
 - Testar se AP trava com flood
 - Forçar lockout para testar timing
 - Denial of Service em WPS
 
-### Display:
+### Display
 
 ```
 WPS DoS FLOOD
@@ -204,7 +211,7 @@ Pacotes: 15847
 
 ## ⚠️ Limitações
 
-### No ESP32:
+### No ESP32
 
 | Limitação | Impacto |
 |-----------|---------|
@@ -213,7 +220,7 @@ Pacotes: 15847
 | Sem wpa_supplicant | Associação limitada |
 | WiFi stack fechado | Alguns frames não funcionam |
 
-### Comparação com PC:
+### Comparação com PC
 
 | | ESP32 | PC + Alfa |
 |-|-------|-----------|
@@ -221,7 +228,7 @@ Pacotes: 15847
 | Brute-force | ⚠️ Lento | ✅ Rápido |
 | Full Reaver | ❌ Parcial | ✅ Completo |
 
-### Recomendação:
+### Recomendação
 
 1. **Sempre tente Pixie Dust primeiro** (segundos se vulnerável)
 2. Se não vulnerável, use PC com Reaver completo
@@ -231,14 +238,14 @@ Pacotes: 15847
 
 ## 📚 Referências
 
-### Ferramentas originais:
+### Ferramentas originais
 
 - [Reaver](https://github.com/t6x/reaver-wps-fork-t6x) - Brute-force WPS
 - [Pixiewps](https://github.com/wiire-a/pixiewps) - Offline Pixie Dust
 - [Bully](https://github.com/aanarchyy/bully) - Alternativa ao Reaver
 - [OneShot](https://github.com/fulvius31/OneShot) - Python WPS
 
-### Documentação técnica:
+### Documentação técnica
 
 - [Wi-Fi Alliance WPS Specification](https://www.wi-fi.org/discover-wi-fi/wi-fi-protected-setup)
 - [Reaver/pixiewps Paper](https://arxiv.org/abs/1305.5549)
@@ -248,10 +255,11 @@ Pacotes: 15847
 ## 🔧 Código Fonte
 
 Implementação em:
+
 - `src/modules/wifi/wps_full_attacks.h`
 - `src/modules/wifi/wps_full_attacks.cpp`
 
-### Funções principais:
+### Funções principais
 
 ```cpp
 wps_attacks_menu()      // Menu principal

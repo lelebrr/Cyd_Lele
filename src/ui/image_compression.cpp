@@ -5,7 +5,7 @@
 
 #include "image_compression.h"
 #include <LittleFS.h>
-#include <SD_MMC.h>
+#include <SD.h>
 #include <debug_log.h>
 
 ImageCompressor imageCompressor;
@@ -29,8 +29,8 @@ bool ImageCompressor::analyzeImage(const char *path, ImageInfo *info) {
 
     // Tenta abrir do SD ou LittleFS
     File file;
-    if (SD_MMC.exists(path)) {
-        file = SD_MMC.open(path, "r");
+    if (SD.exists(path)) {
+        file = SD.open(path, "r");
     } else if (LittleFS.exists(path)) {
         file = LittleFS.open(path, "r");
     }

@@ -10,8 +10,9 @@ Documentação das funcionalidades RFID e NFC do Lele Origin.
 |--------|-----------|-----------|
 | PN532 | 13.56 MHz | NFC (MIFARE, NTAG, etc.) |
 | PN532 Killer | 13.56 MHz | NFC + Magic cards |
-| MFRC522 | 13.56 MHz | MIFARE |
-| Reader 125kHz | 125 kHz | EM4100, HID |
+| MFRC522 | 13.56 MHz> **NFC, 125kHz e 13.56MHz.**
+
+> Última atualização: 2025-12-19
 
 ---
 

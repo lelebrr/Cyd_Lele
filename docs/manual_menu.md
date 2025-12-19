@@ -1,8 +1,6 @@
-# 📖 Manual Completo de Menus - Lele Origin
-
 > **Guia ULTRA-DETALHADO** de todas as funcionalidades do firmware Lele Origin.
 > Cada opção explicada com: O QUE FAZ, COMO USAR, O QUE SIGNIFICA cada informação.
-> Última atualização: 2025-12-17
+> Última atualização: 2025-12-19
 
 ---
 

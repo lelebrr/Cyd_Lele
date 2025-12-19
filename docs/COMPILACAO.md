@@ -1,6 +1,8 @@
 # 🔨 Compilação
 
 Guia para compilar o firmware Lele Origin.
+> **Guia passo-a-passo para compilar e fazer upload.**
+> Última atualização: 2025-12-19
 
 ---
 
@@ -21,10 +23,12 @@ Guia para compilar o firmware Lele Origin.
 ## 🏗️ Compilando
 
 ### Via Interface
+
 1. Clique no PlatformIO (barra lateral)
 2. **CYD-2USB → Build**
 
 ### Via Terminal
+
 ```bash
 pio run -e CYD-2USB
 ```
@@ -34,14 +38,17 @@ pio run -e CYD-2USB
 ## 📤 Upload
 
 ### Via Interface
+
 Clique em **Upload** no PlatformIO
 
 ### Via Terminal
+
 ```bash
 pio run -e CYD-2USB -t upload
 ```
 
 ### Via esptool
+
 ```bash
 esptool.py --port COM3 write_flash 0x00000 firmware.bin
 ```
@@ -53,6 +60,7 @@ esptool.py --port COM3 write_flash 0x00000 firmware.bin
 ```bash
 pio device monitor
 ```
+
 Baud rate: 115200
 
 ---

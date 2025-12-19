@@ -56,6 +56,9 @@ O Lele suporta execução de scripts Ducky para ataques BadUSB, transformando o 
 | `ALT-GUI` | Alt + Win |
 | `GUI-SHIFT` | Win + Shift |
 
+> **BadUSB e emulação de teclado/mouse.**
+> Última atualização: 2025-12-19
+
 #### Layouts de Teclado
 
 | ID | Layout |

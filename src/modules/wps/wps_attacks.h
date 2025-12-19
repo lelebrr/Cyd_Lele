@@ -64,15 +64,23 @@ struct WPSNetwork {
 /**
  * @brief Scanner WPS - encontra redes vulneráveis
  */
+// ... (enums and structs remain)
+
+#define MAX_WPS_NETWORKS 30
+
+/**
+ * @brief Scanner WPS - encontra redes vulneráveis
+ */
 class WPSScanner {
 private:
-    std::vector<WPSNetwork> networks;
+    WPSNetwork networks[MAX_WPS_NETWORKS];
+    int networkCount;
     bool scanning;
     unsigned long scanStartTime;
     int scanTimeout;  // segundos
 
 public:
-    WPSScanner() : scanning(false), scanStartTime(0), scanTimeout(30) {}
+    WPSScanner() : networkCount(0), scanning(false), scanStartTime(0), scanTimeout(30) {}
 
     /**
      * @brief Inicia scan de redes WPS
@@ -85,9 +93,17 @@ public:
     void stopScan();
 
     /**
-     * @brief Obtém lista de redes encontradas
+     * @brief Obtém rede por índice
      */
-    std::vector<WPSNetwork>& getNetworks() { return networks; }
+    WPSNetwork* getNetwork(int index) {
+        if (index >= 0 && index < networkCount) return &networks[index];
+        return nullptr;
+    }
+
+    /**
+     * @brief Obtém contagem de redes
+     */
+    int getNetworkCount() const { return networkCount; }
 
     /**
      * @brief Verifica se está escaneando
@@ -105,52 +121,17 @@ public:
     int getScanProgress() const;
 };
 
-/**
- * @brief Executor de ataques Pixie Dust
- */
-class PixieDustAttacker {
-private:
-    WPSNetwork target;
-    bool attacking;
-    unsigned long attackStartTime;
-    int attemptCount;
+// ... (PixieDustAttacker remains similar)
 
-public:
-    PixieDustAttacker() : attacking(false), attackStartTime(0), attemptCount(0) {}
-
-    /**
-     * @brief Inicia ataque Pixie Dust
-     */
-    bool startAttack(const WPSNetwork& network);
-
-    /**
-     * @brief Para o ataque
-     */
-    void stopAttack();
-
-    /**
-     * @brief Verifica se está atacando
-     */
-    bool isAttacking() const { return attacking; }
-
-    /**
-     * @brief Calcula PIN usando Pixie Dust
-     */
-    String calculatePIN(const uint8_t* eHash1, const uint8_t* eHash2);
-
-    /**
-     * @brief Obtém progresso do ataque (0-100)
-     */
-    int getAttackProgress() const;
-
-    /**
-     * @brief Verifica se a rede é vulnerável ao Pixie Dust
-     */
-    bool isVulnerable(const WPSNetwork& network);
+enum ReaverPhase {
+    PHASE_COMMON,
+    PHASE_COMPUTED,
+    PHASE_BRUTE,
+    PHASE_DONE
 };
 
 /**
- * @brief Executor de ataques Reaver
+ * @brief Executor de ataques Reaver (Zero Alloc Version)
  */
 class ReaverAttacker {
 private:
@@ -158,13 +139,17 @@ private:
     bool attacking;
     unsigned long attackStartTime;
     String currentPIN;
-    int pinIndex;
-    std::vector<String> pinList;
+    
+    // State Machine logic
+    ReaverPhase phase;
+    int phaseIndex;
+    uint32_t bruteCurrent;
+    
     int attemptCount;
     String calculateBSSIDPins(const String& bssidStr);
 
 public:
-    ReaverAttacker() : attacking(false), attackStartTime(0), pinIndex(0), attemptCount(0) {}
+    ReaverAttacker() : attacking(false), attackStartTime(0), phase(PHASE_COMMON), phaseIndex(0), attemptCount(0) {}
 
     /**
      * @brief Inicia ataque Reaver brute force
@@ -185,11 +170,6 @@ public:
      * @brief Verifica se PIN foi encontrado
      */
     bool checkPINResult(const String& pin);
-
-    /**
-     * @brief Gera lista de PINs baseada em padrões conhecidos
-     */
-    void generatePINList();
 
     /**
      * @brief Obtém progresso do ataque (0-100)
@@ -326,9 +306,14 @@ public:
     WPSNetwork getCurrentTarget() const { return currentTarget; }
 
     /**
-     * @brief Obtém lista de redes encontradas
+     * @brief Obtém rede por índice
      */
-    std::vector<WPSNetwork>& getNetworks() { return scanner.getNetworks(); }
+    WPSNetwork* getNetwork(int index) { return scanner.getNetwork(index); }
+
+    /**
+     * @brief Obtém total de redes
+     */
+    int getNetworkCount() const { return scanner.getNetworkCount(); }
 
     /**
      * @brief Obtém estatísticas

@@ -337,15 +337,7 @@ void IrRead::save_device() {
     bool sdCardAvailable = setupSdCard();
     bool littleFsAvailable = checkLittleFsSize();
 
-    if (sdCardAvailable && littleFsAvailable) {
-        // ask to choose one
-        options = {
-            {"SD Card",  [&]() { fs = &SD; }      },
-            {"LittleFS", [&]() { fs = &LittleFS; }},
-        };
-
-        loopOptions(options);
-    } else if (sdCardAvailable) {
+    if (sdCardAvailable) {
         fs = &SD;
     } else if (littleFsAvailable) {
         fs = &LittleFS;

@@ -231,19 +231,26 @@ void Wardriving::append_to_file(int network_amount) {
     }
 
     for (int i = 0; i < network_amount; i++) {
-        String macAddress = WiFi.BSSIDstr(i);
+        uint8_t* bssid = WiFi.BSSID(i);
+        uint64_t macKey = 0;
+        for(int k=0; k<6; k++) macKey = (macKey << 8) | bssid[k];
 
         // Check if MAC was already found in this session
-        if (registeredMACs.find(macAddress) == registeredMACs.end()) {
-            registeredMACs.insert(macAddress); // Adds MAC to file
+        if (registeredMACs.find(macKey) == registeredMACs.end()) {
+            registeredMACs.insert(macKey); // Adds MAC to file
             int32_t channel = WiFi.channel(i);
+            
+            // Format MAC string manually to avoid String allocation
+            char macStr[18];
+            snprintf(macStr, 18, "%02X:%02X:%02X:%02X:%02X:%02X", 
+                bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
 
             char buffer[512];
             snprintf(
                 buffer,
                 sizeof(buffer),
                 "%s,\"%s\",[%s],%04d-%02d-%02d %02d:%02d:%02d,%ld,%ld,%ld,%f,%f,%f,%f,,,WIFI\n",
-                macAddress.c_str(),
+                macStr,
                 WiFi.SSID(i).c_str(),
                 auth_mode_to_string(WiFi.encryptionType(i)).c_str(),
                 gps.date.year(),

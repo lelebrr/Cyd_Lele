@@ -1,6 +1,7 @@
 ﻿# 🙏 Contribuidores
 
-Agradecimentos a todos que contribuíram para este projeto.
+**Agradecimentos aos desenvolvedores e comunidade.**
+Última atualização: 2025-12-19
 
 ---
 
@@ -47,6 +48,7 @@ Adaptação e customização por **Lele** para a placa CYD-2USB.
 Este projeto é distribuído sob a licença **AGPL (Affero General Public License)**.
 
 Isso significa que:
+
 - ✅ Você pode usar, modificar e distribuir
 - ✅ Deve manter os créditos originais
 - ✅ Modificações devem ser open-source

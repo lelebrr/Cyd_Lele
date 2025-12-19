@@ -1,5 +1,8 @@
 # 📻 RF (Rádio Frequência)
 
+> **SubGHz, 433MHz e NRF24.**
+> Última atualização: 2025-12-19
+
 Documentação das funcionalidades de RF, CC1101 e NRF24 do Lele Origin.
 
 ---
@@ -133,6 +136,9 @@ Ataque a mouses e teclados wireless vulneráveis.
 ---
 
 ## 🛠️ Configuração NRF24
+>
+> **SubGHz, 433MHz e NRF24.**
+> Última atualização: 2025-12-19
 
 **Pinagem padrão NRF24:**
 

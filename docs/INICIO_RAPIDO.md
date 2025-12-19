@@ -1,6 +1,7 @@
 # ⚡ Início Rápido
 
-Guia para começar a usar o Lele Origin 1.0 na sua placa CYD-2USB.
+> **Primeiros passos com seu Lele Origin.**
+> Última atualização: 2025-12-19
 
 ---
 

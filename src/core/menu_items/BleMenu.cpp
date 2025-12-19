@@ -42,6 +42,7 @@ void BleMenu::optionsMenu() {
     options.push_back({"BLE Malicioso", [=]() { ducky_setup(hid_ble, true); }});
 #endif
     options.push_back({"Teclado BLE", [=]() { ducky_keyboard(hid_ble, true); }});
+    options.push_back({"BLE Keyboard Inject", [=]() { ble_keyboard_inject_attack(); }});
 
     // Submenu for Pentest Attacks
     options.push_back({"Pentest Attacks", [this]() {

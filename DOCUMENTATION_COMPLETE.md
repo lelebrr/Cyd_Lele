@@ -11,7 +11,7 @@
 
 ## 🎯 **VISÃO GERAL DO SISTEMA COMPLETO**
 
-O **Lele Origin** é um framework completo de pentesting educacional, implementando **41+ ataques avançados** em 8 tecnologias: BLE, NFC, RF, USB, WiFi, WPS, Consoles, IoT.
+O **Lele Origin** é um framework completo de pentesting educacional, implementando **41+ ataques avançados** em 9 tecnologias: BLE, NFC, RF, USB, WiFi, WPS, Consoles, IoT, SecureBoot.
 
 ### **Arquitetura do Sistema**
 
@@ -113,10 +113,21 @@ src/core/menu_items/
 ├── WifiMenu.cpp ✅ (MITM Attacks submenu)
 ├── WPSMenu.cpp ✅ (Interface WPS touchscreen)
 ├── ConsoleMenu.cpp ✅ (Interface consoles touchscreen)
-└── IoTMenu.cpp ✅ (Interface IoT touchscreen)
+├── IoTMenu.cpp ✅ (Interface IoT touchscreen)
+└── secure_boot.cpp ✅ (Core Security Engine)
+```
+
+#### **Core Security Files (2 arquivos)**
+
+```
+src/core/
+├── secure_boot.h ✅ (Security definitions)
+└── secure_boot.cpp ✅ (Implementation: Thermal, CRC, WDT, Overclock)
 ```
 
 ### **📚 Documentation Files (12 arquivos)**
+
+> **SECURITY NOTICE**: This device runs a [Paranoid Secure Boot Protocol](docs/PARANOID_BOOT.md).
 
 ```
 docs/
@@ -125,13 +136,15 @@ docs/
 ├── USB_ATTACKS.md ✅ (USB payloads)
 ├── RFID.md ✅ (NFC attacks)
 ├── RF.md ✅ (RF jamming)
-└── WIFI.md ✅ (MITM attacks)
+├── WIFI.md ✅ (MITM attacks)
+├── PARANOID_BOOT.md ✅ (Secure Boot Protocol)
 ├── IMPLEMENTATION_STATUS.md ✅ (Status de implementação)
 ├── DOCUMENTATION_COMPLETE.md ✅ (Esta documentação)
 ├── OPTIMIZATIONS_IMPLEMENTED.md ✅ (Otimizações completas)
 ├── WPS_ATTACKS_IMPLEMENTATION.md ✅ (WPS detalhado)
 ├── CONSOLE_ATTACKS_IMPLEMENTATION.md ✅ (Consoles detalhado)
 ├── IOT_ATTACKS_IMPLEMENTATION.md ✅ (IoT detalhado)
+├── AGGRESSIVE_SD_IMPLEMENTATION.md ✅ (Secure Boot + SD Wipe)
 └── SYSTEM_COMPLETE_FINAL.md ✅ (Resumo final do sistema)
 ```
 
@@ -339,6 +352,20 @@ docs/
   5. `Doorbell` - SubGHz replay
   6. `BLE Beacon` - Flood attack
   7. `Automated Script` - Ataque sequencial em 6 dispositivos
+
+- **Status:** ✅ **COMPLETAMENTE FUNCIONAL**
+
+### **✅ Secure Boot (Paranoid Mode) - 100% COMPLETO - 5 PROTOKOLS**
+
+#### **5 Security Checks** ⭐⭐⭐
+
+- **Arquivo:** `secure_boot.cpp`
+- **Features Implementadas:**
+  1. `Thermal Killswitch` - Protects chip >70°C
+  2. `Integrity Lock` - Prevents tampering (CRC32)
+  3. `SD Watchdog` - Anti-brick SD monitor
+  4. `Safe Overclock` - Shielded 240MHz boost
+  5. `Power Monitor` - Brownout protection
 
 - **Status:** ✅ **COMPLETAMENTE FUNCIONAL**
 

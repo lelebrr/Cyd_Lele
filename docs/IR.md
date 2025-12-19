@@ -2,16 +2,21 @@
 
 Documentação das funcionalidades de infravermelho do Lele Origin.
 
+> **Controle Universal e TV-B-Gone.**
+> Última atualização: 2025-12-19
+
 ---
 
 ## 🔧 Hardware Necessário
 
 ### Transmissor IR
+
 - LED infravermelho (940nm recomendado)
 - Resistor 100-220Ω
 - Conectar no GPIO 22 ou 27
 
 ### Receptor IR
+
 - Módulo receptor IR (VS1838B, TSOP38238)
 - Conectar no GPIO 35
 
@@ -22,11 +27,13 @@ Documentação das funcionalidades de infravermelho do Lele Origin.
 Função clássica para desligar TVs automaticamente.
 
 **Como funciona:**
+
 1. O Lele emite sequencialmente códigos de desligamento
 2. Cobre mais de 100 modelos de TVs
 3. Funciona em TVs Samsung, LG, Sony, Philips, etc.
 
 **Como usar:**
+
 1. Aponte o LED IR para a TV
 2. Acesse **IR → TV-B-Gone**
 3. Aguarde (pode levar até 1 minuto)
@@ -42,12 +49,14 @@ Função clássica para desligar TVs automaticamente.
 Captura sinais IR de controles remotos.
 
 **Informações capturadas:**
+
 - Protocolo (NEC, Samsung, Sony, etc.)
 - Endereço
 - Comando
 - Dados brutos
 
 **Como usar:**
+
 1. Acesse **IR → IR Receiver**
 2. Aponte o controle para o receptor
 3. Pressione o botão do controle
@@ -61,10 +70,12 @@ Captura sinais IR de controles remotos.
 Reproduz sinais IR salvos.
 
 **Formatos suportados:**
+
 - `.ir` (formato Flipper Zero)
 - `.txt` (formato próprio)
 
 **Como usar:**
+
 1. Copie os arquivos para o SD Card (pasta `/ir/`)
 2. Acesse **IR → Custom IR**
 3. Selecione o arquivo
@@ -109,6 +120,7 @@ Acesse **IR → Config** para ajustar:
 ## 📁 Formato de Arquivos
 
 ### Flipper Zero (.ir)
+
 ```
 Filetype: IR signals file
 Version: 1
@@ -121,6 +133,7 @@ command: 08 00 00 00
 ```
 
 ### RAW (.ir)
+
 ```
 name: Power
 type: raw
@@ -134,12 +147,14 @@ data: 9024 4512 564 564 564 1692 ...
 ## 🔌 Esquema de Conexão
 
 ### LED Transmissor
+
 ```
 GPIO 22 ──[100Ω]──► LED IR ──► GND
                     (Anodo)   (Catodo)
 ```
 
 ### Receptor IR
+
 ```
        ┌─────────┐
 VCC ───┤ VS1838B ├─── GND

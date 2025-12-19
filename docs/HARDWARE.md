@@ -1,6 +1,7 @@
 # 🔧 Hardware - CYD-2USB
 
-Especificações técnicas e pinagem da placa CYD-2USB (Lele Origin 1.0).
+> **Especificações técnicas, pinouts e guia de montagem.**
+> Última atualização: 2025-12-19
 
 ---
 
@@ -155,6 +156,7 @@ Especificações técnicas e pinagem da placa CYD-2USB (Lele Origin 1.0).
 
 > [!IMPORTANT]
 > **Interruptores de Ativação:**
+>
 > - Fio **VCC** possui interruptor (Alimentação)
 > - Fio **SDA** possui interruptor (Dados)
 > - **Ambos** devem estar ligados para o módulo funcionar.
@@ -162,6 +164,7 @@ Especificações técnicas e pinagem da placa CYD-2USB (Lele Origin 1.0).
 
 > [!TIP]
 > **Configuração do PN532 para I2C:**
+>
 > 1. Localize os DIP switches no módulo
 > 2. Configure: **SW1 = ON**, **SW2 = OFF**
 > 3. Isso força o chip a operar em modo I2C.
@@ -243,6 +246,7 @@ GND         →    GND
 ## 🔋 Alimentação
 
 A placa possui 2 conectores Micro USB:
+
 - **USB Superior**: Programação e alimentação
 - **USB Inferior**: Apenas alimentação
 
@@ -282,7 +286,6 @@ Consumo típico: ~150-200mA em operação normal.
                     │   └─────────────────────────────┘   │
                     └─────────────────────────────────────┘
 ```
-
 
 ---
 
@@ -330,7 +333,8 @@ Consumo típico: ~150-200mA em operação normal.
 └────────────────────────────────────────────────────────────┘
 ```
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Modelo | 18650 Shield V3 4X |
@@ -344,7 +348,7 @@ Consumo típico: ~150-200mA em operação normal.
 | Dimensoes | 100x90x20mm |
 | Peso | 71g |
 
-### Conexao com CYD-2USB (✅ INSTALADO):
+### Conexao com CYD-2USB (✅ INSTALADO)
 
 ```
      Shield V3 (5V)              Interruptor           CYD-2USB (P1)
@@ -366,19 +370,23 @@ Consumo típico: ~150-200mA em operação normal.
 | 5V (+) - 1ª saída direita | VCC (P1) | ✅ Conectado | Via interruptor liga/desliga |
 | GND (-) - 1ª saída direita | GND (P1) | ✅ Conectado | Fio direto |
 
-### Funcoes do Shield V3:
+### Funcoes do Shield V3
 
 **Botao Principal:**
+
 - 1 clique = Ligar
 - Segurar 3 segundos = Desligar
 
 **Switch HOLD:**
+
 - Para dispositivos de baixo consumo que desligam automaticamente
 - Ativa carga resistiva para manter o shield ligado
 
-### Modo de Protecao (Importante!):
+### Modo de Protecao (Importante!)
+>
 > [!IMPORTANT]
 > **Se o Shield entrar em modo de protecao apos trocar bateria:**
+>
 > 1. Insira a bateria no modulo
 > 2. Conecte cabo Micro USB para alimentacao externa
 > 3. Aguarde alguns segundos
@@ -387,6 +395,7 @@ Consumo típico: ~150-200mA em operação normal.
 
 > [!WARNING]
 > **Baterias 18650:**
+>
 > - Use baterias de qualidade (Samsung, LG, Sony, Panasonic)
 > - Todas devem ter mesma capacidade e marca
 > - Nao misture baterias velhas com novas
@@ -394,6 +403,7 @@ Consumo típico: ~150-200mA em operação normal.
 
 > [!CAUTION]
 > **Autonomia Estimada:**
+>
 > - 4x 18650 (2600mAh cada) = ~10400mAh
 > - Consumo CYD + modulos = ~300mA
 > - Autonomia: ~30-35 horas de uso contínuo
@@ -420,7 +430,8 @@ Consumo típico: ~150-200mA em operação normal.
 └─────────────────────────────┘
 ```
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Impedancia | 4 ohms ±15% |
@@ -429,7 +440,7 @@ Consumo típico: ~150-200mA em operação normal.
 | Pressao Sonora | 89 ±3dB |
 | Dimensoes | 25mm x 35mm x 6.5mm |
 
-### Conexao:
+### Conexao
 
 | Speaker | CYD-2USB |
 |---------|----------|
@@ -442,6 +453,7 @@ Consumo típico: ~150-200mA em operação normal.
 
 > [!TIP]
 > **Funcionalidades de Audio:**
+>
 > - Sons de feedback do sistema
 > - Alertas sonoros
 > - Reproducao de tons simples
@@ -470,7 +482,8 @@ Consumo típico: ~150-200mA em operação normal.
 └──────────────────────┘
 ```
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Protocolo | 1-Wire (Dallas) |
@@ -480,14 +493,15 @@ Consumo típico: ~150-200mA em operação normal.
 | Alimentacao | 3.0V a 5.5V |
 | Encapsulamento | TO-92 |
 
-### Pinout DS18B20 (Vista Frontal):
+### Pinout DS18B20 (Vista Frontal)
+
 | Pino | Nome | Funcao |
 |------|------|--------|
 | 1 (Esquerda) | GND | Terra |
 | 2 (Centro) | DQ | Linha de Dados (1-Wire) |
 | 3 (Direita) | VDD | Alimentacao (3.3V) |
 
-### Conexao com CYD-2USB:
+### Conexao com CYD-2USB
 
 | DS18B20 | CYD-2USB | Notas |
 |---------|----------|-------|
@@ -510,7 +524,8 @@ GPIO 4    │
          GND
 ```
 
-### Uso Previsto:
+### Uso Previsto
+
 - Monitorar temperatura das baterias 18650
 - Protecao contra superaquecimento
 - Alertas de temperatura critica
@@ -562,17 +577,18 @@ GPIO 4    │
 > **CONEXÃO EM PARALELO (CRÍTICO):**
 > Você ligou o CC1101 e o NRF24 nos **MESMOS** pinos lógico.
 > **REGRA DE OURO:** Você **JAMAIS** pode ligar os interruptores de alimentação (VCC) do NRF24 e do CC1101 ao mesmo tempo.
+>
 > - Se ligar os dois: O barramento SPI travará (conflito de dados no MISO).
 > - Use apenas UM módulo RF de cada vez.
 
 > [!TIP]
 > A CyD reconhecerá automaticamente qual módulo está ativo se apenas um estiver energizado.
 
-### Funcionalidades Suportadas:
+### Funcionalidades Suportadas
+
 - Leitura/Clonagem de controles remotos (433MHz)
 - Jammer SubGHz
 - Analisador de Espectro
-
 
 ---
 
@@ -617,11 +633,13 @@ GPIO 4    │
 > [!IMPORTANT]
 > **Gestão de Conflitos (NFC vs NRF24):**
 > Como os pinos **IO27** e **IO22** são compartilhados com o módulo NFC:
+>
 > 1. **NUNCA** ligue os interruptores de alimentação (VCC) de ambos ao mesmo tempo.
 > 2. O interruptor no pino **CSN (IO27)** e no **SDA (IO27)** do NFC garante que eles não interfiram um no outro quando desligados.
 
 > [!TIP]
 > **Pinos do SD Card:**
+>
 > - **CLK** = IO18
 > - **CMD** = MOSI (IO23)
 > - **DAT0** = MISO (IO19)
@@ -671,7 +689,8 @@ GPIO 4    │
 | Anodo (+) | GPIO 22 | Via resistor 100-150 ohms |
 | Catodo (-) | GND | - |
 
-### Funcionalidades Suportadas:
+### Funcionalidades Suportadas
+
 - TV-B-Gone (desligar TVs)
 - Captura de comandos IR
 - Replay de comandos
@@ -704,7 +723,8 @@ GPIO 4    │
 └────────────────────────────────────────────┘
 ```
 
-### Diferencas do PA+LNA vs Standard:
+### Diferencas do PA+LNA vs Standard
+
 | Caracteristica | Standard | PA+LNA |
 |---------------|----------|--------|
 | Potencia TX | 0 dBm | **+20 dBm** |
@@ -712,7 +732,8 @@ GPIO 4    │
 | Antena | PCB integrada | **SMA externa** |
 | Consumo TX | ~12mA | **~115mA** |
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Frequencia | 2.4GHz - 2.525GHz (126 canais) |
@@ -724,11 +745,13 @@ GPIO 4    │
 | Alimentacao | 3.0V - 3.6V (usar 3.3V) |
 | Consumo TX | ~115mA |
 
-### Conexao com CYD-2USB (SPI):
+### Conexao com CYD-2USB (SPI)
+
 Ver tabela acima (idêntica ao NRF24 padrão).
 
 > [!CAUTION]
 > **Alimentacao Critica:**
+>
 > - Usar APENAS 3.3V no VCC
 > - Consumo alto (115mA) - considerar fonte externa
 > - Capacitor 10-100uF entre VCC e GND recomendado
@@ -763,7 +786,8 @@ Ver tabela acima (idêntica ao NRF24 padrão).
 └────────────────────────────────────────────┘
 ```
 
-### Diferencas do YS-IRTM vs LED/Receptor Simples:
+### Diferencas do YS-IRTM vs LED/Receptor Simples
+
 | Caracteristica | LED/Receptor Simples | YS-IRTM |
 |---------------|---------------------|---------|
 | Interface | GPIO direto | **UART Serial** |
@@ -772,7 +796,8 @@ Ver tabela acima (idêntica ao NRF24 padrão).
 | TX e RX | Separados | **Integrados** |
 | Complexidade | Maior | **Menor** |
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Interface | UART (TTL Serial) |
@@ -782,7 +807,7 @@ Ver tabela acima (idêntica ao NRF24 padrão).
 | Logica | 5V (requer level shifter) |
 | Funcao | Transmissor + Receptor IR |
 
-### Conexao com CYD-2USB (UART):
+### Conexao com CYD-2USB (UART)
 
 | YS-IRTM | Level Shifter | CYD-2USB | GPIO |
 |---------|---------------|----------|------|
@@ -795,7 +820,7 @@ Ver tabela acima (idêntica ao NRF24 padrão).
 > **Level Shifter Obrigatorio!**
 > O YS-IRTM opera em 5V. Conectar diretamente ao ESP32 (3.3V) pode danifica-lo.
 
-### Esquema de Conexao com Level Shifter:
+### Esquema de Conexao com Level Shifter
 
 ```
      YS-IRTM (5V)          Level Shifter         CYD-2USB (3.3V)
@@ -809,7 +834,8 @@ Ver tabela acima (idêntica ao NRF24 padrão).
     └───────────┘         └─────────────┘        └───────────┘
 ```
 
-### Comandos UART do YS-IRTM:
+### Comandos UART do YS-IRTM
+
 | Comando | Funcao |
 |---------|--------|
 | A1 | Transmitir codigo IR gravado |
@@ -847,6 +873,7 @@ Esta secao lista todos os componentes adicionais necessarios para protecao, esta
 ### 🔴 RESISTORES
 
 #### 1. Resistor Pull-up para DS18B20
+
 | Especificacao | Valor |
 |---------------|-------|
 | Resistencia | **4.7k ohms** (4700 ohms) |
@@ -865,6 +892,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ```
 
 #### 2. Resistor Limitador para IR LED
+
 | Especificacao | Valor |
 |---------------|-------|
 | Resistencia | **100-150 ohms** |
@@ -881,6 +909,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ### 🔵 CAPACITORES
 
 #### 1. Capacitor de Estabilidade para NRF24L01+PA+LNA
+
 | Especificacao | Valor |
 |---------------|-------|
 | Capacitancia | **10uF a 100uF** |
@@ -898,6 +927,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ```
 
 #### 2. Capacitores de Desacoplamento
+
 | Especificacao | Valor |
 |---------------|-------|
 | Capacitancia | **100nF (0.1uF)** |
@@ -915,6 +945,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ### 🟡 LEVEL SHIFTER (CONVERSOR DE NIVEL)
 
 #### Para YS-IRTM (5V ↔ 3.3V)
+
 | Especificacao | Valor |
 |---------------|-------|
 | Tipo | Bidirecional 4 canais |
@@ -924,6 +955,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 | Canais usados | 2 (TX e RX) |
 
 **Modelos Recomendados:**
+
 - TXS0108E (8 canais)
 - BSS138 (4 canais - mais comum)
 - Modulo generico "Logic Level Converter"
@@ -949,6 +981,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ### 🟢 CHAVES E SWITCHES
 
 #### Chaves Liga/Desliga para Modulos
+
 | Especificacao | Valor |
 |---------------|-------|
 | Tipo | Mini Switch SPST |
@@ -957,6 +990,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 | Funcao | Desligar modulos nao usados |
 
 **Modulos que podem ter switch:**
+
 - PN532 NFC (VCC e/ou SDA)
 - GPS NEO-6M (VCC)
 - NRF24L01 (VCC)
@@ -971,6 +1005,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ### 🔶 PROTECAO
 
 #### 1. Diodo de Protecao de Polaridade
+
 | Especificacao | Valor |
 |---------------|-------|
 | Tipo | Schottky |
@@ -986,6 +1021,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 ```
 
 #### 2. Fusivel Resetavel (PTC)
+
 | Especificacao | Valor |
 |---------------|-------|
 | Tipo | PTC Resetavel (Polyfuse) |
@@ -1046,6 +1082,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 
 > [!IMPORTANT]
 > **Ordem de Instalacao Recomendada:**
+>
 > 1. Primeiro: Diodo Schottky e Fusivel PTC (protecao geral)
 > 2. Segundo: Capacitores de desacoplamento em cada modulo
 > 3. Terceiro: Level Shifter para YS-IRTM
@@ -1077,7 +1114,8 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 └──────────────────────────────────────────────┘
 ```
 
-### Especificacoes:
+### Especificacoes
+
 | Caracteristica | Valor |
 |---------------|-------|
 | Tipo | LED RGB Enderecavel |
@@ -1089,7 +1127,8 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 | Protocolo | Sinal digital 800kHz |
 | Cores | 16.7 milhoes (24-bit RGB) |
 
-### Pinout WS2812B (4 pinos):
+### Pinout WS2812B (4 pinos)
+
 | Pino | Nome | Funcao |
 |------|------|--------|
 | 1 | VCC | Alimentacao 5V |
@@ -1097,7 +1136,7 @@ GPIO 4 ───┼──── DS18B20 (DQ)
 | 3 | GND | Terra |
 | 4 | DIN | Entrada de dados |
 
-### Conexao em Cadeia (4 LEDs):
+### Conexao em Cadeia (4 LEDs)
 
 ```
 ESP32          LED1           LED2           LED3           LED4
@@ -1109,7 +1148,7 @@ GPIO ──[R]──► DIN→DOUT ────► DIN→DOUT ────► DI
 [R] = Resistor 220-470 ohms (protecao linha de dados)
 ```
 
-### Conexao com CYD-2USB:
+### Conexao com CYD-2USB
 
 | WS2812B | CYD-2USB | Notas |
 |---------|----------|-------|
@@ -1118,7 +1157,7 @@ GPIO ──[R]──► DIN→DOUT ────► DIN→DOUT ────► DI
 | DIN (primeiro LED) | GPIO 16 | Via resistor 220-470 ohms |
 | DOUT (ultimo LED) | (nao conectar) | - |
 
-### Componentes Adicionais Necessarios:
+### Componentes Adicionais Necessarios
 
 | Componente | Valor | Funcao |
 |------------|-------|--------|
@@ -1127,18 +1166,20 @@ GPIO ──[R]──► DIN→DOUT ────► DIN→DOUT ────► DI
 
 > [!IMPORTANT]
 > **Alimentacao:**
+>
 > - 4 LEDs x 60mA = 240mA maximo
 > - Usar fonte externa 5V se possivel
 > - Capacitor 100uF+ recomendado entre VCC e GND
 
 > [!TIP]
 > **Usos no Lele Origin:**
+>
 > - Indicador de status do sistema
 > - Feedback visual de operacoes
 > - Efeitos de iluminacao personalizados
 > - Notificacoes coloridas (vermelho=erro, verde=ok, etc.)
 
-### Esquema Eletrico Completo:
+### Esquema Eletrico Completo
 
 ```
                     Fonte 5V Externa

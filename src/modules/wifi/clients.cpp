@@ -68,10 +68,10 @@ ssh_channel channel_ssh;
 
 char *stringTochar(String s) {
     if (s.length() == 0) {
-        return nullptr; // or handle the case where the string is empty
+        return nullptr;
     }
 
-    static char arr[14]; // Make sure it's large enough to hold the IP address
+    static char arr[64]; // Increased size for safety (IP + leftovers)
     s.toCharArray(arr, sizeof(arr));
     return arr;
 }
@@ -289,13 +289,14 @@ void ssh_loop(void *pvParameters) {
 #endif
 
         // Read data from SSH server and display it, handling ANSI sequences
-        nbytes = ssh_channel_read_nonblocking(channel_ssh, buffer, sizeof(buffer), 0);
+        nbytes = ssh_channel_read_nonblocking(channel_ssh, buffer, sizeof(buffer) - 1, 0);
 
         if (nbytes > 0) {
-            String msg = "";
+            buffer[nbytes] = '\0'; // Ensure null termination
             tft.setTextColor(TFT_WHITE);
+            
+            // Print directly without String concatenation
             for (int i = 0; i < nbytes; ++i) {
-                msg += char(buffer[i]);
                 if (buffer[i] == '\r') continue; // Ignore carriage return
                 tft.write(buffer[i]);
                 if (tft.getCursorY() > tftHeight) {
@@ -307,7 +308,7 @@ void ssh_loop(void *pvParameters) {
                 }
                 cursorY = tft.getCursorY();
             }
-            log_d("%s", msg);
+            log_d("%s", buffer); // Log raw buffer directly
 
             cursorY = tft.getCursorY(); // Update cursor position
             if (cursorY > tftHeight) {

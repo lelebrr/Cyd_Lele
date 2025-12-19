@@ -1,6 +1,7 @@
 # 📶 Bluetooth Low Energy (BLE)
 
-Documentação das funcionalidades Bluetooth do Lele Origin.
+> **Ferramentas Bluetooth Low Energy.**
+> Última atualização: 2025-12-19
 
 ---
 

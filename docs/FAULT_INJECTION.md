@@ -1,14 +1,15 @@
 # ⚡ Fault Injection (Glitcher)
 
-> **STATUS: EM DESENVOLVIMENTO**
-
-Este módulo implementa ataques de injeção de falhas via voltage glitching para bypass de proteções em microcontroladores e dispositivos IoT.
+> **Glitching e injeção de falhas.**
+> Última atualização: 2025-12-19
+---Este módulo implementa ataques de injeção de falhas via voltage glitching para bypass de proteções em microcontroladores e dispositivos IoT.
 
 ---
 
 ## 🛠️ Hardware Necessário
 
 ### Componentes Básicos (~R$ 50)
+
 | Componente | Modelo | Preço Aprox. |
 |------------|--------|--------------|
 | MOSFET N-Channel | **IRLZ44N** | R$ 5-10 |
@@ -19,6 +20,7 @@ Este módulo implementa ataques de injeção de falhas via voltage glitching par
 | (Opcional) Optocoupler | PC817 | R$ 3 |
 
 ### Esquema de Conexão IRLZ44N
+
 ```
 ESP32 GPIO (27) ──[100Ω]──> IRLZ44N Gate
                            IRLZ44N Drain ──> GND do ALVO
@@ -32,18 +34,21 @@ ESP32 GPIO (27) ──[100Ω]──> IRLZ44N Gate
 ## 📋 Funcionalidades Planejadas
 
 ### Fase 1 (Básico)
+
 - [ ] Voltage Glitch via GPIO único
 - [ ] Configuração de parâmetros (delay, pulse width, repeats)
 - [ ] Trigger manual via touchscreen
 - [ ] Log de resultados no SD Card
 
 ### Fase 2 (Avançado)
+
 - [ ] Múltiplos GPIOs (arm, glitch, reset)
 - [ ] Trigger externo via UART
 - [ ] Scan automático de parâmetros
 - [ ] Scripts prontos para alvos comuns
 
 ### Fase 3 (Profissional)
+
 - [ ] EMFI (Electromagnetic Fault Injection) com bobina
 - [ ] Análise pós-glitch via SWD
 - [ ] Extração de chaves criptográficas

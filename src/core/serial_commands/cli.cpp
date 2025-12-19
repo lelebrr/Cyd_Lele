@@ -6,6 +6,7 @@
 #include "gpio_commands.h"
 #include "interpreter_commands.h"
 #include "ir_commands.h"
+#include "network_commands.h"
 #include "power_commands.h"
 #include "rf_commands.h"
 #include "screen_commands.h"
@@ -37,6 +38,7 @@ void SerialCli::setup() {
     createCryptoCommands(&_cli);
     createGpioCommands(&_cli);
     createIrCommands(&_cli);
+    createNetworkCommands(&_cli);
     createPowerCommands(&_cli);
     createRfCommands(&_cli);
     createSettingsCommands(&_cli);

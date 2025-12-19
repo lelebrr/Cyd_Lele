@@ -3,6 +3,7 @@
 #include "core/utils.h"
 #include "modules/badusb_ble/ducky_typer.h"
 #include "modules/bjs_interpreter/interpreter.h"
+#include "modules/network_simulation.h"
 #include "modules/others/clicker.h"
 #include "modules/others/ibutton.h"
 #include "modules/others/mic.h"
@@ -29,6 +30,27 @@ void OthersMenu::optionsMenu() {
         {"iButton",      setup_ibutton                            },
 #endif
         {"Timer",        [=]() { Timer(); }                       },
+        {"UART Keylogger", [=]() { uart_keylogger_attack(); }     },
+        {"Network Sim",  [=]() {
+            if (networkSim.begin()) {
+                networkSim.start_simulation();
+                tft.fillScreen(TFT_BLACK);
+                tft.setTextColor(TFT_RED, TFT_BLACK);
+                tft.drawCentreString("NETWORK SIMULATION ACTIVE", tftWidth/2, tftHeight/2, 2);
+                tft.setTextSize(1);
+                tft.drawCentreString("BLE: 1000pkt/s Core1 | WiFi: 1200pkt/s Core0", tftWidth/2, tftHeight/2 + 30, 1);
+                tft.drawCentreString("Press any key to stop", tftWidth/2, tftHeight/2 + 50, 1);
+                while (!check(AnyKeyPress)) {
+                    delay(100);
+                }
+                networkSim.stop_simulation();
+            } else {
+                tft.fillScreen(TFT_BLACK);
+                tft.setTextColor(TFT_RED, TFT_BLACK);
+                tft.drawCentreString("SIMULATION INIT FAILED", tftWidth/2, tftHeight/2, 2);
+                delay(2000);
+            }
+        } },
     };
     addOptionToMainMenu();
 

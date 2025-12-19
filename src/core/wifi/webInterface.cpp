@@ -13,6 +13,9 @@
 #include <debug_log.h>
 #include <esp_heap_caps.h>
 #include <globals.h>
+#include <ArduinoJson.h>
+#include "core/stealth.h"
+#include "modules/wifi/evil_twin_deauth.h" // For deauth
 
 #if defined(CONFIG_IDF_TARGET_ESP32) && !defined(BOARD_HAS_PSRAM)
 #define MOUNT_SD_CARD setupSdCard()
@@ -31,6 +34,8 @@ const int default_webserverporthttp = 80;
 IPAddress AP_GATEWAY(172, 0, 0, 1); // Gateway
 
 AsyncWebServer *server = nullptr; // initialise webserver
+AsyncWebSocket ws("/ws"); // WebSocket instance
+
 const char *host = "LELE";
 String uploadFolder = "";
 static bool mdnsRunning = false;
@@ -41,6 +46,111 @@ String generateToken(int length = 24) {
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     for (int i = 0; i < length; i++) { token += charset[random(0, sizeof(charset) - 1)]; }
     return token;
+}
+
+/**********************************************************************
+**  WebSocket Functions
+**********************************************************************/
+void broadcastStatus() {
+    if (ws.count() == 0) return;
+    
+    StaticJsonDocument<256> doc;
+    doc["type"] = "status";
+    doc["bat"] = g_state.battery_percent; // From globals
+    doc["temp"] = (int)temperatureRead(); // Built-in ESP32 temp
+    doc["pps"] = random(0, 500); // Placeholder for PPS (packet per second) simulation
+    
+    String output;
+    serializeJson(doc, output);
+    ws.textAll(output);
+}
+
+void sendWifiScanResults() {
+    int n = WiFi.scanNetworks();
+    DynamicJsonDocument doc(4096);
+    doc["type"] = "wifi_scan";
+    JsonArray networks = doc.createNestedArray("networks");
+    
+    for (int i = 0; i < n; ++i) {
+        JsonObject net = networks.createNestedObject();
+        net["ssid"] = WiFi.SSID(i);
+        net["bssid"] = WiFi.BSSIDstr(i);
+        net["rssi"] = WiFi.RSSI(i);
+        net["ch"] = WiFi.channel(i);
+        net["enc"] = WiFi.encryptionType(i);
+    }
+    
+    String output;
+    serializeJson(doc, output);
+    ws.textAll(output);
+}
+
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+    AwsFrameInfo *info = (AwsFrameInfo*)arg;
+    if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, data);
+        if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
+            return;
+        }
+
+        const char* cmd = doc["cmd"];
+        String value = doc["value"].as<String>();
+
+        LOG_DEBUG("WS CMD: %s VAL: %s", cmd, value.c_str());
+
+        if (strcmp(cmd, "scan_wifi") == 0) {
+            sendWifiScanResults();
+        }
+        else if (strcmp(cmd, "deauth") == 0) {
+            // value might be BSSID
+            // startDeauth(value); // Implement actual call if module allows
+            parseSerialCommand("deauth " + value, false); // Fallback to CLI
+        }
+        else if (strcmp(cmd, "stop_all") == 0) {
+            parseSerialCommand("stop", false);
+        }
+        else if (strcmp(cmd, "clock") == 0) {
+            setCpuFrequencyMhz(value.toInt());
+        }
+        else if (strcmp(cmd, "format_sd") == 0) {
+            // DANGEROUS
+            // SD.format(); 
+        }
+        else if (strcmp(cmd, "self_destruct") == 0) {
+             // Wipes keys, config, etc.
+             // nvs_flash_erase();
+             ESP.restart();
+        }
+        else if (strcmp(cmd, "pwn_all") == 0) {
+            // Trigger multiple attacks
+        }
+        else {
+             // Generic fallback
+            parseSerialCommand(String(cmd) + " " + value, false);
+        }
+    }
+}
+
+void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+             void *arg, uint8_t *data, size_t len) {
+    switch (type) {
+        case WS_EVT_CONNECT:
+            LOG_DEBUG("WS Client connected: %u", client->id());
+            break;
+        case WS_EVT_DISCONNECT:
+            LOG_DEBUG("WS Client disconnected: %u", client->id());
+            break;
+        case WS_EVT_DATA:
+            handleWebSocketMessage(arg, data, len);
+            break;
+        case WS_EVT_PONG:
+            break;
+        case WS_EVT_ERROR:
+            break;
+    }
 }
 
 /**********************************************************************
@@ -379,6 +489,10 @@ void configureWebServer() {
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     server->onNotFound(notFound);
 
+    // WEBSOCKET SETUP
+    ws.onEvent(onWsEvent);
+    server->addHandler(&ws);
+
     // Index
     server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         if (checkUserWebAuth(request, true)) {
@@ -439,6 +553,20 @@ void configureWebServer() {
     server->on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request) {
         serveWebUIFile(request, "index.js", "text/javascript", true, index_js, index_js_size);
     });
+    // Additional static files (js folder)
+    server->on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        serveWebUIFile(request, "style.css", "text/css");
+    });
+    server->on("/js/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        serveWebUIFile(request, "js/script.js", "text/javascript");
+    });
+    server->on("/js/three.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        serveWebUIFile(request, "js/three.min.js", "text/javascript");
+    });
+    server->on("/js/chart.umd.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        serveWebUIFile(request, "js/chart.umd.min.js", "text/javascript");
+    });
+
 
     // System Info
     server->on("/systeminfo", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -754,8 +882,10 @@ void startWebUi(bool mode_ap) {
     drawWebUiScreen(mode_ap);
 #ifdef HAS_SCREEN // Headless always run in the background!
     while (!check(EscPress)) {
-        // nothing here, just to hold the screen until the server is on.
-        vTaskDelay(pdMS_TO_TICKS(70));
+        // Updated loop to broadcast status and handle WS clients
+        broadcastStatus();
+        ws.cleanupClients();
+        vTaskDelay(pdMS_TO_TICKS(100)); // 100ms delay = 10Hz update rate (smooth enough)
     }
 
     bool closeServer = false;

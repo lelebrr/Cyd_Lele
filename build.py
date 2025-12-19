@@ -1,5 +1,6 @@
 from pathlib import Path
 import csv
+import shutil
 from SCons.Script import Import
 
 # Import PlatformIO's SCons environment
@@ -33,7 +34,7 @@ boot_bin = build_dir / "bootloader.bin"
 part_bin = build_dir / "partitions.bin"
 app_bin  = build_dir / "firmware.bin"
 
-out_bin  = proj_dir / f"Bruce-{pioenv}.bin"
+out_bin  = proj_dir / f"Lele-{pioenv}.bin"
 
 # Esptool from PlatformIO + Python executable
 esptool_pkg = senv.PioPlatform().get_package_dir("tool-esptoolpy")
@@ -41,6 +42,35 @@ esptool_py  = str(Path(esptool_pkg) / "esptool")
 python_exe  = senv.get("PYTHONEXE", "python")
 
 chip_arg = mcu if mcu else "esp32"
+
+# ---- Web Interface Auto-Deploy ----
+WEB_SRC = proj_dir / "embedded_resources" / "web_interface"
+WEB_DST = proj_dir / "sd_files" / "LeleWebUI"
+
+def _copy_webui_callback(target, source, env):
+    """
+    Post-action callback to copy web interface files to sd_files/LeleWebUI.
+    This ensures the web files are ready to be copied to the SD card.
+    """
+    if not WEB_SRC.exists():
+        print(f"[WebUI] Source folder not found: {WEB_SRC}")
+        return
+    
+    # Create destination if not exists
+    WEB_DST.mkdir(parents=True, exist_ok=True)
+    
+    # Copy all files recursively
+    copied = 0
+    for src_file in WEB_SRC.rglob("*"):
+        if src_file.is_file():
+            rel_path = src_file.relative_to(WEB_SRC)
+            dst_file = WEB_DST / rel_path
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_file, dst_file)
+            copied += 1
+    
+    print(f"[WebUI] Copied {copied} files to {WEB_DST}")
+    print(f"[WebUI] Ready for SD card deployment!")
 
 def _merge_bins_callback(target, source, env):
     """
@@ -92,7 +122,7 @@ def _merge_bins_callback(target, source, env):
         filled = int(bar_len * fw_size / ota_size)
         bar = "=" * filled + " " * (bar_len - filled)
         print(
-            f"BRUCE: [{bar}] {percent:.1f}% (used 0x{fw_size:X} bytes of 0x{ota_size:X} of OTA partition)"
+            f"LELE: [{bar}] {percent:.1f}% (used 0x{fw_size:X} bytes of 0x{ota_size:X} of OTA partition)"
         )
         if fw_size > ota_size:
             print("[merge_bin] Error: firmware.bin exceeds OTA partition size")
@@ -132,6 +162,7 @@ def _merge_bins_callback(target, source, env):
 
 # Automatically run after firmware.bin is generated
 senv.AddPostAction(str(app_bin), _merge_bins_callback)
+senv.AddPostAction(str(app_bin), _copy_webui_callback)
 
 # Optional manual target: depend on the three binaries and run the same callback
 # Wrap it in a lambda so SCons can call it without (target, source, env) if needed.
@@ -151,3 +182,13 @@ senv.AddCustomTarget(
     title="Upload Nobuild",
     description="Run upload without rebuilding"
 )
+
+# Manual WebUI copy target
+senv.AddCustomTarget(
+    name="copy-webui",
+    dependencies=None,
+    actions=[lambda target, source, env: _copy_webui_callback(target, source, env)],
+    title="Copy WebUI",
+    description="Copy web interface files to sd_files/LeleWebUI"
+)
+

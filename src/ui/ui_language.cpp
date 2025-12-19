@@ -46,16 +46,16 @@ const char* const LanguageManager::_strings_ptbr[] PROGMEM = {
     "Rede",
     "Som",
     "Sistema",
-    "Dragao",
+    "-----",
     "Brilho",
     "Tema",
     "Idioma",
     "Volume",
 
-    // Dragão
-    "Nome do Dragao",
-    "Personalidade",
-    "Humor",
+    // Dragão (Removed)
+    "",
+    "",
+    "",
 
     // Diversos
     "Carregando...",
@@ -114,16 +114,16 @@ const char* const LanguageManager::_strings_en[] PROGMEM = {
     "Network",
     "Sound",
     "System",
-    "Dragon",
+    "-----",
     "Brightness",
     "Theme",
     "Language",
     "Volume",
 
-    // Dragon
-    "Dragon Name",
-    "Personality",
-    "Mood",
+    // Dragon (Removed)
+    "",
+    "",
+    "",
 
     // Misc
     "Loading...",
@@ -182,16 +182,16 @@ const char* const LanguageManager::_strings_es[] PROGMEM = {
     "Red",
     "Sonido",
     "Sistema",
-    "Dragon",
+    "-----",
     "Brillo",
     "Tema",
     "Idioma",
     "Volumen",
 
-    // Dragon
-    "Nombre del Dragon",
-    "Personalidad",
-    "Estado de animo",
+    // Dragon (Removed)
+    "",
+    "",
+    "",
 
     // Varios
     "Cargando...",

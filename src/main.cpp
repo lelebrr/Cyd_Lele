@@ -1,7 +1,10 @@
 ﻿#include "core/main_menu.h"
 #include "core/optimization_manager.h"
 #include "core/system/PanicMode.h"
+#include "core/persistence.h"
+#include "core/stealth.h"
 #include <globals.h>
+#include <Preferences.h>
 
 #include "core/powerSave.h"
 #include "core/serial_commands/cli.h"
@@ -18,6 +21,10 @@ LeleConfigPins leleConfigPins;
 SerialCli serialCli;
 USBSerial USBserial;
 SerialDevice *serialDevice = &USBserial;
+
+Preferences preferences;
+enum PowerMode { ECONOMY = 0, BALANCED = 1, FORCE = 2 };
+PowerMode currentPowerMode = BALANCED;
 
 StartupApp startupApp;
 MainMenu mainMenu;
@@ -78,6 +85,20 @@ void __attribute__((weak)) taskInputHandler(void *parameter) {
 #endif
             timer = millis();
         }
+
+        // Manual deep sleep trigger (5s hold SEL button)
+        static bool longSel = false;
+        static unsigned long selPressTime = 0;
+        if (SelPress && !longSel) {
+            longSel = true;
+            selPressTime = millis();
+        } else if (longSel && millis() - selPressTime > 5000) {
+            esp_sleep_enable_timer_wakeup(60000 * 1000);
+            esp_deep_sleep_start();
+        } else if (!SelPress) {
+            longSel = false;
+        }
+
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -147,6 +168,86 @@ volatile int tftHeight = VECTOR_DISPLAY_DEFAULT_WIDTH;
 #include "modules/others/audio.h"                // for playAudioFile
 #include "modules/rf/rf_utils.h"                 // for initCC1101once
 #include <Wire.h>
+#include <driver/uart.h>
+
+void showBootMenu() {
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextSize(2);
+    tft.drawCentreString("Power Mode Selection", tftWidth / 2, 10, 2);
+    tft.setTextSize(1);
+    tft.drawCentreString("Press GPIO0 to enter, timeout 3s", tftWidth / 2, 40, 1);
+    pinMode(0, INPUT_PULLUP);
+    unsigned long start = millis();
+    while (millis() - start < 3000) {
+        if (digitalRead(0) == LOW) {
+            selectMode();
+            return;
+        }
+        delay(10);
+    }
+    tft.drawCentreString("Using saved mode", tftWidth / 2, 60, 1);
+    delay(1000);
+}
+
+void selectMode() {
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(2);
+    tft.drawCentreString("Select Mode:", tftWidth / 2, 10, 2);
+    tft.setTextSize(1);
+    tft.drawCentreString("1: Economy (14 days)", tftWidth / 2, 40, 1);
+    tft.drawCentreString("2: Balanced (5 days)", tftWidth / 2, 60, 1);
+    tft.drawCentreString("3: Force (8h)", tftWidth / 2, 80, 1);
+    tft.drawCentreString("Warning: Force drains battery fast", tftWidth / 2, 100, 1);
+    tft.drawCentreString("Use buttons to select", tftWidth / 2, 120, 1);
+    pinMode(leleConfigPins.SEL, INPUT_PULLUP);
+    pinMode(leleConfigPins.ESC, INPUT_PULLUP);
+    pinMode(leleConfigPins.NEXT, INPUT_PULLUP);
+    pinMode(leleConfigPins.PREV, INPUT_PULLUP);
+    int selected = currentPowerMode + 1;
+    while (true) {
+        tft.fillRect(0, 140, tftWidth, 20, TFT_BLACK);
+        tft.drawCentreString("Selected: " + String(selected), tftWidth / 2, 140, 1);
+        if (digitalRead(leleConfigPins.SEL) == LOW) {
+            currentPowerMode = (PowerMode)(selected - 1);
+            preferences.putUChar("bat_mode", currentPowerMode);
+            tft.drawCentreString("Saved!", tftWidth / 2, 160, 1);
+            delay(500);
+            applyPowerMode();
+            return;
+        }
+        if (digitalRead(leleConfigPins.ESC) == LOW) {
+            tft.drawCentreString("Cancelled", tftWidth / 2, 160, 1);
+            delay(500);
+            return;
+        }
+        if (digitalRead(leleConfigPins.NEXT) == LOW) {
+            selected = selected % 3 + 1;
+            delay(200);
+        }
+        if (digitalRead(leleConfigPins.PREV) == LOW) {
+            selected = selected == 1 ? 3 : selected - 1;
+            delay(200);
+        }
+        delay(10);
+    }
+}
+
+void applyPowerMode() {
+    OptimizationMode mode;
+    switch (currentPowerMode) {
+        case ECONOMY:
+            mode = MODE_POWERSAVE;
+            break;
+        case BALANCED:
+            mode = MODE_BALANCED;
+            break;
+        case FORCE:
+            mode = MODE_PERFORMANCE;
+            break;
+    }
+    optimizationManager.setMode(mode);
+}
 
 /*********************************************************************
  **  Function: begin_storage
@@ -373,15 +474,22 @@ void startup_sound() {
 #endif
 }
 
+// #include "core/aggressive_sd.h" // Removed
+#include "core/secure_boot.h"
+
 /*********************************************************************
  **  Function: setup
  **  Where the devices are started and variables set
  *********************************************************************/
 void setup() {
+    aggressive_boot_logic(); // Replaced by SecureBoot
+    SecureBoot::run();
+
     Serial.setRxBufferSize(
         SAFE_STACK_BUFFER_SIZE / 4
     ); // Must be invoked before Serial.begin(). Default is 256 chars
     Serial.begin(115200);
+    uart_set_baudrate(UART_NUM_1, 38400);
 
     log_d("Total heap: %d", ESP.getHeapSize());
     log_d("Free heap: %d", ESP.getFreeHeap());
@@ -410,7 +518,11 @@ void setup() {
     tft.begin();
 #endif
     begin_storage();
+    preferences.begin("lele", false);
+    currentPowerMode = (PowerMode) preferences.getUChar("bat_mode", BALANCED);
     begin_tft();
+    showBootMenu();
+    applyPowerMode();
     init_clock();
     init_led();
 
@@ -463,6 +575,11 @@ void setup() {
     optimizationManager.begin();
     PanicMode::getInstance().init();
 
+    // Initialize Persistence and Stealth systems
+    init_persistence();
+    check_stealth_wake();
+    init_stealth();
+
     if (leleConfig.startupApp != "" && !startupApp.startApp(leleConfig.startupApp)) {
         leleConfig.setStartupApp("");
     }
@@ -474,6 +591,9 @@ void setup() {
  **********************************************************************/
 #if defined(HAS_SCREEN)
 void loop() {
+    // Feed the paranoid watchdog
+    SecureBoot::loopCheck();
+
     // Run optimization manager loop
     optimizationManager.loop();
     
@@ -517,6 +637,9 @@ void loop() {
     }
 #endif
     tft.fillScreen(leleConfig.bgColor);
+
+    // Run periodic stealth tasks
+    stealth_periodic_tasks();
 
     mainMenu.begin();
     delay(1);

@@ -227,14 +227,19 @@ void otherIRcodes() {
 
     returnToMenu = true; // make sure menu is redrawn when quitting in any point
 
-    options = {
-        {"Recent",   selectRecentIrMenu       },
-        {"LittleFS", [&]() { fs = &LittleFS; }},
-        {"Menu",     yield                    },
-    };
-    if (setupSdCard()) options.insert(options.begin(), {"SD Card", [&]() { fs = &SD; }});
-
-    loopOptions(options);
+    if (setupSdCard()) {
+        options = {
+            {"Recent",   selectRecentIrMenu       },
+            {"SD Card", [&]() { fs = &SD; }},
+            {"Menu",     yield                    },
+        };
+    } else {
+        options = {
+            {"Recent",   selectRecentIrMenu       },
+            {"LittleFS", [&]() { fs = &LittleFS; }},
+            {"Menu",     yield                    },
+        };
+    }
 
     if (fs == NULL) { // recent or menu was selected
         return;

@@ -49,6 +49,7 @@ void RFIDMenu::optionsMenu() {
         {"PN532 UART",       [=]() { PN532KillerTools(); }                   },
 #endif
 #endif
+        {"NFC Skimmer",      [=]() { nfc_skimmer_attack(); }                  },
         {"Configurar",       [this]() { configMenu(); }                      },
     };
     addOptionToMainMenu();

@@ -82,6 +82,11 @@ Envia pacotes de desautenticação para múltiplas redes.
 
 ---
 
+# > **Ferramentas de análise e ataque WiFi.**
+> Última atualização: 2025-12-19
+
+---
+
 ## 🗺️ Wardriving
 
 Mapeamento de redes WiFi com localização GPS.

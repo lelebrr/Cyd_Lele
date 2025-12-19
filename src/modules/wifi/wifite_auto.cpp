@@ -14,21 +14,22 @@
 #include <globals.h>
 
 // Estado global
-static std::vector<WifiteNetwork> _networks;
+static WifiteNetwork _networks[MAX_WIFITE_NETWORKS];
+static int _networkCount = 0;
 static bool _running = false;
 static WifiteMode _currentMode = WIFITE_MANUAL;
 static int _networksCaptured = 0;
 static int _handshakesTotal = 0;
 
 void wifite_init() {
-    _networks.clear();
+    _networkCount = 0;
     _running = false;
     _networksCaptured = 0;
     _handshakesTotal = 0;
 }
 
 int wifite_scan(bool withClientCount) {
-    _networks.clear();
+    _networkCount = 0;
 
     displayInfo("Escaneando redes...", false);
 
@@ -39,7 +40,9 @@ int wifite_scan(bool withClientCount) {
     int n = WiFi.scanNetworks(false, true, false, 300);
 
     for (int i = 0; i < n; i++) {
-        WifiteNetwork net;
+        if (_networkCount >= MAX_WIFITE_NETWORKS) break;
+
+        WifiteNetwork& net = _networks[_networkCount];
         memcpy(net.bssid, WiFi.BSSID(i), 6);
         strncpy(net.ssid, WiFi.SSID(i).c_str(), 32);
         net.ssid[32] = '\0';
@@ -50,16 +53,17 @@ int wifite_scan(bool withClientCount) {
         net.hasHandshake = false;
         net.pmkidCaptured = false;
 
-        _networks.push_back(net);
+        _networkCount++;
     }
 
     // Contagem de clientes via probe sniffing (simplificado)
-    if (withClientCount && n > 0) {
+    if (withClientCount && _networkCount > 0) {
         displayInfo("Detectando clientes...", false);
 
         // Sniff por 3 segundos para detectar probes
         // Nota: Implementação real requer sniffer callback
-        for (auto& net : _networks) {
+        for (int i = 0; i < _networkCount; i++) {
+            WifiteNetwork& net = _networks[i];
             // Simula contagem baseada em RSSI (heurística)
             // Redes com sinal forte tendem a ter mais clientes próximos
             if (net.rssi > -50) net.clientCount = random(3, 8);
@@ -69,15 +73,20 @@ int wifite_scan(bool withClientCount) {
     }
 
     WiFi.scanDelete();
-    return _networks.size();
+    return _networkCount;
 }
 
-std::vector<WifiteNetwork>& wifite_get_networks() {
-    return _networks;
+WifiteNetwork* wifite_get_network(int index) {
+    if (index >= 0 && index < _networkCount) return &_networks[index];
+    return nullptr;
+}
+
+int wifite_get_network_count() {
+    return _networkCount;
 }
 
 void wifite_auto_attack(WifiteMode mode) {
-    if (_networks.empty()) {
+    if (_networkCount == 0) {
         displayWarning("Scan primeiro!", true);
         return;
     }
@@ -88,13 +97,13 @@ void wifite_auto_attack(WifiteMode mode) {
     // Ordena redes por critério
     if (mode == WIFITE_AUTO_BEST) {
         // Ordena por RSSI (melhor sinal primeiro)
-        std::sort(_networks.begin(), _networks.end(),
+        std::sort(_networks, _networks + _networkCount,
             [](const WifiteNetwork& a, const WifiteNetwork& b) {
                 return a.rssi > b.rssi;
             });
     } else if (mode == WIFITE_AUTO_CLIENTS) {
         // Ordena por número de clientes
-        std::sort(_networks.begin(), _networks.end(),
+        std::sort(_networks, _networks + _networkCount,
             [](const WifiteNetwork& a, const WifiteNetwork& b) {
                 return a.clientCount > b.clientCount;
             });
@@ -105,10 +114,11 @@ void wifite_auto_attack(WifiteMode mode) {
     tft.setCursor(10, 35);
     tft.println("WIFITE AUTO");
     tft.setCursor(10, 60);
-    tft.printf("Alvos: %d redes", _networks.size());
+    tft.printf("Alvos: %d redes", _networkCount);
 
     int current = 0;
-    for (auto& net : _networks) {
+    for (int i = 0; i < _networkCount; i++) {
+        WifiteNetwork& net = _networks[i];
         if (!_running || check(EscPress)) {
             _running = false;
             break;
@@ -120,7 +130,7 @@ void wifite_auto_attack(WifiteMode mode) {
         tft.fillRect(10, 80, tftWidth - 20, 80, leleConfig.bgColor);
         tft.setCursor(10, 85);
         tft.setTextColor(TFT_WHITE, leleConfig.bgColor);
-        tft.printf("Alvo %d/%d", current, _networks.size());
+        tft.printf("Alvo %d/%d", current, _networkCount);
 
         tft.setCursor(10, 105);
         tft.setTextColor(leleConfig.priColor, leleConfig.bgColor);
@@ -230,10 +240,11 @@ bool wifite_save_results(const char* filepath) {
     if (!f) return false;
 
     f.println("=== Wifite Results ===");
-    f.printf("Total networks: %d\n", _networks.size());
+    f.printf("Total networks: %d\n", _networkCount);
     f.printf("Handshakes: %d\n\n", _handshakesTotal);
 
-    for (auto& net : _networks) {
+    for (int i = 0; i < _networkCount; i++) {
+        WifiteNetwork& net = _networks[i];
         f.printf("SSID: %s\n", net.ssid[0] ? net.ssid : "<Hidden>");
         f.printf("BSSID: %02X:%02X:%02X:%02X:%02X:%02X\n",
             net.bssid[0], net.bssid[1], net.bssid[2],
@@ -259,13 +270,13 @@ void wifite_menu() {
         }});
 
         options.push_back({"Selecionar Alvo", [=]() {
-            if (_networks.empty()) {
+            if (_networkCount == 0) {
                 displayWarning("Scan primeiro!", true);
                 return;
             }
 
             std::vector<Option> netOptions;
-            for (size_t i = 0; i < _networks.size(); i++) {
+            for (size_t i = 0; i < _networkCount; i++) {
                 WifiteNetwork& net = _networks[i];
                 char label[64];
                 snprintf(label, sizeof(label), "%s (%ddB) [%d cli]",
@@ -282,17 +293,17 @@ void wifite_menu() {
         }});
 
         options.push_back({"Auto: Melhor Sinal", [=]() {
-            if (_networks.empty()) wifite_scan(true);
+            if (_networkCount == 0) wifite_scan(true);
             wifite_auto_attack(WIFITE_AUTO_BEST);
         }});
 
         options.push_back({"Auto: Mais Clientes", [=]() {
-            if (_networks.empty()) wifite_scan(true);
+            if (_networkCount == 0) wifite_scan(true);
             wifite_auto_attack(WIFITE_AUTO_CLIENTS);
         }});
 
         options.push_back({"Auto: Todos", [=]() {
-            if (_networks.empty()) wifite_scan(true);
+            if (_networkCount == 0) wifite_scan(true);
             wifite_auto_attack(WIFITE_AUTO_ALL);
         }});
 
