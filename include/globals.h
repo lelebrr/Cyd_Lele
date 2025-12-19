@@ -241,13 +241,11 @@ extern inline bool check(volatile bool &btn) {
 
 struct GlobalState {
     bool wifi_enabled = true;
-    int mascot_type = 1;
     long handshakes_captured = 0;
     bool ble_enabled = false;
     bool voice_enabled = false;
     int battery_percent = 100;
     bool is_charging = false;
-    bool mascot_enabled = true;
     bool chatgpt_enabled = false;
     char openai_voice[64] = "";
     char openai_model[64] = "gpt-3.5-turbo";
@@ -261,6 +259,7 @@ struct GlobalState {
     bool auto_attack_favorites = false;
     bool insane_mode_enabled = false;
     int current_theme = 0;
+    bool mascot_enabled = false;  // Mascot desabilitado por padrão (economiza memória)
 };
 
 extern GlobalState g_state;

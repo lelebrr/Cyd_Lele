@@ -1,5 +1,5 @@
 #include "ui_charging.h"
-#include "mascot_faces.h"
+
 #include "ui_helpers.h"
 #include "../hardware/system_hardware.h" // Para sys_hw
 

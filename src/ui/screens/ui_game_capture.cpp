@@ -36,7 +36,7 @@ static void update_leaderboard_ui() {
         lv_obj_align(name, LV_ALIGN_LEFT_MID, 10, 0);
 
         lv_obj_t *score = lv_label_create(item);
-        lv_label_set_text_fmt(score, "%d XP", p.score);
+        lv_label_set_text_fmt(score, "%d pts", p.score);
         lv_obj_align(score, LV_ALIGN_RIGHT_MID, -10, 0);
     }
 }
@@ -48,8 +48,8 @@ struct GameSyncPacket {
 };
 
 void game_report_handshake_capture(const char *ssid) {
-    myScore += 100; // 100 XP per handshake
-    if (ui_MyScoreLabel) { lv_label_set_text_fmt(ui_MyScoreLabel, "MY XP: %d", myScore); }
+    myScore += 100; // 100 pontos por handshake
+    if (ui_MyScoreLabel) { lv_label_set_text_fmt(ui_MyScoreLabel, "PONTOS: %d", myScore); }
 
     // Broadcast new score
     GameSyncPacket pkt;
@@ -63,10 +63,6 @@ void game_report_handshake_capture(const char *ssid) {
 void ui_capture_handshake_game_init(void) {
     // TODO: MeshSystem.begin() - not implemented yet
 
-    // Mock initial players
-    // players.push_back({"HackerOne", 500, millis()});
-    // players.push_back({"ScriptKiddie", 200, millis()});
-
     ui_GameScreen = lv_obj_create(NULL);
 
     lv_obj_t *title = lv_label_create(ui_GameScreen);
@@ -75,7 +71,7 @@ void ui_capture_handshake_game_init(void) {
     lv_obj_set_style_text_font(title, &lv_font_montserrat_16, 0);
 
     ui_MyScoreLabel = lv_label_create(ui_GameScreen);
-    lv_label_set_text_fmt(ui_MyScoreLabel, "MY XP: %d", myScore);
+    lv_label_set_text_fmt(ui_MyScoreLabel, "PONTOS: %d", myScore);
     lv_obj_align(ui_MyScoreLabel, LV_ALIGN_TOP_MID, 0, 30);
     lv_obj_set_style_text_color(ui_MyScoreLabel, lv_color_hex(0x00FF00), 0);
 

@@ -33,10 +33,7 @@ static void btn_sdcard_cb(lv_event_t *e) { LOG_UI("SD Card manager"); }
 
 static void btn_sysinfo_cb(lv_event_t *e) {
     LOG_UI("System info");
-    LOG_INFO("Free Heap: %s", memtempPlugin.getFormattedHeap().c_str());
-    LOG_INFO("Temp: %s", memtempPlugin.getFormattedTemp().c_str());
-    LOG_INFO("XP: %u Level %d", expPlugin.getTotalXP(), expPlugin.getLevel());
-    LOG_INFO("Uptime: %s", agePlugin.getFormattedUptime().c_str());
+    // TODO: Implementar exibição de informações do sistema
 }
 
 static void create_menu_item(lv_obj_t *parent, const char *icon, const char *text, lv_event_cb_t cb, int y) {

@@ -20,9 +20,6 @@ public:
 private:
   lv_obj_t *_screen;
   lv_obj_t *_lblSession;
-  lv_obj_t *_lblXP;
-  lv_obj_t *_lblLevel;
-  lv_obj_t *_barXP;
   lv_obj_t *_lblNetworks;
   lv_obj_t *_lblHandshakes;
   lv_obj_t *_lblDeauths;

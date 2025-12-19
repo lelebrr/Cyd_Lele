@@ -1,5 +1,5 @@
 #include "ui_ota.h"
-#include "mascot_faces.h"
+
 #include "ui_helpers.h"
 #include "ui_main.h" // To force switch
 

@@ -4,12 +4,6 @@
  */
 
 #include "ui_stats_screen.h"
-// TODO: These plugins don't exist yet
-// #include "../../plugins/age_tracker.h"
-// #include "../../plugins/battery_monitor.h"
-// #include "../../plugins/exp_system.h"
-// #include "../../plugins/memtemp.h"
-// #include "../../plugins/session_stats.h"
 #include "../ui_main.h"
 
 StatsScreen statsScreen;
@@ -39,29 +33,6 @@ void StatsScreen::create(lv_obj_t *parent) {
     lv_obj_set_style_border_width(cont, 0, 0);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(cont, 8, 0);
-
-    // XP e Level
-    _lblLevel = lv_label_create(cont);
-    lv_label_set_text(_lblLevel, "Level: 1 - Hatchling");
-    lv_obj_set_style_text_color(_lblLevel, lv_color_hex(0xffff00), 0);
-
-    // Barra de XP
-    _barXP = lv_bar_create(cont);
-    lv_obj_set_size(_barXP, lv_pct(80), 15);
-    lv_bar_set_range(_barXP, 0, 100);
-    lv_bar_set_value(_barXP, 0, LV_ANIM_OFF);
-    lv_obj_set_style_bg_color(_barXP, lv_color_hex(0x333355), 0);
-    lv_obj_set_style_bg_color(_barXP, lv_color_hex(0x00ff88), LV_PART_INDICATOR);
-
-    _lblXP = lv_label_create(cont);
-    lv_label_set_text(_lblXP, "XP: 0/100");
-    lv_obj_set_style_text_color(_lblXP, lv_color_hex(0xaaaaaa), 0);
-
-    // Separador
-    lv_obj_t *sep = lv_obj_create(cont);
-    lv_obj_set_size(sep, lv_pct(90), 1);
-    lv_obj_set_style_bg_color(sep, lv_color_hex(0x444444), 0);
-    lv_obj_set_style_border_width(sep, 0, 0);
 
     // Stats de sessão
     _lblSession = lv_label_create(cont);
@@ -112,12 +83,6 @@ void StatsScreen::hide() {
 void StatsScreen::update() {
     if (!_screen) return;
 
-    // TODO: These plugins don't exist yet - using placeholder values
-    // When the plugins are implemented, uncomment and use the real data
-
-    lv_label_set_text(_lblLevel, "Level 1 - Hatchling");
-    lv_label_set_text(_lblXP, "XP: 0 / 100");
-    lv_bar_set_value(_barXP, 0, LV_ANIM_ON);
     lv_label_set_text(_lblSession, "Sessão: 00:00:00");
     lv_label_set_text(_lblNetworks, "Redes: 0");
     lv_label_set_text(_lblHandshakes, "Handshakes: 0");

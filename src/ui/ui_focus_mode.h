@@ -4,7 +4,7 @@
  * @file ui_focus_mode.h
  * @brief Modo Focus/Minimal - Interface simplificada sem distrações
  *
- * Mostra apenas informações essenciais: hora, mascote, status do ataque atual
+ * Mostra apenas informações essenciais: hora, status do ataque atual
  */
 
 #include <lvgl.h>
@@ -14,7 +14,7 @@
  */
 struct FocusModeConfig {
   bool showClock;         // Mostrar relógio
-  bool showMascot;        // Mostrar dragão
+  bool showEmoji;         // Mostrar emoji
   bool showBattery;       // Mostrar bateria
   bool showAttackStatus;  // Mostrar status de ataque
   bool hideNotifications; // Esconder notificações
@@ -80,7 +80,7 @@ private:
   FocusModeConfig _config;
   lv_obj_t *_screen;
   lv_obj_t *_clockLabel;
-  lv_obj_t *_mascotLabel;
+  lv_obj_t *_emojiLabel;
   lv_obj_t *_batteryLabel;
   lv_obj_t *_attackLabel;
   lv_obj_t *_attackIndicator;

@@ -2,16 +2,12 @@
  * 🖥️ UI MAIN MANAGER
  *
  * Gerencia as telas e o LVGL.
- * Mantém tudo rodando liso a 60fps (se Deus quiser).
  */
 
 #include "ui_main.h"
 #include "globals.h"
-#include "../hardware/system_hardware.h"
-#include "../hardware/wifi_driver.h"
-// #include "../iot_pwn/iot_pwn_menu.h" // File not found - disabled
 #include "gesture_handler.h"
-#include "mascot_faces.h"
+
 #include "screens/ui_files_screen.h"
 #include "screens/ui_stats_screen.h"
 #include "status_bar.h"
@@ -28,46 +24,32 @@
 // Objetos LVGL
 static lv_obj_t *scr_main = nullptr;
 static lv_obj_t *lbl_mood = nullptr;
-static lv_obj_t *mascot_container = nullptr;
-static lv_obj_t *dragon_emoji = nullptr;
 
-GlobalState g_state; // Define global state definition
+GlobalState g_state;
 
 // Estado da UI
 static UIScreen current_screen = UI_SCREEN_MAIN;
 static bool ui_initialized = false;
 static lv_timer_t *update_timer = nullptr;
-
-// Transition animation (needs to be declared before use)
 static lv_scr_load_anim_t current_transition_anim = LV_SCR_LOAD_ANIM_FADE_IN;
 
-// UI Color definitions (fallback if not defined elsewhere)
 #ifndef UI_COLOR_BG
 #define UI_COLOR_BG lv_color_hex(0x0D0D0D)
 #endif
 
-// Forward declarations
 void ui_set_screen(UIScreen screen);
 
-// Declarações antecipadas (porque o C++ é chato)
 static void ui_update_timer_cb(lv_timer_t *timer);
 static void init_styles();
 
-// Global Content Area (Zone 2)
 static lv_obj_t *content_area = nullptr;
 lv_obj_t *ui_get_content_area() { return content_area; }
 void ui_clear_content_area() {
     if (content_area) lv_obj_clean(content_area);
 }
 
-// Timer Callback
 static void ui_update_timer_cb(lv_timer_t *timer) {
     if (!ui_initialized) return;
-
-    // Atualiza o mascote
-    mascotFaces.update();
-    // A gente atualiza o mascote aqui se precisar.
-    // Lógica legada, vai que precisa...
 }
 
 static void init_styles() { ui_init_global_styles(); }
@@ -82,19 +64,13 @@ bool ui_main_init() {
     lv_obj_set_style_bg_color(scr_main, UI_COLOR_BG, 0);
     lv_obj_clear_flag(scr_main, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Status Bar
     statusBar.create(scr_main);
-
-    // Content Area & Nav
     ui_create_3_zone_layout(scr_main, &content_area);
-
-    // Default Home
     ui_home_show();
 
     lv_scr_load(scr_main);
     update_timer = lv_timer_create(ui_update_timer_cb, 500, nullptr);
 
-    // Gestures
     gesture_handler.begin();
     gesture_handler.setCallback([](GestureType gesture, int16_t x, int16_t y) {
         switch (gesture) {
@@ -108,7 +84,7 @@ bool ui_main_init() {
                 break;
             case GESTURE_SWIPE_LEFT:
                 if (ui_get_current_screen() == UI_SCREEN_MAIN) {
-                    ui_set_screen(UI_SCREEN_WIFI_CHAOS); // Ou ataques
+                    ui_set_screen(UI_SCREEN_WIFI_CHAOS);
                 } else if (ui_get_current_screen() == UI_SCREEN_WIFI_CHAOS) {
                     ui_set_screen(UI_SCREEN_BLE_CHAOS);
                 }
@@ -130,19 +106,15 @@ bool ui_main_init() {
     current_screen = UI_SCREEN_MAIN;
     LOG_UI("Interface pronta!");
 
-    // Avisos de hardware nao encontrado (executar apos delay para UI estar pronta)
     lv_timer_create(
         [](lv_timer_t *t) {
-            // Verifica bateria (se percent=0 e nao esta carregando, provavelmente sem bateria)
             if (g_state.battery_percent == 0 && !g_state.is_charging) {
                 ui_notification_push("Aviso", "Bateria nao detectada", NOTIFY_WARNING);
             }
-            // Verifica WiFi
             if (!g_state.wifi_enabled) { ui_notification_push("Info", "WiFi desativado", NOTIFY_INFO); }
-            lv_timer_del(t); // Executa apenas uma vez
+            lv_timer_del(t);
         },
-        2000,
-        nullptr
+        2000, nullptr
     );
 
     return true;
@@ -168,10 +140,8 @@ void ui_set_screen(UIScreen screen) {
         case UI_SCREEN_CAPTURES: ui_captures_show(); return;
         case UI_SCREEN_STATS: statsScreen.show(); return;
         case UI_SCREEN_FILES: filesScreen.show(); return;
-        case UI_SCREEN_PLUGINS:
-            // ui_plugins_show();
-            return;
-        case UI_SCREEN_IOT_PWN: /* iot_pwn_menu_show(); */ return; // Function not defined
+        case UI_SCREEN_PLUGINS: return;
+        case UI_SCREEN_IOT_PWN: return;
         default: target = scr_main; break;
     }
 
@@ -193,28 +163,9 @@ void ui_set_transition_animation(uint8_t anim_type) {
 }
 
 void ui_main_show() {
-    // Se já estamos na home, garante que tá tudo limpo.
-    // Só volta pro main.
     if (scr_main) {
         ui_switch_screen(scr_main, current_transition_anim);
         current_screen = UI_SCREEN_MAIN;
-        // Atualiza o conteúdo se precisar
         ui_home_show();
     }
-}
-
-void ui_set_mascot_face(MascotFace face) {
-    if (!g_state.mascot_enabled) return;
-
-    // Delega pro helper global
-    MascotFaceType newFace = FACE_HAPPY;
-    switch (face) {
-        case MASCOT_FACE_NORMAL: newFace = FACE_HAPPY; break;
-        case MASCOT_FACE_HAPPY: newFace = FACE_EXCITED; break;
-        case MASCOT_FACE_ANGRY: newFace = FACE_ANGRY; break;
-        case MASCOT_FACE_SLEEP: newFace = FACE_SLEEP; break;
-        case MASCOT_FACE_CONFUSED: newFace = FACE_CONFUSED; break;
-        case MASCOT_FACE_COOL: newFace = FACE_COOL; break;
-    }
-    mascotFaces.setFace(newFace);
 }

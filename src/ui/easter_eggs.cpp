@@ -4,7 +4,6 @@
  */
 
 #include "easter_eggs.h"
-#include "mascot_faces.h"
 #include "ui_themes.h"
 #include <debug_log.h>
 
@@ -100,58 +99,7 @@ void EasterEggs::activateKonami() {
     _konamiActive = true;
     LOG_UI("EASTER: KONAMI CODE ACTIVATED!");
 
-    showDragonDance();
-
     if (_onEasterEgg) {
         _onEasterEgg(1); // Easter Egg ID 1 = Konami
     }
-}
-
-void EasterEggs::showDragonDance() {
-    // Sequência de dança do dragão
-    static const MascotFaceType danceSequence[] = {
-        FACE_EXCITED,
-        FACE_LOOK_L,
-        FACE_LOOK_R,
-        FACE_LOOK_L,
-        FACE_LOOK_R,
-        FACE_HAPPY,
-        FACE_WINK,
-        FACE_EXCITED,
-        FACE_KING,
-        FACE_VICTORY
-    };
-
-    // Anima a sequência
-    static int danceStep = 0;
-    static uint32_t lastDance = 0;
-
-    // Cria timer para animação
-    lv_timer_t *timer = lv_timer_create(
-        [](lv_timer_t *t) {
-            static int step = 0;
-            if (step < 10) {
-                MascotFaceType faces[] = {
-                    FACE_EXCITED,
-                    FACE_LOOK_L,
-                    FACE_LOOK_R,
-                    FACE_LOOK_L,
-                    FACE_LOOK_R,
-                    FACE_HAPPY,
-                    FACE_WINK,
-                    FACE_EXCITED,
-                    FACE_KING,
-                    FACE_VICTORY
-                };
-                mascotFaces.setFace(faces[step]);
-                step++;
-            } else {
-                lv_timer_del(t);
-                step = 0;
-                mascotFaces.setFace(FACE_HAPPY);
-            }
-        },
-        300,
-        nullptr
-    );
 }

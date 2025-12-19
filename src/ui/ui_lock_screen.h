@@ -2,7 +2,7 @@
 
 /**
  * @file ui_lock_screen.h
- * @brief Tela de bloqueio com relógio, dragão e senha opcional
+ * @brief Tela de bloqueio com relógio e senha opcional
  */
 
 #include <lvgl.h>
@@ -26,7 +26,7 @@ struct LockScreenConfig {
   char pin[5];              // PIN de 4 dígitos
   uint8_t pattern[9];       // Padrão de pontos (sequência)
   uint8_t patternLength;    // Tamanho do padrão atual
-  bool showMascot;          // Mostrar dragão na tela de bloqueio
+  bool showEmoji;          // Mostrar emoji na tela de bloqueio
   bool showStats;           // Mostrar estatísticas (handshakes, etc)
   uint16_t autoLockSeconds; // Tempo para auto-bloqueio (0=nunca)
 };
@@ -100,7 +100,7 @@ private:
   lv_obj_t *_screen;
   lv_obj_t *_clockLabel;
   lv_obj_t *_dateLabel;
-  lv_obj_t *_mascotLabel;
+  lv_obj_t *_emojiLabel;
   lv_obj_t *_statusLabel;
   lv_obj_t *_unlockHint;
   lv_obj_t *_patternGrid[9];

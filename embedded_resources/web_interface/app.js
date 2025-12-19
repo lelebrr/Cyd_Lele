@@ -83,13 +83,7 @@ function handleMessage(msg) {
         updateNetworkTable(msg.networks);
     }
 
-    // 4. Mascot
-    if (msg.mascot) {
-        document.getElementById('mascot-mood').innerText = msg.mascot.face || "🦖";
-        document.getElementById('mascot-text').innerText = msg.mascot.text || "...";
-    }
-
-    // 5. Terminal Output
+    // 4. Terminal Output
     if (msg.term_out) {
         logToTerminal(msg.term_out);
     }

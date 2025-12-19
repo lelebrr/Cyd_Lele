@@ -253,7 +253,7 @@ bool WiiUAttacker::injectSaveData() {
     // 3. Trigger NAND dump via FTP
 
     // Criar save file malicioso
-    uint8_t saveData[1024];
+    uint8_t saveData[512]; // Reduzido de 1024 para economizar DRAM
     // Preencher com dados maliciosos + overflow
 
     logOperation("Save data injected successfully");

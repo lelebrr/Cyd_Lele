@@ -1,4 +1,5 @@
 #include "cli.h"
+#include "attack_commands.h"
 #include "badusb_commands.h"
 #include "core/sd_functions.h"
 #include "crypto_commands.h"
@@ -42,6 +43,7 @@ void SerialCli::setup() {
     createStorageCommands(&_cli);
     createUtilCommands(&_cli);
     createWifiCommands(&_cli);
+    createAttackCommands(&_cli);  // Attack commands (WiFi, BLE, IoT, Console, Fault)
 
 #ifdef USB_as_HID
     createBadUsbCommands(&_cli);

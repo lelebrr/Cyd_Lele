@@ -53,7 +53,7 @@ void StatusBar::create(lv_obj_t *parent) {
     // Wifi/BLE/Level Icons (Right) - Aligned to Margin (Tip 10)
     _lblMode = lv_label_create(_container);
     lv_obj_add_style(_lblMode, &style_label, 0);
-    lv_label_set_text(_lblMode, LV_SYMBOL_WIFI " " LV_SYMBOL_BLUETOOTH " LVL 1");
+    lv_label_set_text(_lblMode, LV_SYMBOL_WIFI " " LV_SYMBOL_BLUETOOTH);
     lv_obj_align(_lblMode, LV_ALIGN_RIGHT_MID, -MARGIN_SIDE, 0);
 
     // Hidden/Secondary stats (can be toggled or smaller)
@@ -180,13 +180,13 @@ void StatusBar::updateLabels() {
     lv_label_set_text(_lblUptime, buf);
 
     // Mode/Connectivity (Right)
-    // Tip 2: Wi-Fi + BLE icons | XP/Level | Canal atual
+    // Tip 2: Wi-Fi + BLE icons | Canal atual
     // Format: "W B Lvl8 CH1"
     const char *wifiIcon = (g_state.wifi_enabled) ? LV_SYMBOL_WIFI : "";
     const char *bleIcon = (BLEConnected) ? LV_SYMBOL_BLUETOOTH : "";
 
-    snprintf(buf, sizeof(buf), "%s %s L%d CH%d", wifiIcon, bleIcon, 1,
-             _channel); // Level 1 hardcoded for now
+    snprintf(buf, sizeof(buf), "%s %s CH%d", wifiIcon, bleIcon,
+             _channel);
     lv_label_set_text(_lblMode, buf);
     lv_obj_set_style_text_color(_lblMode, getTheme().secondary, 0);
 }
