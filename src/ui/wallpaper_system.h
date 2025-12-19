@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <PNGdec.h>
+#undef local  // PNGdec defines 'local' as 'static' which conflicts with Timezone.h
 #include <vector>
 
 // ═══════════════════════════════════════════════════════════════════════════

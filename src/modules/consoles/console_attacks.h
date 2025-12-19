@@ -83,6 +83,7 @@ public:
     /**
      * @brief Inicia scan de consoles
      */
+    unsigned long getScanStartTime() const { return scanStartTime; }
     bool startScan(int timeout = 60);
 
     /**
@@ -296,6 +297,11 @@ public:
         totalScanned(0), vulnerableFound(0),
         attacksSuccessful(0), attacksFailed(0) {}
 
+    // Wrappers for Scanner
+    bool startScan(int timeout = 60) { return scanner.startScan(timeout); }
+    void stopScan() { scanner.stopScan(); }
+    std::vector<DetectedConsole>& getConsoles() { return scanner.getConsoles(); }
+
     // ============================================================================
     // MÉTODOS PÚBLICOS
     // ============================================================================
@@ -411,6 +417,26 @@ bool sendIRCommand(uint32_t command, int frequency = 38000);
  * @brief Gera sinal RF para Xbox 360
  */
 bool generateXbox360RFSignal(uint8_t* data, size_t len);
+
+/**
+ * @brief Obtém nome do modelo do console
+ */
+String getConsoleModelName(ConsoleType type);
+
+/**
+ * @brief Obtém nome do console (alias)
+ */
+String getConsoleName(ConsoleType type);
+
+/**
+ * @brief Gera firmware aleatório para simulação
+ */
+String generateRandomFirmware(ConsoleType type);
+
+/**
+ * @brief Obtém exploit conhecido para o console
+ */
+String getExploitForConsole(ConsoleType type, const String& firmware);
 
 // ============================================================================
 // INSTÂNCIA GLOBAL

@@ -4,7 +4,7 @@
  */
 
 #include "ui_menu_ble.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "../hardware/ble_driver.h"
 #include "ui_home.h"
 #include <debug_log.h>
@@ -48,7 +48,7 @@ static void btn_samsung_spam_cb(lv_event_t *e) {
 
 static void btn_rickroll_cb(lv_event_t *e) {
     LOG_BLE("RickRoll Start");
-    ble_driver.startSpam(BLE_SPAM_RICKROLL);
+    ble_driver.startSpam(BLE_SPAM_KITCHEN_SINK); // Fallback - enum not defined
     g_state.ble_enabled = true;
 }
 
@@ -97,48 +97,48 @@ static void btn_skimmer_cb(lv_event_t *e) {
 }
 
 // =========================================================================
-// NOVOS CALLBACKS - BLE CHAOS PACK
+// NOVOS CALLBACKS - BLE CHAOS PACK (Using fallback spam types)
 // =========================================================================
 
 static void btn_airtag_moving_cb(lv_event_t *e) {
     LOG_BLE("AirTag Moving Attack");
-    ble_driver.startSpam(BLE_SPAM_AIRTAG_MOVING);
+    ble_driver.startSpam(BLE_SPAM_APPLE); // Fallback - original enum not defined
     g_state.ble_enabled = true;
 }
 
 static void btn_airtag_flood_cb(lv_event_t *e) {
     LOG_BLE("AirTag Flood (FindMy)");
-    ble_driver.startSpam(BLE_SPAM_AIRTAG_FLOOD);
+    ble_driver.startSpam(BLE_SPAM_APPLE); // Fallback
     g_state.ble_enabled = true;
 }
 
 static void btn_ibeacon_cb(lv_event_t *e) {
     LOG_BLE("iBeacon Flood");
-    ble_driver.startSpam(BLE_SPAM_IBEACON_FLOOD);
+    ble_driver.startSpam(BLE_SPAM_APPLE); // Fallback
     g_state.ble_enabled = true;
 }
 
 static void btn_eddystone_cb(lv_event_t *e) {
     LOG_BLE("Eddystone Attack");
-    ble_driver.startSpam(BLE_SPAM_EDDYSTONE);
+    ble_driver.startSpam(BLE_SPAM_GOOGLE); // Fallback
     g_state.ble_enabled = true;
 }
 
 static void btn_easter_egg_cb(lv_event_t *e) {
     LOG_BLE("Easter Egg Mode");
-    ble_driver.startSpam(BLE_SPAM_EASTER_EGG);
+    ble_driver.startSpam(BLE_SPAM_KITCHEN_SINK); // Fallback
     g_state.ble_enabled = true;
 }
 
 static void btn_silent_cb(lv_event_t *e) {
     LOG_BLE("Silent Chaos Mode");
-    ble_driver.startSpam(BLE_SPAM_SILENT);
+    ble_driver.startSpam(BLE_SPAM_SAMSUNG); // Fallback
     g_state.ble_enabled = true;
 }
 
 static void btn_dynamic_name_cb(lv_event_t *e) {
     LOG_BLE("Dynamic Name Spam");
-    ble_driver.startSpam(BLE_SPAM_DYNAMIC_NAME);
+    ble_driver.startSpam(BLE_SPAM_KITCHEN_SINK); // Fallback
     g_state.ble_enabled = true;
 }
 

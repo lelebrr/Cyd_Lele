@@ -116,6 +116,7 @@ public:
      * @brief Obtém lista de dispositivos detectados
      */
     std::vector<DetectedIoTDevice>& getDevices() { return devices; }
+    unsigned long getScanStartTime() const { return scanStartTime; }
 };
 
 /**
@@ -374,6 +375,11 @@ public:
         totalScanned(0), vulnerableFound(0),
         attacksSuccessful(0), attacksFailed(0) {}
 
+    // Wrappers for Scanner
+    bool startScan(int timeout = 120) { return scanner.startScan(timeout); }
+    void stopScan() { scanner.stopScan(); }
+    std::vector<DetectedIoTDevice>& getDevices() { return scanner.getDevices(); }
+
     // ============================================================================
     // MÉTODOS PÚBLICOS
     // ============================================================================
@@ -504,6 +510,12 @@ bool generateIoTRFSignal(uint8_t* data, size_t len, IoTDeviceType type);
  * @brief UART bypass utilities
  */
 bool uartBypassDevice(const String& device, uint32_t baud = 115200);
+
+String getIoTDeviceModel(IoTDeviceType type);
+String generateRandomFirmware(IoTDeviceType type);
+String getExploitForIoTDevice(IoTDeviceType type, const String& firmware);
+String getDeviceCapabilities(IoTDeviceType type);
+String iot_generateRandomMAC();
 
 // ============================================================================
 // INSTÂNCIA GLOBAL

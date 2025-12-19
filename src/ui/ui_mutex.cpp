@@ -5,7 +5,7 @@
  */
 
 #include "ui_mutex.h"
-#include "../usb_serial_compat.h"
+// #include "../usb_serial_compat.h" // File not found - disabled
 #include <debug_log.h>
 
 // Mutex global

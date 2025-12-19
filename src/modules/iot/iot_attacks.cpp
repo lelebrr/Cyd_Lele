@@ -16,6 +16,10 @@
 // Instância global
 IoTAttackManager iotAttackManager;
 
+static void logOperation(const String& operation) {
+    Serial.println("[IOT] " + operation);
+}
+
 // ============================================================================
 // IMPLEMENTAÇÃO IOTSCANNER
 // ============================================================================
@@ -55,7 +59,7 @@ void IoTScanner::scanUPnP() {
         device.type = (IoTDeviceType)(random(6)); // 6 tipos diferentes
         device.model = getIoTDeviceModel(device.type);
         device.ipAddress = "192.168.1." + String(random(100, 200));
-        device.macAddress = generateRandomMAC();
+        device.macAddress = iot_generateRandomMAC();
         device.firmware = generateRandomFirmware(device.type);
         device.isVulnerable = isIoTVulnerable(device.type, device.firmware);
         device.exploitAvailable = getExploitForIoTDevice(device.type, device.firmware);
@@ -554,7 +558,7 @@ void IoTAttackManager::loop() {
         scanner.scanARP();
 
         // Timeout check
-        if (millis() - scanner.scanStartTime > 120000) { // 120 seconds
+        if (millis() - scanner.getScanStartTime() > 120000) { // 120 seconds
             scanner.stopScan();
             updateState(IOT_IDLE);
         }
@@ -742,6 +746,8 @@ void IoTAttackManager::logOperation(const String& operation) {
 // FUNÇÕES GLOBAIS DE UTILITÁRIO
 // ============================================================================
 
+
+
 IoTDeviceType detectIoTDevice(const String& model, const String& capabilities) {
     // Detectar por modelo e capacidades
     if (model.indexOf("HS100") >= 0 || model.indexOf("HS110") >= 0) {
@@ -771,13 +777,13 @@ bool isIoTVulnerable(IoTDeviceType type, const String& firmware) {
             return firmware.startsWith("1.0") || firmware.startsWith("1.1");
 
         case IOT_IP_CAMERA:
-            return firmware.contains("5.2.") || firmware.contains("5.1.");
+            return firmware.indexOf("5.2.") != -1 || firmware.indexOf("5.1.") != -1;
 
         case IOT_THERMOSTAT:
             return firmware.startsWith("1.") || firmware.startsWith("2.");
 
         case IOT_SMART_SPEAKER:
-            return firmware.contains("1.") || firmware.contains("2.");
+            return firmware.indexOf("1.") != -1 || firmware.indexOf("2.") != -1;
 
         case IOT_DOORBELL:
             return firmware.startsWith("1.") || firmware.startsWith("2.");
@@ -911,10 +917,10 @@ String getDeviceCapabilities(IoTDeviceType type) {
     }
 }
 
-String generateRandomMAC() {
+String iot_generateRandomMAC() {
     char mac[18];
     sprintf(mac, "%02X:%02X:%02X:%02X:%02X:%02X",
-            random(256), random(256), random(256),
-            random(256), random(256), random(256));
+            (uint8_t)random(256), (uint8_t)random(256), (uint8_t)random(256),
+            (uint8_t)random(256), (uint8_t)random(256), (uint8_t)random(256));
     return String(mac);
 }

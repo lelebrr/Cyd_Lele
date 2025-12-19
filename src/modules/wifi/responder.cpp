@@ -114,12 +114,12 @@ uint64_t getWindowsTimestamp() {
 }
 
 // Buffer pour le NTLM Type 2 généré dynamiquement
-uint8_t ntlmType2Buffer[512];
+uint8_t ntlmType2Buffer[256]; // Reduced from 512
 uint16_t ntlmType2Len = 0;
 
 
 void buildNTLMType2Msg(uint8_t *challenge, uint8_t *buffer, uint16_t *len) {
-  uint8_t avPairs[512];
+  uint8_t avPairs[256]; // Reduced from 512
   int offset = 0;
 
   auto appendAVPair = [&](uint16_t type, const char* data) {
@@ -392,7 +392,7 @@ void sendSMB1Type2(uint8_t* req, uint8_t* ntlm1) {
   buildNTLMType2Msg(smbState.challenge, ntlmType2Buffer, &ntlmType2Len);
 
   // 3) Prépare la réponse SessionSetupAndX SMB1
-  uint8_t resp[512] = {0};
+  uint8_t resp[256] = {0}; // Reduced from 512
 
   // – NBSS + header SMBv1 (copie 32 octets)
   memcpy(resp + 4, req, 32);

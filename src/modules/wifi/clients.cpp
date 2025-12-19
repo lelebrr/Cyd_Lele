@@ -221,7 +221,7 @@ void ssh_loop(void *pvParameters) {
     tft.fillScreen(leleConfig.bgColor);
     tft.setTextColor(TFT_WHITE, leleConfig.bgColor);
     tft.setTextSize(FP);
-    char buffer[1024];
+    char buffer[512]; // Reduced from 1024 to save DRAM
     int nbytes;
     keyStroke key;
     while (1) {

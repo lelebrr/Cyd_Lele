@@ -677,11 +677,11 @@ void dataLoggerTask(void* parameter) {
     // Result logging task
     GlitchResult result;
     while (true) {
-        if (faultInjectionManager && faultInjectionManager->resultQueue) {
-            if (xQueueReceive(faultInjectionManager->resultQueue, &result, pdMS_TO_TICKS(1000)) == pdTRUE) {
+        if (faultInjectionManager && faultInjectionManager->getResultQueue()) {
+            if (xQueueReceive(faultInjectionManager->getResultQueue(), &result, pdMS_TO_TICKS(1000)) == pdTRUE) {
                 // Log to SD card
-                Serial.printf("GLITCH RESULT: Success=%d, Time=%dms, Attempts=%d\n",
-                    result.success, result.executionTime, result.attempts);
+                Serial.printf("GLITCH RESULT: Success=%d, Time=%lums, Attempts=%d\n",
+                    result.success, (unsigned long)result.executionTime, result.attempts);
             }
         }
         vTaskDelay(pdMS_TO_TICKS(100));

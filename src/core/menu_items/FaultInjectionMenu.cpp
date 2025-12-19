@@ -352,8 +352,8 @@ void FaultInjectionMenu::showArmSystem() {
     lv_label_set_text(lblArmCrowbar, "ARM CROWBAR");
     lv_obj_set_style_bg_color(btnArmCrowbar, lv_color_hex(0xFF4500), 0);
     lv_obj_add_event_cb(btnArmCrowbar, [](lv_event_t* e) {
-        if (faultInjectionManager && faultInjectionManager->crowbar) {
-            faultInjectionManager->crowbar->setArmed(true);
+        if (faultInjectionManager && faultInjectionManager->getCrowbar()) {
+            faultInjectionManager->getCrowbar()->setArmed(true);
             faultInjectionMenu.updateStatusDisplay();
         }
     }, LV_EVENT_CLICKED, nullptr);

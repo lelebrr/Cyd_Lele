@@ -4,6 +4,10 @@
 #include "core/mykeyboard.h"
 #include <algorithm>
 
+#ifndef SUCCESS
+#define SUCCESS 0
+#endif
+
 // Function to generate NDEF URI record bytes
 // Returns dynamically allocated array (caller must free)
 uint8_t* generateNDEFURI(const char* url, size_t* outLength) {
@@ -33,11 +37,11 @@ uint8_t* generateNDEFURI(const char* url, size_t* outLength) {
     return ndef;
 }
 
-// NFC Attack Functions for Pentest TCC
+// Basic NFC Attack Functions
 
 // 1. Clone card (bus, hotel key, badge)
 void nfc_clone_card() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -63,7 +67,7 @@ void nfc_clone_card() {
 
 // 2. Phishing NFC tag
 void nfc_phishing_tag() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -121,7 +125,7 @@ void nfc_phishing_tag() {
 
 // 3. OTA rewrite emergency contact
 void nfc_ota_rewrite() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -147,7 +151,7 @@ void nfc_fake_apple_pay() {
 
 // 5. Audio injection via NFC
 void nfc_audio_injection() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -213,7 +217,7 @@ void nfc_audio_injection() {
 
 // 6. Claw machine credit injection (125kHz RFID)
 void nfc_pulse_injection_claw_machine() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -254,7 +258,7 @@ void nfc_pulse_injection_claw_machine() {
 
 // 7. Time clock shock attack (13.56MHz NFC)
 void nfc_pulse_injection_time_clock() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -290,7 +294,7 @@ void nfc_pulse_injection_time_clock() {
 
 // 8. Bus card overflow attack (13.56MHz)
 void nfc_pulse_injection_bus_card() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -308,11 +312,11 @@ void nfc_pulse_injection_bus_card() {
     // High-intensity burst to force overflow
     digitalWrite(BURST_PIN, HIGH);
 
-    // Send multiple modulation bursts
+    // Send multiple modulation bursts (modulateField not supported in Adafruit_PN532)
     for (int i = 0; i < 10; i++) {
-        nfc.nfc.modulateField(true);   // Enable modulation
+        // nfc.nfc.modulateField(true);   // Enable modulation
         delay(100);
-        nfc.nfc.modulateField(false);  // Disable modulation
+        // nfc.nfc.modulateField(false);  // Disable modulation
         delay(50);
     }
 
@@ -324,7 +328,7 @@ void nfc_pulse_injection_bus_card() {
 
 // 9. Reverse credit attack (zero balance)
 void nfc_pulse_injection_reverse_credit() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -336,7 +340,8 @@ void nfc_pulse_injection_reverse_credit() {
     displayWarning("ETHICAL WARNING: Reverse Credit Attack", false);
     displayInfo("This zeros another person's balance", false);
 
-    if (!keyboard("Confirm attack? (Y/N)", "N")) {
+    String input = keyboard("Confirm (Y/N)", 2, "N");
+    if (!input.equalsIgnoreCase("Y")) {
         displayInfo("Attack cancelled", true);
         return;
     }
@@ -362,7 +367,7 @@ void nfc_pulse_injection_reverse_credit() {
 
 // 10. Ghost reader attack (simulate validation machine)
 void nfc_pulse_injection_ghost_reader() {
-    PN532 nfc(I2C);
+    PN532 nfc(PN532::I2C);
     if (!nfc.begin()) {
         displayError("PN532 not found", true);
         return;
@@ -394,7 +399,8 @@ void nfc_pulse_injection_ghost_reader() {
             displayInfo("Balance: R$25.00", false);
 
             // Option to inject false validation
-            if (keyboard("Inject false validation? (Y/N)", "N")) {
+            String input = keyboard("Inject false validation? (Y/N)", 20, "N");
+            if (input.equalsIgnoreCase("Y")) {
                 digitalWrite(BURST_PIN, HIGH);
                 delay(500);
                 digitalWrite(BURST_PIN, LOW);

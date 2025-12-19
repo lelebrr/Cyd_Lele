@@ -537,7 +537,7 @@ optimizationManager.updateComponentState(COMPONENT_RF, true);
 - ✅ **Hardware Integration** - Suporte CYD-2USB completo
 - ✅ **Touch Interface** - Controles touchscreen intuitivos
 - ✅ **Real-time Monitoring** - Status e progresso ao vivo
-- ✅ **Educational Focus** - TCC-ready com metodologia
+- ✅ **Educational Focus** - Foco educacional com metodologia
 - ✅ **Safety Features** - Proteções anti-dano
 
 ### **Recursos Exclusivos:**

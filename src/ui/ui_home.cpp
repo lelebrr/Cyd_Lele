@@ -1,4 +1,4 @@
-Ôªø/**
+/**
  * @file ui_home.cpp
  * @brief Tela Home - Menu Carousel Estilo Lele
  *
@@ -6,14 +6,14 @@
  */
 
 #include "ui_home.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "screens/ui_menu_carousel.h"
 #include "ui_helpers.h"
 #include "ui_main.h"
 #include "ui_themes.h"
 #include <debug_log.h>
 
-// Vari√°veis Est√°ticas
+// Vari·veis Est·ticas
 static bool _initialized = false;
 static bool _carouselCreated = false;
 
@@ -28,7 +28,7 @@ void ui_home_show() {
 
     ui_clear_content_area();
 
-    // Se o carousel j√° foi criado, apenas mostra
+    // Se o carousel j· foi criado, apenas mostra
     if (_carouselCreated) {
         menuCarousel.show();
         LOG_UI("Menu carousel mostrado");
@@ -38,8 +38,8 @@ void ui_home_show() {
     // Cria o menu carousel (primeira vez)
     LOG_UI("Criando menu carousel...");
 
-    // Estica o content para usar a √°rea toda
-    lv_obj_set_size(content, LCD_WIDTH, LCD_HEIGHT - 50); // Deixa espa√ßo pro status bar
+    // Estica o content para usar a ·rea toda
+    lv_obj_set_size(content, LCD_WIDTH, LCD_HEIGHT - 50); // Deixa espaÁo pro status bar
     lv_obj_set_style_bg_opa(content, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(content, 0, 0);
     lv_obj_clear_flag(content, LV_OBJ_FLAG_SCROLLABLE);
@@ -54,12 +54,12 @@ void ui_home_show() {
 void ui_home_update() {
     if (!_initialized) return;
 
-    // Atualiza o carousel se necess√°rio
+    // Atualiza o carousel se necess·rio
     menuCarousel.update();
 }
 
 void ui_home_set_assistant_text(const char *text) {
-    // N√£o usado mais com carousel
+    // N„o usado mais com carousel
     (void)text;
 }
 
@@ -67,16 +67,16 @@ void ui_home_open_menu(HomeMenuCategory category) {
     // Navega para a categoria correspondente no carousel
     switch (category) {
         case MENU_WIFI:
-            menuCarousel.goTo(0); // WiFi √© √≠ndice 0
+            menuCarousel.goTo(0); // WiFi È Ìndice 0
             break;
         case MENU_BLE:
-            menuCarousel.goTo(1); // BLE √© √≠ndice 1
+            menuCarousel.goTo(1); // BLE È Ìndice 1
             break;
         case MENU_TOOLS:
-            menuCarousel.goTo(4); // Files/Tools √© √≠ndice 4
+            menuCarousel.goTo(4); // Files/Tools È Ìndice 4
             break;
         case MENU_SETTINGS:
-            menuCarousel.goTo(5); // Settings √© √≠ndice 5
+            menuCarousel.goTo(5); // Settings È Ìndice 5
             break;
         default: break;
     }

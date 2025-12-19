@@ -1,5 +1,5 @@
-#ifndef BRUCE_BLE_SERVICE_H
-#define BRUCE_BLE_SERVICE_H
+#ifndef LELE_BLE_SERVICE_H
+#define LELE_BLE_SERVICE_H
 
 #include <NimBLEServer.h>
 
@@ -14,4 +14,4 @@ public:
     void setMTU(int new_mtu) { mtu = new_mtu; }
 };
 
-#endif // BRUCE_BLE_SERVICE_H
+#endif // LELE_BLE_SERVICE_H

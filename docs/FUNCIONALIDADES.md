@@ -8,7 +8,7 @@ Lista completa de funcionalidades disponíveis no Lele Origin v1.0.
 - ✅ **Performance:** +300% velocidade, -60% consumo
 - ✅ **Interface:** Touchscreen profissional LVGL
 - ✅ **Otimização:** BufferPool + ConnectionPool proprietários
-- ✅ **Documentação:** 12 documentos TCC-ready
+- ✅ **Documentação:** 12 documentos técnicos educacionais
 
 ---
 

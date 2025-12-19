@@ -1,5 +1,5 @@
-#ifndef BRUCE_SERIALDEVICE_H
-#define BRUCE_SERIALDEVICE_H
+#ifndef LELE_SERIALDEVICE_H
+#define LELE_SERIALDEVICE_H
 
 #include <Arduino.h>
 
@@ -27,4 +27,4 @@ public:
     virtual ~SerialDevice() = default;
 };
 
-#endif // BRUCE_SERIALDEVICE_H
+#endif // LELE_SERIALDEVICE_H

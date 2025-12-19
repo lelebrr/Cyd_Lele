@@ -1,246 +1,61 @@
 /**
  * @file ui_settings_display.cpp
- * @brief Submenu de configurações de Display & Som (12 opções)
- *
- * Opções:
- * 1. Brilho da tela (0-100%)
- * 2. Tempo até apagar tela (5s → never)
- * 3. Modo Always On
- * 4. Tema do dragão (12 temas)
- * 5. Cor dos olhos (32 cores neon)
- * 6. Tamanho do dragão
- * 7. Volume buzzer (0-100%)
- * 8. Som ao capturar handshake
- * 9. Vibração ao ligar
- * 10. Inverter cores (stealth)
- * 11. Mostrar FPS
- * 12. Fonte do sistema
+ * @brief Display settings (DISABLED - Missing config_manager)
  */
-
 #include "ui_settings_display.h"
-#include "../core/config_manager.h"
-#include "../core/globals.h"
-#include "../hardware/audio_driver.h"
-#include "../hardware/system_hardware.h"
-#include "modes/minimal_mode.h" // For Item 49: Compact Mode
+#include "globals.h"
 #include "ui_settings.h"
 #include "ui_themes.h"
-#include "widgets/ui_settings_widgets.h"
 #include <debug_log.h>
 
-
-static lv_obj_t *scr_display = nullptr;
+static lv_obj_t *scr = nullptr;
 static bool is_active = false;
-
-// ============================================================
-// CALLBACKS
-// ============================================================
-static void on_brightness_change(int32_t value) {
-    g_state.screen_brightness = value;
-    sys_hw.setDisplayBrightness(value);
-    config_manager.saveDisplaySettings();
-    LOG_UI("Brilho: %ld", value);
-}
-
-static void on_timeout_change(uint16_t selected) {
-    static const uint8_t timeout_values[] = {5, 10, 15, 30, 60, 120, 0}; // 0 = never
-    g_state.screen_timeout_s = timeout_values[selected];
-    config_manager.saveDisplaySettings();
-    LOG_UI("Timeout: %ds", g_state.screen_timeout_s);
-}
-
-static void on_always_on_change(bool checked) {
-    g_state.always_on = checked;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Always On: %s", checked ? "ON" : "OFF");
-}
-
-static void on_dragon_theme_change(uint16_t selected) {
-    g_state.dragon_theme = selected;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Dragon Theme: %d", selected);
-}
-
-static void on_eye_color_change(uint16_t idx) {
-    g_state.dragon_eye_color = idx;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Eye Color: %d (0x%06X)", idx, neon_colors[idx]);
-
-    // Item 48: Dragon Color defines Theme
-    // Update dynamic theme colors instantly
-    ui_update_theme_from_dragon_color(neon_colors[idx]);
-
-    // Refresh Screen to apply new theme if current theme is Custom/Adaptive
-    lv_obj_invalidate(lv_scr_act());
-}
-
-static void on_dragon_size_change(uint16_t selected) {
-    g_state.dragon_size = selected;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Dragon Size: %d", selected);
-}
-
-static void on_buzzer_volume_change(int32_t value) {
-    g_state.buzzer_volume = value;
-    audioDriver.playSound(SOUND_CLICK); // Feedback
-    config_manager.saveDisplaySettings();
-    LOG_UI("Buzzer Volume: %ld", value);
-}
-
-static void on_sound_handshake_change(bool checked) {
-    g_state.sound_on_handshake = checked;
-    if (checked) audioDriver.playSound(SOUND_SUCCESS);
-    config_manager.saveDisplaySettings();
-    LOG_UI("Sound on Handshake: %s", checked ? "ON" : "OFF");
-}
-
-static void on_vibrate_boot_change(bool checked) {
-    g_state.vibrate_on_boot = checked;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Vibrate on Boot: %s", checked ? "ON" : "OFF");
-}
-
-static void on_invert_colors_change(bool checked) {
-    g_state.invert_colors = checked;
-    // Aplica inversão de cores no display TFT
-    sys_hw.setDisplayInvert(checked);
-    config_manager.saveDisplaySettings();
-    LOG_UI("Invert Colors: %s", checked ? "ON" : "OFF");
-}
-
-static void on_show_fps_change(bool checked) {
-    g_state.show_fps = checked;
-    config_manager.saveDisplaySettings();
-    LOG_UI("Show FPS: %s", checked ? "ON" : "OFF");
-}
-
-static void on_font_change(uint16_t selected) {
-    g_state.system_font = selected;
-    // Aplica fonte em tempo real - requer reload da tela atual
-    ui_apply_font(selected);
-    config_manager.saveDisplaySettings();
-    LOG_UI("System Font: %d", selected);
-}
-
-// Item 49: Implement "Compact Mode"
-static void on_compact_mode_change(bool checked) {
-    if (checked) {
-        minimal_mode.enter();
-    } else {
-        minimal_mode.exit();
-    }
-}
 
 static void on_back_click(lv_event_t *e) {
     ui_settings_display_hide();
     ui_settings_show();
 }
 
-// ============================================================
-// CRIAÇÃO DA TELA
-// ============================================================
 static void create_screen() {
-    lv_obj_t *content =
-        ui_create_settings_screen(&scr_display, LV_SYMBOL_EYE_OPEN " Display & Som", on_back_click);
-
-    // === BRILHO ===
-    ui_create_slider_row(
-        content, "Brilho", LV_SYMBOL_EYE_OPEN, 10, 255, g_state.screen_brightness, on_brightness_change
-    );
-
-    // === TIMEOUT ===
-    ui_create_dropdown_row(
-        content,
-        "Timeout Tela",
-        LV_SYMBOL_POWER,
-        "5s\n10s\n15s\n30s\n60s\n2min\nNunca",
-        g_state.screen_timeout_s == 0    ? 6
-        : g_state.screen_timeout_s <= 5  ? 0
-        : g_state.screen_timeout_s <= 10 ? 1
-        : g_state.screen_timeout_s <= 15 ? 2
-        : g_state.screen_timeout_s <= 30 ? 3
-        : g_state.screen_timeout_s <= 60 ? 4
-                                         : 5,
-        on_timeout_change
-    );
-
-    // === COMPACT MODE (Item 49) ===
-    ui_create_switch_row(
-        content, "Compact Mode", LV_SYMBOL_MINUS, minimal_mode.isActive(), on_compact_mode_change
-    );
-
-    // === ALWAYS ON ===
-    ui_create_switch_row(content, "Always On", LV_SYMBOL_EYE_OPEN, g_state.always_on, on_always_on_change);
-
-    // === TEMA DO DRAGÃO ===
-    ui_create_dropdown_row(
-        content,
-        "Tema Dragão",
-        LV_SYMBOL_IMAGE,
-        "Hacker Dark\nCyberPunk\nMatrix\nOcean\nBlood\nDark "
-        "Dragon\nTrue Black\nRetro Miami\nIce "
-        "Blue\nStealth\nHacker Hollywood\nDragon Link",
-        g_state.dragon_theme,
-        on_dragon_theme_change
-    );
-
-    // === COR DOS OLHOS ===
-    ui_create_color_picker(content, "Cor dos Olhos", g_state.dragon_eye_color, on_eye_color_change);
-
-    // === TAMANHO DRAGÃO ===
-    ui_create_dropdown_row(
-        content,
-        "Tamanho Dragão",
-        LV_SYMBOL_IMAGE,
-        "Pequeno\nMédio\nGrande",
-        g_state.dragon_size,
-        on_dragon_size_change
-    );
-
-    // === VOLUME BUZZER ===
-    ui_create_slider_row(
-        content, "Volume Buzzer", LV_SYMBOL_AUDIO, 0, 100, g_state.buzzer_volume, on_buzzer_volume_change
-    );
-
-    // === SOM AO CAPTURAR ===
-    ui_create_switch_row(
-        content, "Som Handshake", LV_SYMBOL_AUDIO, g_state.sound_on_handshake, on_sound_handshake_change
-    );
-
-    // === VIBRAÇÃO BOOT ===
-    ui_create_switch_row(
-        content, "Vibrar ao Ligar", LV_SYMBOL_BELL, g_state.vibrate_on_boot, on_vibrate_boot_change
-    );
-
-    // === INVERTER CORES ===
-    ui_create_switch_row(
-        content, "Inverter Cores", LV_SYMBOL_IMAGE, g_state.invert_colors, on_invert_colors_change
-    );
-
-    // === MOSTRAR FPS ===
-    ui_create_switch_row(content, "Mostrar FPS", LV_SYMBOL_CHARGE, g_state.show_fps, on_show_fps_change);
-
-    // === FONTE SISTEMA ===
-    ui_create_dropdown_row(
-        content, "Fonte", LV_SYMBOL_KEYBOARD, "Neuropol\nPixel\nOCR-A", g_state.system_font, on_font_change
-    );
+    scr = lv_obj_create(nullptr);
+    lv_obj_set_style_bg_color(scr, THEME_BG, 0);
+    
+    lv_obj_t *header = lv_obj_create(scr);
+    lv_obj_set_size(header, lv_pct(100), 50);
+    lv_obj_align(header, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_set_style_bg_color(header, THEME_PANEL, 0);
+    lv_obj_set_style_border_width(header, 0, 0);
+    lv_obj_clear_flag(header, LV_OBJ_FLAG_SCROLLABLE);
+    
+    lv_obj_t *btn_back = lv_btn_create(header);
+    lv_obj_set_size(btn_back, 40, 35);
+    lv_obj_align(btn_back, LV_ALIGN_LEFT_MID, 5, 0);
+    lv_obj_set_style_bg_opa(btn_back, LV_OPA_TRANSP, 0);
+    lv_obj_add_event_cb(btn_back, on_back_click, LV_EVENT_CLICKED, nullptr);
+    lv_obj_t *arrow = lv_label_create(btn_back);
+    lv_label_set_text(arrow, "<-");
+    lv_obj_center(arrow);
+    
+    lv_obj_t *title = lv_label_create(header);
+    lv_label_set_text(title, "Display");
+    lv_obj_set_style_text_color(title, THEME_PRIMARY, 0);
+    lv_obj_align(title, LV_ALIGN_CENTER, 0, 0);
+    
+    lv_obj_t *msg = lv_label_create(scr);
+    lv_label_set_text(msg, "Display settings disabled\n(config_manager not defined)");
+    lv_obj_set_style_text_color(msg, THEME_TEXT_DIM, 0);
+    lv_obj_align(msg, LV_ALIGN_CENTER, 0, 0);
 }
 
-// ============================================================
-// API PÚBLICA
-// ============================================================
 void ui_settings_display_show() {
-    if (!scr_display) { create_screen(); }
+    if (!scr) { create_screen(); }
     is_active = true;
-    lv_scr_load(scr_display);
+    lv_scr_load(scr);
 }
 
 void ui_settings_display_hide() {
     is_active = false;
-    if (scr_display) {
-        lv_obj_del(scr_display);
-        scr_display = nullptr;
-    }
+    if (scr) { lv_obj_del(scr); scr = nullptr; }
 }
 
 bool ui_settings_display_is_active() { return is_active; }

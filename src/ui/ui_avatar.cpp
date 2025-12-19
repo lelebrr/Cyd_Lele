@@ -49,7 +49,7 @@ static void avatar_touch_cb(lv_event_t *e) {
             avatar->setFocus(p.x, p.y);
         }
     } else if (code == LV_EVENT_RELEASED) {
-        avatar->setFocus(LCD_WIDTH / 2, 110); // Center back
+        avatar->setFocus(TFT_WIDTH / 2, 110); // Center back
     }
 }
 
@@ -307,7 +307,7 @@ void VoiceAvatar::setFocus(int x, int y) {
 
     // Parallax Effect: Move face label slightly towards touch
     // Center of avatar is roughly (LCD_WIDTH/2, 110)
-    int cx = LCD_WIDTH / 2;
+    int cx = TFT_WIDTH / 2;
     int cy = 110; // Approx
 
     int dx = (x - cx) / 10; // Dampen movement

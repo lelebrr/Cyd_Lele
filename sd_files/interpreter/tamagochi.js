@@ -1,6 +1,6 @@
 // created by hxd57. V2
-// repository: https://github.com/HawkstoNGriM/m5-bruce-tamagochi-lite
-var dbStore = {fs: "sd", path: "/pet.json"}; // fs can be "sd" or "littlefs"
+// repository: https://github.com/lelebrr/Cyd_Lele
+var dbStore = { fs: "sd", path: "/pet.json" }; // fs can be "sd" or "littlefs"
 var storage = require("storage");
 var display = require('display');
 var keyboardApi = require('keyboard');
@@ -60,42 +60,42 @@ function Pet(name, type, hunger, cleanliness, happiness, timeLastFed, timeLastPe
 }
 
 Pet.prototype = {
-  feed: function() {
+  feed: function () {
     this.hunger = Math.max(0, this.hunger - 10); // Reduce hunger by 10%, but not below 0%
     this.timeLastFed = now();
     this.happiness = Math.min(100, this.happiness + 20); // Increase happiness by 20%, but not above 100%
     display.fill(currentBgColor);
     dialogMessage(this.name + " has been fed!");
   },
-  clean: function() {
+  clean: function () {
     this.cleanliness = 100; // Fully clean
     this.timeLastCleaned = now();
     display.fill(currentBgColor);
     dialogMessage(this.name + " is now clean!");
   },
-  pet: function() {
+  pet: function () {
     this.happiness = Math.min(100, this.happiness + 10); // Reduced happiness gain
     this.timeLastPet = now();
     display.fill(currentBgColor);
     dialogMessage(this.name + " loves your petting!");
   },
-  updateHunger: function() {
+  updateHunger: function () {
     var time = now();
     var elapsed = time - this.timeLastFed;
     this.hunger = Math.min(100, Math.max(0, this.hunger + Math.floor(elapsed / 7200000) * 10)); // Ensure hunger is between 0% and 100%
   },
-  updateHappiness: function() {
+  updateHappiness: function () {
     var time = now();
     var elapsed = time - this.timeLastPet;
     this.happiness = Math.max(0, this.happiness - Math.floor(elapsed / 3600000) * 5); // Ensure happiness is between 0% and 100%
   },
-  updateCleanliness: function() {
+  updateCleanliness: function () {
     var time = now();
     var elapsed = time - this.timeLastCleaned;
     var hours = elapsed / 3600000;
     this.cleanliness = Math.max(0, 100 - Math.floor(hours * 5)); // Ensure cleanliness is between 0% and 100%
   },
-  save: function() {
+  save: function () {
     var petData = {
       name: this.name,
       type: this.type,
@@ -134,7 +134,7 @@ function loadPet() {
         // Ensure timeLastFed and timeLastPet are numbers
         obj.timeLastFed = Number(obj.timeLastFed);
         obj.timeLastPet = Number(obj.timeLastPet);
-         // Handle old saves without timeLastCleaned
+        // Handle old saves without timeLastCleaned
         if (obj.timeLastCleaned === undefined) {
           var hoursAgo = (100 - obj.cleanliness) / 5;
           obj.timeLastCleaned = now() - hoursAgo * 3600000;
@@ -142,7 +142,7 @@ function loadPet() {
           obj.timeLastCleaned = Number(obj.timeLastCleaned);
         }
         return new Pet(obj.name, obj.type, obj.hunger, obj.cleanliness,
-                       obj.happiness, obj.timeLastFed, obj.timeLastPet, obj.timeLastCleaned);
+          obj.happiness, obj.timeLastFed, obj.timeLastPet, obj.timeLastCleaned);
       }
     } catch (e) {
       display.fill(currentBgColor);
@@ -170,7 +170,7 @@ function drawPet(pet) {
 
   // Include cleanliness in state calculation
   var stateIndex = (pet.hunger >= 70 || pet.happiness <= 30 || pet.cleanliness <= 30) ? 0 :
-                   (pet.hunger >= 30 || pet.happiness <= 50 || pet.cleanliness <= 50) ? 1 : 2;
+    (pet.hunger >= 30 || pet.happiness <= 50 || pet.cleanliness <= 50) ? 1 : 2;
 
   var face = faces[pet.type][stateIndex];
   var faceWidth = face.length * 12;
@@ -253,14 +253,14 @@ if (!pet) {
   setTextColor(faceColor);
   setTextSize(2);
   var name = keyboardPrompt("", 12, "Pet's name?") || "gotchi"; // Default to "gotchi"
-  var type = dialogChoice({["Cat"]:"cat", ["Dog"]:"dog", ["Bird"]:"bird"}) || "cat";
+  var type = dialogChoice({ ["Cat"]: "cat", ["Dog"]: "dog", ["Bird"]: "bird" }) || "cat";
   pet = new Pet(name, type);
   pet.save();
 }
 
-var updateTime=0;
+var updateTime = 0;
 while (true) {
-  if(now()-updateTime>500){
+  if (now() - updateTime > 500) {
     pet.updateHunger();
     pet.updateHappiness();
     pet.updateCleanliness();
@@ -299,7 +299,7 @@ while (true) {
           "Blue",
           "Yellow",
           "White",
-          "Lavender",,
+          "Lavender", ,
           "Coral",
           "Aqua",
           "Beige"
@@ -327,7 +327,7 @@ while (true) {
       });
 
       if (confirm === "yes") {
-        serialCmd("storage remove JS-scripts/bruce_0.sub");
+        serialCmd("storage remove JS-scripts/lele_0.sub");
         serialCmd("storage remove pet.json");
 
         // Create a new pet
@@ -335,7 +335,7 @@ while (true) {
         setTextColor(faceColor);
         setTextSize(2);
         var name = keyboardPrompt("", 12, "Pet's name?") || "gotchi"; // Default to "gotchi"
-        var type = dialogChoice({["Cat"]:"cat", ["Dog"]:"dog", ["Bird"]:"bird"}) || "cat";
+        var type = dialogChoice({ ["Cat"]: "cat", ["Dog"]: "dog", ["Bird"]: "bird" }) || "cat";
         pet = new Pet(name, type);
         pet.save();
       }

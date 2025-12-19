@@ -238,15 +238,7 @@ static const ThemeColors themes[] = {
 #define THEME_HACKER_HOLLYWOOD 10
 // THEME_CUSTOM_DRAGON 11 defined below
 
-struct GlobalState {
-    int current_theme = 0;
-    int battery_percent = 100;
-    bool is_charging = false;
-    bool wifi_enabled = true;
-    bool ble_enabled = true;
-    bool mascot_enabled = true;
-};
-extern GlobalState g_state;
+// GlobalState is defined in globals.h - use extern here
 
 // Dynamic theme storage
 extern ThemeColors g_dynamic_theme;

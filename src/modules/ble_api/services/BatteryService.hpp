@@ -5,6 +5,7 @@
 class BatteryService : public LeleBLEService {
     NimBLECharacteristic *battery_char = nullptr;
     TaskHandle_t battery_task_handle = nullptr;
+    friend void runLowbattBLE();
 
 public:
     BatteryService(/* args */);

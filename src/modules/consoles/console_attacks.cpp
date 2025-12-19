@@ -13,6 +13,10 @@
 #include <core/mykeyboard.h>
 #include <core/optimization_manager.h>
 
+static void logOperation(const String& operation) {
+    Serial.println("[CONSOLE] " + operation);
+}
+
 // Instância global
 ConsoleAttackManager consoleAttackManager;
 
@@ -44,6 +48,9 @@ void ConsoleScanner::stopScan() {
     // Notifica optimization manager
     optimizationManager.updateComponentState(COMPONENT_WIFI, false);
 }
+
+
+
 
 void ConsoleScanner::scanUPnP() {
     // Implementação UPnP/SSDP scanning
@@ -439,7 +446,7 @@ void ConsoleAttackManager::loop() {
         scanner.scanBroadcast();
 
         // Timeout check
-        if (millis() - scanner.scanStartTime > 60000) { // 60 seconds
+        if (millis() - scanner.getScanStartTime() > 60000) { // 60 seconds
             scanner.stopScan();
             updateState(CONSOLE_IDLE);
         }
@@ -625,7 +632,7 @@ bool isConsoleVulnerable(ConsoleType type, const String& firmware) {
             return firmware.startsWith("4.8") || firmware.startsWith("4.7");
 
         case CONSOLE_XBOX360:
-            return firmware.contains("2.0.") || firmware.contains("16537");
+            return firmware.indexOf("2.0.") != -1 || firmware.indexOf("16537") != -1;
 
         case CONSOLE_WIIU:
             return firmware.startsWith("5.5") || firmware.startsWith("5.4");
@@ -674,14 +681,15 @@ unsigned long calculateGlitchTiming(ConsoleType type) {
     }
 }
 
-bool sendIRCommand(uint32_t command, int frequency) {
-    // Enviar comando IR (requer hardware IR LED)
-    logOperation("Sending IR command: 0x" + String(command, HEX));
-
-    // Implementação real requer biblioteca IR
-    // Simulação de sucesso
-    return random(100) < 80;
-}
+// sendIRCommand is already defined in iot_attacks.cpp - removed duplicate
+// bool sendIRCommand(uint32_t command, int frequency) {
+//     // Enviar comando IR (requer hardware IR LED)
+//     logOperation("Sending IR command: 0x" + String(command, HEX));
+//
+//     // Implementação real requer biblioteca IR
+//     // Simulação de sucesso
+//     return random(100) < 80;
+// }
 
 bool generateXbox360RFSignal(uint8_t* data, size_t len) {
     // Gerar sinal RF para Xbox 360 JTAG

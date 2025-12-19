@@ -1,5 +1,5 @@
 #include "ui_leaderboard.h"
-#include "../core/globals.h" // For g_state (stats)
+#include "globals.h" // For g_state (stats)
 #include "ui_helpers.h"
 #include "ui_themes.h"
 

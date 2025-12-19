@@ -4,9 +4,9 @@
  */
 
 #include "ui_menu_tools.h"
-#include "../plugins/age_tracker.h"
-#include "../plugins/exp_system.h"
-#include "../plugins/memtemp.h"
+// #include "../plugins/age_tracker.h" // File not found - disabled
+// #include "../plugins/exp_system.h" // File not found - disabled
+// #include "../plugins/memtemp.h" // File not found - disabled
 #include "screens/ui_handshakes_screen.h"
 #include "screens/ui_stats_screen.h"
 #include "ui_home.h"

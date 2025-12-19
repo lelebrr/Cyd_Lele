@@ -5,6 +5,14 @@
 #include "core/mykeyboard.h"
 #include "core/optimization_manager.h"
 
+static bool optimizedTimer(unsigned long *lastUpdate, unsigned long interval) {
+    if (millis() - *lastUpdate >= interval) {
+        *lastUpdate = millis();
+        return true;
+    }
+    return false;
+}
+
 // WiFi MITM and Portal Attacks
 
 // MITM with dnsspoof + ettercap simulation

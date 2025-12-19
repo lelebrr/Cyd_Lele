@@ -26,17 +26,20 @@
 Versão de baixo consumo do Bluetooth, projetada para dispositivos pequenos e IoT.
 
 **Diferença do Bluetooth clássico:**
+
 - Consome menos energia (bateria dura meses/anos)
 - Menor taxa de dados (~1 Mbps vs ~3 Mbps)
 - Alcance similar (~100m)
 
 **Onde é usado:**
+
 - Smartwatches, pulseiras fitness
 - AirPods, fones wireless
 - Sensores IoT, termômetros
 - Teclados e mouses Bluetooth
 
 **No Lele:**
+
 - Spam de advertising (Applejuice)
 - Emulação de teclado BLE
 - Scan de dispositivos
@@ -49,12 +52,14 @@ Versão de baixo consumo do Bluetooth, projetada para dispositivos pequenos e Io
 Tecnologia de rede sem fio baseada no padrão IEEE 802.11.
 
 **Frequências:**
+
 | Banda | Canais | Velocidade | Alcance |
 |-------|--------|------------|---------|
 | 2.4 GHz | 1-13 | até 600 Mbps | ~50m indoor |
 | 5 GHz | 36-165 | até 6.9 Gbps | ~30m indoor |
 
 **No Lele:**
+
 - Scan de redes
 - Ataques Deauth
 - Captura de handshakes
@@ -68,18 +73,21 @@ Tecnologia de rede sem fio baseada no padrão IEEE 802.11.
 Chip transceptor de rádio 2.4GHz fabricado pela Nordic Semiconductor.
 
 **Especificações:**
+
 - Frequência: 2.4-2.525 GHz (126 canais)
 - Taxa: 250 Kbps, 1 Mbps ou 2 Mbps
 - Alcance: 100m (NRF24L01+PA+LNA pode chegar a 1km)
 - Potência TX: até 0 dBm
 
 **Usos comuns:**
+
 - Drones e controles RC
 - Teclados/mouses wireless
 - Sensores sem fio
 - Comunicação entre Arduinos
 
 **No Lele:**
+
 - Spectrum analyzer
 - Jammer 2.4 GHz
 - MouseJack (ataque a mouses wireless)
@@ -93,6 +101,7 @@ Chip transceptor de rádio 2.4GHz fabricado pela Nordic Semiconductor.
 Ondas eletromagnéticas usadas para transmitir dados sem fio.
 
 **Faixas comuns:**
+
 | Frequência | Nome | Uso típico |
 |------------|------|------------|
 | 315 MHz | ISM | Controles remotos (EUA/Ásia) |
@@ -101,6 +110,7 @@ Ondas eletromagnéticas usadas para transmitir dados sem fio.
 | 915 MHz | ISM | IoT, LoRa (EUA/Brasil) |
 
 **No Lele:**
+
 - Captura de sinais RF
 - Replay de códigos
 - Bruteforce de controles
@@ -114,6 +124,7 @@ Ondas eletromagnéticas usadas para transmitir dados sem fio.
 Frequências de rádio abaixo de 1 GHz (sub-gigahertz).
 
 **Vantagens:**
+
 - Maior alcance que 2.4 GHz
 - Penetra melhor em paredes
 - Menos interferência
@@ -132,6 +143,7 @@ Luz invisível com comprimento de onda maior que a luz vermelha (700nm-1mm).
 LED IR pisca rapidamente em padrões específicos. Receptor interpreta os padrões como comandos.
 
 **Protocolos comuns:**
+
 | Protocolo | Fabricante | Bits |
 |-----------|------------|------|
 | NEC | LG, Samsung, genéricos | 32 |
@@ -140,6 +152,7 @@ LED IR pisca rapidamente em padrões específicos. Receptor interpreta os padrõ
 | RC6 | Microsoft MCE | 16+ |
 
 **No Lele:**
+
 - TV-B-Gone (desliga TVs)
 - Captura e replay de comandos
 - IR Jammer
@@ -152,11 +165,13 @@ LED IR pisca rapidamente em padrões específicos. Receptor interpreta os padrõ
 Protocolo de rede mesh para IoT, opera em 2.4 GHz.
 
 **Características:**
+
 - Baixo consumo de energia
 - Suporta milhares de dispositivos em rede mesh
 - Taxa: 250 Kbps
 
 **Onde é usado:**
+
 - Lâmpadas inteligentes (Philips Hue, IKEA)
 - Sensores de casa inteligente
 - Automação industrial
@@ -171,6 +186,7 @@ Protocolo de rede mesh para IoT, opera em 2.4 GHz.
 Formato padrão para armazenar dados em tags NFC.
 
 **Estrutura:**
+
 ```
 NDEF Message
 ├── Record 1 (ex: URL)
@@ -179,14 +195,16 @@ NDEF Message
 ```
 
 **Tipos de registro:**
+
 | Tipo | Descrição | Exemplo |
 |------|-----------|---------|
-| URI | Link | https://google.com |
+| URI | Link | <https://google.com> |
 | Text | Texto simples | "Olá mundo" |
 | Smart Poster | URL + título | "Site - https://..." |
 | vCard | Contato | Nome, telefone, email |
 
 **No Lele:**
+
 - Ler dados NDEF de cartões
 - Escrever NDEF em tags
 
@@ -198,6 +216,7 @@ NDEF Message
 Protocolos de segurança para redes WiFi.
 
 **Evolução:**
+
 | Versão | Ano | Criptografia | Segurança |
 |--------|-----|--------------|-----------|
 | WEP | 1997 | RC4 | ❌ Quebrável em minutos |
@@ -206,6 +225,7 @@ Protocolos de segurança para redes WiFi.
 | WPA3 | 2018 | SAE | ✅✅ Mais seguro |
 
 **No Lele:**
+
 - Exibe tipo de criptografia no scan
 - Captura handshakes WPA/WPA2
 
@@ -217,15 +237,18 @@ Protocolos de segurança para redes WiFi.
 Sistema para conectar dispositivos WiFi sem digitar senha.
 
 **Métodos:**
+
 1. **PIN**: Digita 8 dígitos
 2. **Push Button**: Aperta botão no roteador
 3. **NFC**: Aproxima dispositivo
 
 **Vulnerabilidades:**
+
 - PIN pode ser descoberto em ~4 horas (Reaver)
 - Pixie Dust extrai PIN em segundos (alguns modelos)
 
 **No Lele:**
+
 - Scan de redes com WPS
 - Tentativa de Pixie Dust
 - PIN Flood DoS
@@ -238,6 +261,7 @@ Sistema para conectar dispositivos WiFi sem digitar senha.
 Protocolo usado na autenticação WPA/WPA2.
 
 **4-Way Handshake:**
+
 ```
 1. AP → Cliente: ANonce
 2. Cliente → AP: SNonce + MIC
@@ -249,6 +273,7 @@ Protocolo usado na autenticação WPA/WPA2.
 Capturando o handshake, é possível tentar quebrar a senha offline.
 
 **No Lele:**
+
 - Sniffer filtra pacotes EAPOL
 - Conta handshakes capturados
 
@@ -266,6 +291,7 @@ Pode ser capturado SEM cliente conectado (basta enviar association request).
 No primeiro pacote EAPOL (message 1).
 
 **No Lele:**
+
 - Captura PMKID Attack
 - Salva para crack offline
 
@@ -277,6 +303,7 @@ No primeiro pacote EAPOL (message 1).
 Pacote WiFi enviado pelo roteador anunciando a rede.
 
 **Contém:**
+
 - SSID (nome da rede)
 - BSSID (MAC do AP)
 - Canal
@@ -287,6 +314,7 @@ Pacote WiFi enviado pelo roteador anunciando a rede.
 ~10 beacons/segundo por rede.
 
 **No Lele:**
+
 - Beacon Spam (cria redes falsas)
 - Conta beacons no sniffer
 
@@ -298,6 +326,7 @@ Pacote WiFi enviado pelo roteador anunciando a rede.
 Pacote WiFi que força desconexão de um cliente.
 
 **Como funciona:**
+
 ```
 [Pacote Deauth]
 ├── Tipo: Management Frame (0x00)
@@ -308,11 +337,13 @@ Pacote WiFi que força desconexão de um cliente.
 ```
 
 **Usos:**
+
 - Forçar reconexão (para capturar handshake)
 - Denial of Service
 - Expulsar dispositivos da rede
 
 **No Lele:**
+
 - Deauth direcionado
 - Deauth Flood (broadcast)
 
@@ -333,6 +364,7 @@ AP responde: "Sim, sou a rede X!"
 Dispositivos enviam probes com SSIDs conhecidos, revelando redes salvas.
 
 **No Lele:**
+
 - Karma Attack (responde a qualquer probe)
 - Sniffer de probes
 
@@ -346,11 +378,13 @@ Dispositivos enviam probes com SSIDs conhecidos, revelando redes salvas.
 Chip fabricado pela NXP para comunicação NFC/RFID.
 
 **Especificações:**
+
 - Frequência: 13.56 MHz
 - Protocolos: ISO14443A/B, FeliCa, Mifare
 - Interfaces: I2C, SPI, UART
 
 **Modos de operação:**
+
 | Modo | Função |
 |------|--------|
 | Reader | Lê cartões |
@@ -359,6 +393,7 @@ Chip fabricado pela NXP para comunicação NFC/RFID.
 | P2P | Comunicação entre dispositivos |
 
 **No Lele:**
+
 - PN532 I2C (pinos SDA/SCL)
 - PN532 SPI (pinos MOSI/MISO/CLK/CS)
 - PN532 UART (pinos TX/RX)
@@ -371,6 +406,7 @@ Chip fabricado pela NXP para comunicação NFC/RFID.
 Chip RFID de baixo custo fabricado pela NXP.
 
 **Diferença do PN532:**
+
 | | RC522 | PN532 |
 |-|-------|-------|
 | Preço | ~R$10 | ~R$40 |
@@ -389,12 +425,14 @@ Menu RFID detecta automaticamente qual módulo está conectado.
 Chip transceptor SubGHz fabricado pela Texas Instruments.
 
 **Especificações:**
+
 - Frequência: 300-928 MHz
 - Modulação: ASK, OOK, FSK, GFSK, MSK
 - Potência TX: -30 a +10 dBm
 - Sensibilidade: -116 dBm
 
 **Vantagem sobre TX/RX genérico:**
+
 - Maior alcance
 - Melhor filtro de ruído
 - Mais configurável
@@ -410,6 +448,7 @@ Indicador "(CC1101)" aparece no menu RF se detectado.
 Microcontrolador fabricado pela Espressif com WiFi e Bluetooth integrados.
 
 **Especificações do modelo no Lele (CYD-2USB):**
+
 | Spec | Valor |
 |------|-------|
 | CPU | Dual-core Xtensa 240 MHz |
@@ -427,6 +466,7 @@ Microcontrolador fabricado pela Espressif com WiFi e Bluetooth integrados.
 Pinos do microcontrolador que podem ser configurados como entrada ou saída.
 
 **Modos:**
+
 | Modo | O que faz |
 |------|-----------|
 | INPUT | Lê estado (HIGH/LOW) |
@@ -445,6 +485,7 @@ Você pode configurar qual GPIO é usado para RF TX, RF RX, IR TX, IR RX.
 Interface serial para comunicação entre dispositivos.
 
 **Pinos:**
+
 | Pino | Função |
 |------|--------|
 | TX | Transmit (envia dados) |
@@ -452,12 +493,14 @@ Interface serial para comunicação entre dispositivos.
 | GND | Ground (terra comum) |
 
 **Configuração típica:**
+
 - Baud rate: 9600, 115200 (comum)
 - Data bits: 8
 - Stop bits: 1
 - Parity: None (8N1)
 
 **No Lele:**
+
 - PN532 UART
 - GPS UART
 - Debug Serial
@@ -470,6 +513,7 @@ Interface serial para comunicação entre dispositivos.
 Interface serial síncrona de alta velocidade.
 
 **Pinos:**
+
 | Pino | Nome | Função |
 |------|------|--------|
 | MOSI | Master Out Slave In | Dados master → slave |
@@ -478,10 +522,12 @@ Interface serial síncrona de alta velocidade.
 | CS/SS | Chip Select | Seleciona dispositivo |
 
 **Vantagem sobre I2C:**
+
 - Mais rápido (MHz vs kHz)
 - Full-duplex (envia e recebe simultâneo)
 
 **No Lele:**
+
 - Display TFT (SPI)
 - SD Card (SPI)
 - NRF24 (SPI)
@@ -495,6 +541,7 @@ Interface serial síncrona de alta velocidade.
 Interface serial com apenas 2 fios.
 
 **Pinos:**
+
 | Pino | Função |
 |------|--------|
 | SDA | Serial Data (dados) |
@@ -507,6 +554,7 @@ Cada dispositivo tem endereço único (0x00 a 0x7F).
 Múltiplos dispositivos no mesmo barramento.
 
 **No Lele:**
+
 - PN532 (I2C)
 - Sensores (DS18B20 via OneWire, similar)
 
@@ -518,11 +566,13 @@ Múltiplos dispositivos no mesmo barramento.
 Sensor digital de temperatura com interface 1-Wire.
 
 **Especificações:**
+
 - Faixa: -55°C a +125°C
 - Precisão: ±0.5°C (entre -10°C e +85°C)
 - Resolução: 9-12 bits configurável
 
 **No Lele:**
+
 - Monitor de temperatura
 - Alerta de superaquecimento
 
@@ -534,11 +584,13 @@ Sensor digital de temperatura com interface 1-Wire.
 LEDs RGB endereçáveis individualmente (NeoPixel).
 
 **Características:**
+
 - Cada LED tem chip controlador interno
 - Alimentação: 5V
 - 3 bytes por LED (R, G, B)
 
 **No Lele:**
+
 - Efeitos de iluminação
 - Feedback visual de ataques
 
@@ -552,6 +604,7 @@ LEDs RGB endereçáveis individualmente (NeoPixel).
 Dispositivo que emite ruído para bloquear comunicações.
 
 **Tipos no Lele:**
+
 | Alvo | Frequência | Efeito |
 |------|------------|--------|
 | WiFi Jammer | 2.4 GHz | Bloqueia WiFi e BLE |
@@ -570,6 +623,7 @@ Uso de jammers é ILEGAL em muitos países. Apenas para fins educacionais.
 Envio massivo de pacotes/mensagens para sobrecarregar ou irritar.
 
 **Tipos no Lele:**
+
 | Ataque | Alvo | Efeito |
 |--------|------|--------|
 | BLE Spam | iOS/Android/Windows | Popups infinitos |
@@ -584,6 +638,7 @@ Envio massivo de pacotes/mensagens para sobrecarregar ou irritar.
 Rede WiFi falsa com mesmo nome de uma legítima.
 
 **Como funciona:**
+
 1. Cria AP com SSID igual ao alvo
 2. Desautentica clientes do original
 3. Clientes conectam no falso
@@ -600,6 +655,7 @@ Clone AP → cria o Evil Twin
 Página de login falsa para capturar credenciais.
 
 **Fluxo:**
+
 1. Vítima conecta no WiFi
 2. Ao abrir navegador, vê página de login
 3. Pensa que é o WiFi do hotel/aeroporto
@@ -607,6 +663,7 @@ Página de login falsa para capturar credenciais.
 5. Credenciais enviadas para atacante
 
 **Templates no Lele:**
+
 - Google
 - Facebook
 - Hotel WiFi
@@ -624,6 +681,7 @@ Ataque que explora o protocolo de pareamento da Apple.
 Envia pacotes BLE fingindo ser AirPods. iPhone próximos mostram popup de pareamento infinitamente.
 
 **Variantes:**
+
 | Nome | Efeito |
 |------|--------|
 | Applejuice | Popup AirPods |
@@ -700,6 +758,7 @@ Endereço numérico que identifica dispositivo na rede.
 **IPv4:**
 Formato: `192.168.1.100`
 Ranges privados:
+
 - 10.0.0.0/8
 - 172.16.0.0/12
 - 192.168.0.0/16
@@ -715,6 +774,7 @@ Endereço físico único de cada interface de rede.
 `AA:BB:CC:DD:EE:FF` (6 bytes em hexadecimal)
 
 **Estrutura:**
+
 - Primeiros 3 bytes: OUI (fabricante)
 - Últimos 3 bytes: Identificador único
 
@@ -747,12 +807,14 @@ ARP Scan descobre dispositivos na rede local.
 ## TCP/UDP
 
 **TCP:**
+
 - Conexão estabelecida
 - Garantia de entrega
 - Ordenação de pacotes
 - Mais lento
 
 **UDP:**
+
 - Sem conexão
 - Sem garantia de entrega
 - Mais rápido
@@ -802,11 +864,13 @@ Algoritmo de criptografia simétrica usado no WPA2.
 Função que transforma dados em string de tamanho fixo.
 
 **Propriedades:**
+
 - Mesmo input = mesmo output (sempre)
 - Diferente input = diferente output (idealmente)
 - Impossível reverter
 
 **Algoritmos comuns:**
+
 | Algoritmo | Bits | Exemplo |
 |-----------|------|---------|
 | MD5 | 128 | `d41d8cd98f00b204e9800998ecf8427e` |
@@ -847,6 +911,7 @@ Software permanente gravado no chip. É o "sistema operacional" do dispositivo.
 Sistema numérico base 16 (0-9, A-F).
 
 **Conversão:**
+
 ```
 Decimal  Hex    Binário
 0        0x00   00000000
@@ -881,6 +946,7 @@ Quando pacote WiFi chega, callback do sniffer é chamada.
 Unidade de potência usada em telecomunicações.
 
 **Escala (WiFi):**
+
 | dBm | Qualidade |
 |-----|-----------|
 | -30 a -50 | Excelente |
@@ -943,6 +1009,7 @@ Emulação de Amiibos no Lele.
 Dispositivo USB de emulação RFID.
 
 **Modelos:**
+
 - Chameleon Mini
 - Chameleon Tiny
 
@@ -967,6 +1034,7 @@ Versão integrada com 200+ códigos.
 Linguagem de script para BadUSB (USB Rubber Ducky).
 
 **Comandos básicos:**
+
 ```
 STRING Hello World    → Digita texto
 DELAY 1000           → Espera 1 segundo
@@ -992,6 +1060,7 @@ Wireshark
 Primeiros 3 bytes do MAC address que identificam o fabricante.
 
 **Exemplos:**
+
 | OUI | Fabricante |
 |-----|------------|
 | 00:50:56 | VMware |
@@ -1001,4 +1070,4 @@ Primeiros 3 bytes do MAC address que identificam o fabricante.
 
 ---
 
-*Documento gerado pelo Lele Origin Team - v1.0*
+*Documentação Lele Origin - v1.0*

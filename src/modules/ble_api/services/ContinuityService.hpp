@@ -6,6 +6,7 @@
 class ContinuityCallbacks;
 
 class ContinuityService : public LeleBLEService {
+    friend class ContinuityCallbacks;
     NimBLECharacteristic *title_char = nullptr;
     NimBLECharacteristic *message_char = nullptr;
     NimBLECharacteristic *deeplink_char = nullptr;

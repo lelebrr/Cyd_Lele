@@ -239,4 +239,30 @@ extern inline bool check(volatile bool &btn) {
 #endif
 }
 
+struct GlobalState {
+    bool wifi_enabled = true;
+    int mascot_type = 1;
+    long handshakes_captured = 0;
+    bool ble_enabled = false;
+    bool voice_enabled = false;
+    int battery_percent = 100;
+    bool is_charging = false;
+    bool mascot_enabled = true;
+    bool chatgpt_enabled = false;
+    char openai_voice[64] = "";
+    char openai_model[64] = "gpt-3.5-turbo";
+    char openai_api_key[256] = "";
+    bool wps_pixie_auto = false;
+    bool wps_bruteforce = false;
+    int wps_flood_intensity = 0;
+    int rogue_ap_count = 0;
+    bool auto_capture_new_only = false;
+    bool auto_save_pcap = false;
+    bool auto_attack_favorites = false;
+    bool insane_mode_enabled = false;
+    int current_theme = 0;
+};
+
+extern GlobalState g_state;
+
 #endif

@@ -166,7 +166,7 @@ void OptimizationManager::setMode(OptimizationMode mode) {
             currentConfig.cpuFrequency = 40;
             currentConfig.wifiPower = 2;
             currentConfig.wifiSleep = true;
-            currentConfig.blePower = ESP_PWR_LVL_P0;
+            currentConfig.blePower = ESP_PWR_LVL_N0;
             currentConfig.bleSleep = true;
             currentConfig.displayDim = true;
             currentConfig.rfLowPower = true;
@@ -240,16 +240,17 @@ void* OptimizationManager::allocateOptimized(size_t size) {
 String OptimizationManager::getPerformanceMetrics() {
     char metrics[512];
     snprintf(metrics, sizeof(metrics),
-        "CPU: %d MHz | WiFi: %d dBm | BLE: %d | "
-        "Mem: %d/%d KB | PSRAM: %d KB | Buffers: %d/%d",
-        currentConfig.cpuFrequency,
-        currentConfig.wifiPower,
-        currentConfig.blePower,
-        memoryUsed / 1024,
-        ESP.getHeapSize() / 1024,
-        psramUsed / 1024,
-        bufferPool.getAvailableBuffers(),
-        10); // MAX_BUFFERS
+        "CPU: %lu MHz | WiFi: %u dBm | BLE: %u | "
+        "Mem: %lu/%lu KB | PSRAM: %lu KB | Buffers: %lu/%lu",
+        (unsigned long)currentConfig.cpuFrequency,
+        (unsigned int)currentConfig.wifiPower,
+        (unsigned int)currentConfig.blePower,
+        (unsigned long)memoryUsed / 1024,
+        (unsigned long)ESP.getHeapSize() / 1024,
+        (unsigned long)psramUsed / 1024,
+        (unsigned long)bufferPool.getAvailableBuffers(),
+        (unsigned long)bufferPool.getMaxBuffers());
+
 
     return String(metrics);
 }

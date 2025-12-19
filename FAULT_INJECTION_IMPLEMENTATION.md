@@ -447,7 +447,7 @@ GlitchResult result = faultInjectionManager->performGlitch();
 
 #### **Educação e Pesquisa**
 
-- TCC sobre hardware security
+- Pesquisa sobre hardware security
 - Demonstrações de ataques side-channel
 - Ensino de embedded security
 

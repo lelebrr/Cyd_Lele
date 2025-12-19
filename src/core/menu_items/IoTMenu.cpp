@@ -413,11 +413,9 @@ void IoTMenu::drawIcon(float scale) {
 }
 
 void IoTMenu::drawIconImg() {
-    if (leleConfig.theme.paths.iot != "") {
-         drawImg(*leleConfig.themeFS(), leleConfig.getThemeItemImg(leleConfig.theme.paths.iot), 0, imgCenterY, true);
-    }
+    // Theme not supported yet
 }
 
 bool IoTMenu::getTheme() { 
-    return leleConfig.theme.apps.iot; 
+    return false;
 }

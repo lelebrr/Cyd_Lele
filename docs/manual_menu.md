@@ -1217,4 +1217,4 @@ Confirme digitando "RESET" no teclado.
 
 ---
 
-*Documento gerado pelo Lele Origin Team - v2.0 Ultra-Detalhado*
+*Documentação Lele Origin - v2.0 Ultra-Detalhado*

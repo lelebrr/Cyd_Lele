@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
  * WAVEPWN - Main Application Entry Point
  * ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initEasterEggs();
         initGlitchButtons();
         initCharts();
+        initTerminal(); // NEW: Interactive Terminal
+        simulateTraffic(); // NEW: Fake traffic for visuals
 
         // Show initial view
         showView('dashboard');
@@ -67,6 +69,281 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('[Lele] Initialization complete!');
     });
 });
+
+// ==========================================
+// FAULT INJECTION (POCKET GLITCHER)
+// ==========================================
+function updateFiSettings() {
+    const target = document.getElementById('fi-target').value;
+    const desc = document.getElementById('fi-desc');
+    const delay = document.getElementById('fi-delay');
+    const pulse = document.getElementById('fi-pulse');
+
+    // Presets based on research
+    if (target === 'switch_rcm') {
+        desc.innerText = "Glitch VCore durante bootrom para entrar em RCM.";
+        delay.value = 100; pulse.value = 50;
+    } else if (target === 'iphone_checkm8') {
+        desc.innerText = "Glitch USB stack para Checkm8 exploit (A8-A11).";
+        delay.value = 200; pulse.value = 40;
+    } else if (target === 'car_keyless') {
+        desc.innerText = "Glitch Keeloq/Rolling Code resync.";
+        delay.value = 50; pulse.value = 20;
+    }
+}
+
+function setFiTrigger(type) {
+    alert(`Gatilho configurado para: ${type.toUpperCase()}`);
+    sendCommand('fi_set_trigger', { type: type });
+}
+
+function armFaultInjection() {
+    const delay = document.getElementById('fi-delay').value;
+    const pulse = document.getElementById('fi-pulse').value; // Corrected: .value was missing
+
+    document.body.classList.add('glitch-active');
+    setTimeout(() => document.body.classList.remove('glitch-active'), 500);
+
+    sendCommand('fi_arm', { delay: delay, pulse: pulse });
+    alert('⚡ SISTEMA ARMADO! Cuidado com alta tensão.');
+}
+
+// ==========================================
+// INTERACTIVE TERMINAL
+// ==========================================
+function initTerminal() {
+    const input = document.getElementById('cmd-input');
+    const output = document.getElementById('term-output');
+
+    if (!input || !output) return;
+
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value.trim().toLowerCase();
+            this.value = '';
+
+            // Echo command
+            printTerm(`> ${cmd}`, 'cmd-echo');
+
+            // Process
+            processCommand(cmd);
+        }
+    });
+
+    printTerm('LeleOS v2.0 - Terminal Access Granted', 'system');
+    printTerm('Type "help" for verified commands.', 'info');
+}
+
+function printTerm(text, type = '') {
+    const output = document.getElementById('term-output');
+    if (!output) return;
+
+    const line = document.createElement('div');
+    line.className = `term-line ${type}`;
+    line.textContent = text;
+    output.appendChild(line);
+    output.scrollTop = output.scrollHeight;
+}
+
+function processCommand(cmd) {
+    switch (cmd) {
+        case 'help':
+            printTerm('Available Commands:', 'info');
+            printTerm('  scan      - Scan for WiFi networks');
+            printTerm('  status    - Show system status');
+            printTerm('  clear     - Clear terminal');
+            printTerm('  matrix    - Toggle Matrix mode');
+            printTerm('  reboot    - Reboot system');
+            break;
+        case 'clear':
+            document.getElementById('term-output').innerHTML = '';
+            break;
+        case 'scan':
+            printTerm('Scanning for targets...', 'warning');
+            setTimeout(() => {
+                printTerm('[+] 12 targets found.', 'success');
+                printTerm('    - NET_ONE (-65dBm) [WPA2]', 'info');
+                printTerm('    - SKY_NET (-40dBm) [OPEN]', 'danger');
+            }, 1000);
+            break;
+        case 'status':
+            printTerm('CPU: 240MHz | RAM: 52% | BAT: 98%', 'info');
+            break;
+        case 'matrix':
+            toggleMatrixMode();
+            printTerm('The Matrix has you...', 'success');
+            break;
+        case 'reboot':
+            printTerm('Rebooting...', 'danger');
+            sendCommand('reboot');
+            break;
+        case 'nuke':
+            printTerm('ACCESS DENIED. Are you crazy?', 'danger');
+            break;
+        default:
+            printTerm(`Command not found: ${cmd}`, 'error');
+    }
+}
+
+// ==========================================
+// USB ATTACKS
+// ==========================================
+function usbPayload(type) {
+    const script = document.getElementById('ducky-script-sel').value;
+
+    if (type === 'disk_wipe') {
+        if (!confirm('⛔ PERIGO: Isso vai simular formatação. Tem certeza absoluta?')) return;
+    }
+
+    sendCommand('usb_payload', {
+        type: type,
+        script: script
+    });
+}
+
+function runDuckyScript() {
+    const script = document.getElementById('ducky-script-sel').value;
+    sendCommand('usb_ducky', { script: script });
+}
+
+// ==========================================
+// GAMING & AMIIBO
+// ==========================================
+function loadAmiibo() {
+    const amiibo = document.getElementById('amiibo-select').value;
+    sendCommand('nfc_amiibo_load', { file: amiibo });
+    alert(`🍄 Carregando ${amiibo}... Encoste no Joycon!`);
+}
+
+// ==========================================
+// NFC ADVANCED ATTACKS
+// ==========================================
+function nfcAttack(type) {
+    if (type.startsWith('pulse_')) {
+        if (!confirm('⚡ ALERTA: Pulse Injection usa alta frequência. Pode danificar o leitor ou o ESP32. Continuar?')) return;
+
+        // Visual feedback
+        const btn = event.srcElement; // Note: event.target is safer but srcElement works in most
+        if (btn) {
+            btn.classList.add('glitch-active');
+            setTimeout(() => btn.classList.remove('glitch-active'), 1000);
+        }
+    }
+
+    sendCommand('nfc_attack', { type: type });
+
+    if (type === 'fake_apple') {
+        alert('📱 Aproxime do iPhone alvo. Ele mostrará um cartão Apple Pay falso.');
+    }
+}
+
+
+// ==========================================
+// RF GATES ATTACKS
+// ==========================================
+function rfAttack(type) {
+    const protocol = document.getElementById('rf-protocol').value;
+
+    // Ghost Mode special handling
+    if (type === 'ghost_mode') {
+        const confirmGhost = confirm('👻 GHOST MODE: Isso vai gravar o próximo sinal e ficar repetindo aleatoriamente. Tem certeza?');
+        if (!confirmGhost) return;
+    }
+
+    // Jammer Warning
+    if (type === 'jam_433') {
+        if (!confirm('⚠️ ATENÇÃO: Jamming é ilegal. Use apenas em ambiente controlado. Continuar?')) return;
+        sendCommand('rf_jammer', { freq: 433.92 });
+        return;
+    }
+
+    // Standard commands
+    sendCommand('rf_gate_attack', {
+        type: type,
+        protocol: protocol
+    });
+}
+
+// ==========================================
+// ETHERNET ATTACKS
+// ==========================================
+function ethAttack(type) {
+    const output = document.getElementById('eth-output');
+    output.innerHTML += `<div>[>] Iniciando ${type}...</div>`;
+
+    // Send command
+    sendCommand('eth_attack', { type: type });
+
+    // Simulate initial feedback
+    setTimeout(() => {
+        if (type === 'arp_scan') {
+            output.innerHTML += `<div>[+] Scan iniciado. Aguardando hosts...</div>`;
+        }
+    }, 500);
+}
+// ==========================================
+// EASTER EGGS
+// ==========================================
+function initEasterEggs() {
+    let konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let current = 0;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === konami[current]) {
+            current++;
+            if (current === konami.length) {
+                activateKonamiMode();
+                current = 0;
+            }
+        } else {
+            current = 0;
+        }
+    });
+}
+
+function activateKonamiMode() {
+    alert('ðŸ‰ KONAMI CODE ACTIVATED! SUPER ADMIN MODE ENABLED ðŸ‰');
+    document.body.classList.add('super-admin');
+    playSound('kaChng');
+    // Unleash all particles
+    for (let i = 0; i < 50; i++) {
+        createParticle(window.innerWidth / 2, window.innerHeight / 2);
+    }
+}
+
+// Simulated Particles (Simple version if initParticles is missing or complex)
+function createParticle(x, y) {
+    const p = document.createElement('div');
+    p.style.position = 'fixed';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.width = '4px';
+    p.style.height = '4px';
+    p.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    p.style.borderRadius = '50%';
+    p.style.pointerEvents = 'none';
+    p.style.zIndex = '9999';
+    document.body.appendChild(p);
+
+    const destX = (Math.random() - 0.5) * 500;
+    const destY = (Math.random() - 0.5) * 500;
+
+    p.animate([
+        { transform: `translate(0,0)`, opacity: 1 },
+        { transform: `translate(${destX}px, ${destY}px)`, opacity: 0 }
+    ], {
+        duration: 1000,
+        easing: 'ease-out'
+    }).onfinish = () => p.remove();
+}
+
+function playSound(name) {
+    if (WavePwn && WavePwn.sounds && WavePwn.sounds[name]) {
+        WavePwn.sounds[name].currentTime = 0;
+        WavePwn.sounds[name].play().catch(e => { });
+    }
+}
+
 
 // ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
 // BOOT ANIMATION
@@ -708,13 +985,250 @@ function pwnEverything() {
 }
 
 // ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
+// ==========================================
+// SPA INTEGRATION LOGIC (Remote, Update, Theme)
+// ==========================================
+
+// --- REMOTE STREAM ---
+let streamInterval = null;
+const streamImg = document.getElementById('stream-screen');
+const streamCanvas = document.getElementById('stream-overlay');
+
+function toggleRemoteStream(enable) {
+    const wrapper = document.getElementById('remote-stream-wrapper');
+    const startBtn = document.getElementById('btn-start-stream');
+
+    if (enable) {
+        if (startBtn) startBtn.style.display = 'none';
+        if (wrapper) wrapper.style.display = 'block';
+        startStream();
+    } else {
+        if (startBtn) startBtn.style.display = 'block';
+        if (wrapper) wrapper.style.display = 'none';
+        stopStream();
+    }
+}
+
+function startStream() {
+    if (streamInterval) clearInterval(streamInterval);
+    const updateFrame = () => {
+        const streamImg = document.getElementById('stream-screen');
+        const remoteView = document.getElementById('remote-access');
+        const streamWrapper = document.getElementById('remote-stream-wrapper');
+
+        if (remoteView && remoteView.classList.contains('active') && streamWrapper && streamWrapper.style.display === 'block') {
+            if (streamImg) streamImg.src = '/stream?' + Date.now();
+        } else {
+            stopStream(); // Auto stop if view hidden
+        }
+    };
+
+    // Initial call
+    if (streamImg) {
+        streamImg.onload = () => setTimeout(updateFrame, 100); // 10 FPS target
+        streamImg.onerror = () => setTimeout(updateFrame, 1000); // Retry slow on error
+        // Trigger first load
+        streamImg.src = '/stream?' + Date.now();
+    }
+}
+
+function stopStream() {
+    const streamImg = document.getElementById('stream-screen');
+    if (streamImg) {
+        streamImg.onload = null;
+        streamImg.onerror = null;
+        streamImg.src = '';
+    }
+}
+
+// Touch Handling
+if (streamCanvas) {
+    streamCanvas.addEventListener('click', (e) => {
+        const rect = streamCanvas.getBoundingClientRect();
+        // Map click to 320x240 or whatever resolution the ESP32 uses (adjust 368/448 if needed based on original remote.html)
+        // Original remote.html used normalized coordinates? No, it used exact pixels. 
+        // Assuming standard ESP32-S3 touch resolution.
+        const x = Math.floor((e.clientX - rect.left) / rect.width * 320);
+        const y = Math.floor((e.clientY - rect.top) / rect.height * 240);
+
+        fetch(`/touch?x=${x}&y=${y}`);
+
+        // Visual feedback
+        const ripple = document.createElement('div');
+        ripple.style.position = 'absolute';
+        ripple.style.left = (e.clientX - rect.left) + 'px';
+        ripple.style.top = (e.clientY - rect.top) + 'px';
+        ripple.style.width = '20px';
+        ripple.style.height = '20px';
+        ripple.style.background = 'rgba(0,255,255,0.5)';
+        ripple.style.borderRadius = '50%';
+        ripple.style.transform = 'translate(-50%, -50%)';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.animation = 'ripple 0.5s linear'; // Needs CSS for ripple
+        streamCanvas.parentElement.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+    });
+}
+
+function sendTouch(action) {
+    // Helper for buttons below stream
+    fetch(`/touch_action?action=${action}`);
+}
+
+// --- IR REMOTE ---
+function changeDeviceType(type) {
+    // Hide all remotes
+    document.querySelectorAll('.ir-controls').forEach(el => el.style.display = 'none');
+
+    // Show selected
+    const selected = document.getElementById(`remote-${type}`);
+    if (selected) {
+        selected.style.display = 'block';
+    } else {
+        // Fallback to TV if type not found (e.g. fan/projector generic)
+        const tv = document.getElementById('remote-tv');
+        if (tv) tv.style.display = 'block';
+    }
+
+    console.log("Changed IR device to:", type);
+}
+
+function changeBrand(brand) {
+    console.log("Changed IR brand to:", brand);
+}
+
+function sendIR(cmd) {
+    sendCommand('ir', { command: cmd }); // Assuming backend support
+}
+
+
+// --- FIRMWARE UPDATE ---
+function uploadFirmware() {
+    const fileInput = document.getElementById('ota-file');
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Selecione um arquivo .bin primeiro!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("update", file);
+
+    const xhr = new XMLHttpRequest();
+    const progressBar = document.getElementById('ota-bar');
+    const statusDiv = document.getElementById('ota-status');
+    const progressWrapper = document.getElementById('ota-progress-wrapper');
+
+    if (progressWrapper) progressWrapper.style.display = 'block';
+    if (statusDiv) statusDiv.textContent = "Iniciando upload...";
+
+    xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable && progressBar && statusDiv) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = percent + "%";
+            statusDiv.textContent = `Enviando: ${percent}%`;
+        }
+    });
+
+    xhr.addEventListener("load", () => {
+        if (xhr.status === 200) {
+            if (statusDiv) statusDiv.textContent = "Sucesso! Reiniciando...";
+            if (progressBar) progressBar.style.background = "#00ff00";
+            setTimeout(() => location.reload(), 10000);
+        } else {
+            if (statusDiv) statusDiv.textContent = "Erro no upload.";
+            if (progressBar) progressBar.style.background = "#ff0000";
+        }
+    });
+
+    xhr.addEventListener("error", () => {
+        if (statusDiv) statusDiv.textContent = "Erro de conexão.";
+        if (progressBar) progressBar.style.background = "#ff0000";
+    });
+
+    xhr.open("POST", "/update"); // Usually /update endpoint for ESP32 OTA
+    xhr.send(formData);
+}
+
+
+// --- THEME EDITOR ---
+function updateLiveTheme() {
+    const root = document.documentElement;
+    const p = document.getElementById('theme-primary').value;
+    const s = document.getElementById('theme-secondary').value;
+    const bg = document.getElementById('theme-bg').value;
+    const txt = document.getElementById('theme-text').value;
+
+    root.style.setProperty('--primary', p);
+    root.style.setProperty('--secondary', s);
+    root.style.setProperty('--bg-dark', bg);
+    root.style.setProperty('--text-main', txt);
+
+    // Update preview
+    const mascot = document.getElementById('preview-mascot');
+    if (mascot) mascot.style.color = p;
+}
+
+function loadThemePreset(preset) {
+    const presets = {
+        cyberpunk: { p: '#00fff5', s: '#bd00ff', bg: '#0a0b10', t: '#e0e0e0' },
+        matrix: { p: '#00ff00', s: '#008800', bg: '#001100', t: '#00ff00' },
+        dracula: { p: '#ff79c6', s: '#bd93f9', bg: '#282a36', t: '#f8f8f2' },
+        neon: { p: '#ff0099', s: '#ffff00', bg: '#111111', t: '#ffffff' }
+    };
+
+    const colors = presets[preset];
+    if (colors) {
+        const elP = document.getElementById('theme-primary');
+        const elS = document.getElementById('theme-secondary');
+        const elBg = document.getElementById('theme-bg');
+        const elT = document.getElementById('theme-text');
+
+        if (elP) elP.value = colors.p;
+        if (elS) elS.value = colors.s;
+        if (elBg) elBg.value = colors.bg;
+        if (elT) elT.value = colors.t;
+
+        updateLiveTheme();
+    }
+}
+
+function saveCustomTheme() {
+    const theme = {
+        primary: document.getElementById('theme-primary').value,
+        secondary: document.getElementById('theme-secondary').value,
+        bg: document.getElementById('theme-bg').value,
+        text: document.getElementById('theme-text').value
+    };
+    // In a real app, send to backend. For now, save to local storage
+    localStorage.setItem('custom_theme', JSON.stringify(theme));
+    alert('Tema salvo (Local Storage)!');
+}
+
+function resetTheme() {
+    loadThemePreset('cyberpunk');
+}
+
+
 // EXPORTS
 // ââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Âââ¢Â
+// Export functions to window for HTML buttons
 window.WavePwn = WavePwn;
 window.showView = showView;
 window.setTheme = setTheme;
 window.toggleNightOps = toggleNightOps;
+window.toggleSidebar = toggleSidebar;
+window.loadView = loadView;
 window.sendCommand = sendCommand;
+window.rfAttack = rfAttack;
+window.ethAttack = ethAttack;
+window.usbPayload = usbPayload;
+window.runDuckyScript = runDuckyScript;
+window.loadAmiibo = loadAmiibo;
+window.armFaultInjection = armFaultInjection;
+window.setFiTrigger = setFiTrigger;
+window.updateFiSettings = updateFiSettings;
+window.nfcAttack = nfcAttack;
 window.startDeauth = startDeauth;
 window.startBeaconFlood = startBeaconFlood;
 window.startHandshakeCapture = startHandshakeCapture;
@@ -723,4 +1237,14 @@ window.pwnEverything = pwnEverything;
 window.toggleAmbientSound = toggleAmbientSound;
 window.toggleSidebar = toggleSidebar;
 window.closeSidebarOnNavClick = closeSidebarOnNavClick;
+window.toggleRemoteStream = toggleRemoteStream;
+window.uploadFirmware = uploadFirmware;
+window.updateLiveTheme = updateLiveTheme;
+window.loadThemePreset = loadThemePreset;
+window.saveCustomTheme = saveCustomTheme;
+window.resetTheme = resetTheme;
+window.sendTouch = sendTouch;
+window.sendIR = sendIR;
+window.changeDeviceType = changeDeviceType;
+window.changeBrand = changeBrand;
 

@@ -4,8 +4,8 @@
  */
 
 #include "ui_menu_voice.h"
-#include "../core/globals.h"
-#include "../voice/voice_assistant.h"
+#include "globals.h"
+// #include "../voice/voice_assistant.h" // File not found - disabled
 #include "ui_home.h"
 #include <debug_log.h>
 
@@ -28,7 +28,7 @@ static void btn_back_cb(lv_event_t *e) {
 
 static void btn_toggle_cb(lv_event_t *e) {
     g_state.voice_enabled = !g_state.voice_enabled;
-    voiceAssistant.setListening(g_state.voice_enabled);
+    // voiceAssistant.setListening(g_state.voice_enabled); // Not defined - disabled
 
     if (g_state.voice_enabled) {
         lv_obj_set_style_bg_color(_toggleBtn, VOICE_COLOR_ON, 0);
@@ -39,7 +39,7 @@ static void btn_toggle_cb(lv_event_t *e) {
     }
 }
 
-static void btn_test_cb(lv_event_t *e) { voiceAssistant.speak(TTS_HELLO); }
+static void btn_test_cb(lv_event_t *e) { /* voiceAssistant.speak(TTS_HELLO); */ LOG_UI("Test voice - disabled"); }
 
 static void btn_commands_cb(lv_event_t *e) { LOG_UI("Show commands list"); }
 

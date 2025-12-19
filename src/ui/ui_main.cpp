@@ -6,10 +6,10 @@
  */
 
 #include "ui_main.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "../hardware/system_hardware.h"
 #include "../hardware/wifi_driver.h"
-#include "../iot_pwn/iot_pwn_menu.h"
+// #include "../iot_pwn/iot_pwn_menu.h" // File not found - disabled
 #include "gesture_handler.h"
 #include "mascot_faces.h"
 #include "screens/ui_files_screen.h"
@@ -171,7 +171,7 @@ void ui_set_screen(UIScreen screen) {
         case UI_SCREEN_PLUGINS:
             // ui_plugins_show();
             return;
-        case UI_SCREEN_IOT_PWN: iot_pwn_menu_show(); return;
+        case UI_SCREEN_IOT_PWN: /* iot_pwn_menu_show(); */ return; // Function not defined
         default: target = scr_main; break;
     }
 

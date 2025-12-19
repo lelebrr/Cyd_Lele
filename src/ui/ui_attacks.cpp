@@ -345,7 +345,7 @@ void ui_attacks_refresh() {
     for (int i = 0; i < num_networks && i < 20; i++) {
         WiFiNetwork net = wifi_driver.getNetwork(i);
         char buf[48];
-        snprintf(buf, sizeof(buf), "%s (%ddBm)", net.ssid, net.rssi);
+        snprintf(buf, sizeof(buf), "%s (%lddBm)", net.ssid, (long)net.rssi);
 
         lv_obj_t *btn = lv_list_add_btn(list_networks, LV_SYMBOL_WIFI, buf);
         lv_obj_add_event_cb(btn, network_selected_cb, LV_EVENT_CLICKED, nullptr);

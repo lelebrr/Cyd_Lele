@@ -160,9 +160,11 @@ private:
     String currentPIN;
     int pinIndex;
     std::vector<String> pinList;
+    int attemptCount;
+    String calculateBSSIDPins(const String& bssidStr);
 
 public:
-    ReaverAttacker() : attacking(false), attackStartTime(0), pinIndex(0) {}
+    ReaverAttacker() : attacking(false), attackStartTime(0), pinIndex(0), attemptCount(0) {}
 
     /**
      * @brief Inicia ataque Reaver brute force
@@ -193,6 +195,16 @@ public:
      * @brief Obtém progresso do ataque (0-100)
      */
     int getAttackProgress() const;
+
+    /**
+     * @brief Verifica se está atacando
+     */
+    bool isAttacking() const { return attacking; }
+
+    /**
+     * @brief Obtém PIN atual
+     */
+    const String& getCurrentPIN() const { return currentPIN; }
 };
 
 /**
@@ -227,6 +239,9 @@ public:
      * @brief Verifica se está ativo
      */
     bool isActive() const { return active; }
+
+private:
+    String generateFakeBSSID(const String& realBSSID);
 };
 
 /**

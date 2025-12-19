@@ -44,7 +44,7 @@ private:
     lv_obj_t *_btnClear;
     lv_obj_t *_btnBack;
 
-    HandshakeData _handshakes[100];
+    HandshakeData _handshakes[32]; // Reduced from 100 to save ~6KB DRAM
     int _count;
 
     static void onExportClick(lv_event_t *e);

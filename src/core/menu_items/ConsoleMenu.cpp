@@ -113,7 +113,7 @@ static void switchAttackEvent(lv_event_t* e) {
 static void micBleedAttackEvent(lv_event_t* e) {
     lv_event_code_t code = lv_event_get_code(e);
     if (code == LV_EVENT_CLICKED) {
-        String command = keyboard("Voice Command", "open_settings\ndisable_firewall\ngo_to_config", "open_settings");
+        String command = keyboard("open_settings", 200, "Voice Command");
 
         displayInfo("Starting microphone bleed attack...", false);
 
@@ -140,7 +140,7 @@ static void consoleSelectEvent(lv_event_t* e) {
         lv_obj_t* btn = lv_event_get_target(e);
         uint32_t idx = lv_obj_get_index(btn);
 
-        auto& consoles = consoleAttackManager.getNetworks();
+        auto& consoles = consoleAttackManager.getConsoles();
         if (idx < consoles.size()) {
             consoleAttackManager.selectTarget(consoles[idx]);
             displaySuccess("Target: " + consoles[idx].model, true);
@@ -166,7 +166,7 @@ void updateConsoleMenu() {
     if (!consoleMenuActive || !consoleScreen) return;
 
     // Atualiza lista de consoles
-    auto& consoles = consoleAttackManager.getNetworks();
+    auto& consoles = consoleAttackManager.getConsoles();
 
     // Limpa lista atual
     lv_obj_clean(consoleList);
@@ -362,13 +362,9 @@ void ConsoleMenu::drawIcon(float scale) {
 }
 
 void ConsoleMenu::drawIconImg() {
-    // Assuming apps.console maps to a path in leleConfig or check config manually
-    // For now try generic logic or comment out if unsure of strict structure
-    if (leleConfig.theme.paths.console != "") {
-         drawImg(*leleConfig.themeFS(), leleConfig.getThemeItemImg(leleConfig.theme.paths.console), 0, imgCenterY, true);
-    }
+    // Theme not supported yet
 }
 
 bool ConsoleMenu::getTheme() { 
-    return leleConfig.theme.apps.console; 
+    return false;
 }

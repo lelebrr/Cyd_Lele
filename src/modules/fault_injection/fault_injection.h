@@ -200,6 +200,7 @@ public:
     LaserGlitcher* getLaser() { return laser; }
     CrowbarGlitcher* getCrowbar() { return crowbar; }
     RFTrigger* getRFTrigger() { return rfTrigger; }
+    QueueHandle_t getResultQueue() { return resultQueue; }
 
     // Target-specific methods
     bool glitchSwitchRCM();

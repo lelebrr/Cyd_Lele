@@ -29,7 +29,7 @@ void rf_ghost_replay() {
 
     // PHASE 1: CAPTURE
     while (!captured && !check(AnyKeyPress)) {
-        if (ELECHOUSE_cc1101.CheckRxFifo()) {
+        if (ELECHOUSE_cc1101.CheckRxFifo(100)) {
             codeLength = ELECHOUSE_cc1101.ReceiveData(capturedCode);
             if (codeLength > 0) {
                 captured = true;

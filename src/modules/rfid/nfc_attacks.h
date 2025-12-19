@@ -1,6 +1,6 @@
 #pragma once
 
-// NFC Attack Functions for Pentest TCC - Advanced Pulse Injection
+// NFC Attack Functions - Advanced Pulse Injection Techniques
 
 // Traditional attacks
 void nfc_clone_card();

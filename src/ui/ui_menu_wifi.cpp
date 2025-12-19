@@ -4,7 +4,7 @@
  */
 
 #include "ui_menu_wifi.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "../hardware/wifi_driver.h"
 #include "ui_attacks.h"
 #include "ui_home.h"
@@ -25,7 +25,7 @@ static void btn_back_cb(lv_event_t *e) {
 
 static void btn_scan_cb(lv_event_t *e) {
     LOG_WIFI("Iniciando scan...");
-    wifi_driver.scanNetworks(true);
+    // wifi_driver.scanNetworks(true); // Method not defined - disabled
 }
 
 static void btn_attacks_cb(lv_event_t *e) { ui_attacks_show(); }

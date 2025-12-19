@@ -1,5 +1,5 @@
 #include "wallpaper_system.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include <FS.h>
 #include <PNGdec.h> // Include at top
 #include <SD_MMC.h>

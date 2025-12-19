@@ -4,8 +4,8 @@
  */
 
 #include "ui_menu_ai.h"
-#include "../ai/neura9_inference.h"
-#include "../core/globals.h"
+// #include "../ai/neura9_inference.h" // File not found - disabled
+#include "globals.h"
 #include "ui_home.h"
 #include <debug_log.h>
 

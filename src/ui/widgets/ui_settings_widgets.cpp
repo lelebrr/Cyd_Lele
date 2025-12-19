@@ -4,7 +4,7 @@
  */
 
 #include "ui_settings_widgets.h"
-#include "../../core/globals.h"
+#include "globals.h"
 #include "../../core/pin_definitions.h"
 #include "../ui_themes.h"
 

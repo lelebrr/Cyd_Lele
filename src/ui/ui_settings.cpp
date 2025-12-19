@@ -13,7 +13,7 @@
  */
 
 #include "ui_settings.h"
-#include "../core/globals.h"
+#include "globals.h"
 #include "../hardware/audio_driver.h"
 #include "ui_helpers.h"
 #include "ui_main.h"
